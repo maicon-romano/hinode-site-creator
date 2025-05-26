@@ -1,8 +1,8 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from 'firebase/auth';
+import { User, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
+import { initializeApp } from 'firebase/app';
 
 export interface UserData {
   uid: string;
@@ -46,18 +46,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const createUser = async (email: string, password: string, role: 'admin' | 'cliente', name?: string) => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-    
-    const newUserData: UserData = {
-      uid: user.uid,
-      email: user.email!,
-      role,
-      name,
-      createdAt: new Date()
+    // Create a separate Firebase Auth instance to avoid logging out the current user
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2U6gnrapNB4Trhrzxs6Y3L5dlPz5KP9M",
+      authDomain: "create-site-original.firebaseapp.com",
+      projectId: "create-site-original",
+      storageBucket: "create-site-original.firebasestorage.app",
+      messagingSenderId: "324185614412",
+      appId: "1:324185614412:web:ba3f60c0ee85ba58226ce9",
+      measurementId: "G-4YNKQ1JEKN"
     };
+    
+    const secondaryApp = initializeApp(firebaseConfig, 'secondary');
+    const secondaryAuth = getAuth(secondaryApp);
+    
+    try {
+      const userCredential = await createUserWithEmailAndPassword(secondaryAuth, email, password);
+      const user = userCredential.user;
+      
+      const newUserData: UserData = {
+        uid: user.uid,
+        email: user.email!,
+        role,
+        name,
+        createdAt: new Date()
+      };
 
-    await setDoc(doc(db, 'users', user.uid), newUserData);
+      await setDoc(doc(db, 'users', user.uid), newUserData);
+      
+      // Sign out from the secondary auth instance
+      await signOut(secondaryAuth);
+      
+      // Delete the secondary app instance
+      await secondaryApp.delete();
+      
+    } catch (error) {
+      // Clean up the secondary app even if there's an error
+      try {
+        await signOut(secondaryAuth);
+        await secondaryApp.delete();
+      } catch (cleanupError) {
+        console.error('Error cleaning up secondary app:', cleanupError);
+      }
+      throw error;
+    }
   };
 
   const fetchUserData = async (user: User) => {
