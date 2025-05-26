@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
-import { initializeApp } from 'firebase/app';
+import { initializeApp, deleteApp } from 'firebase/app';
 
 export interface UserData {
   uid: string;
@@ -78,13 +78,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await signOut(secondaryAuth);
       
       // Delete the secondary app instance
-      await secondaryApp.delete();
+      await deleteApp(secondaryApp);
       
     } catch (error) {
       // Clean up the secondary app even if there's an error
       try {
         await signOut(secondaryAuth);
-        await secondaryApp.delete();
+        await deleteApp(secondaryApp);
       } catch (cleanupError) {
         console.error('Error cleaning up secondary app:', cleanupError);
       }
