@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -46,6 +45,7 @@ const ManageSites = () => {
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSite, setEditingSite] = useState<SiteData | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const form = useForm<SiteForm>({
@@ -64,18 +64,37 @@ const ManageSites = () => {
 
   const fetchSites = async () => {
     try {
+      setError(null);
+      console.log('Tentando carregar sites...');
+      
       const sitesCollection = collection(db, 'sites');
       const sitesSnapshot = await getDocs(sitesCollection);
-      const sitesList = sitesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as SiteData));
+      const sitesList = sitesSnapshot.docs.map(doc => {
+        const data = {
+          id: doc.id,
+          ...doc.data()
+        } as SiteData;
+        console.log('Site carregado:', data);
+        return data;
+      });
+      
       setSites(sitesList);
-    } catch (error) {
+      console.log('Total de sites carregados:', sitesList.length);
+    } catch (error: any) {
       console.error('Erro ao carregar sites:', error);
+      
+      let errorMessage = "Não foi possível carregar os sites";
+      
+      if (error.code === 'permission-denied') {
+        errorMessage = "Permissão negada. Verifique as regras de segurança do Firestore.";
+      } else if (error.code === 'unavailable') {
+        errorMessage = "Serviço temporariamente indisponível. Tente novamente.";
+      }
+      
+      setError(errorMessage);
       toast({
         title: "Erro",
-        description: "Não foi possível carregar os sites",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -360,6 +379,13 @@ const ManageSites = () => {
             {loading ? (
               <div className="flex justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : error ? (
+              <div className="text-center py-8">
+                <p className="text-red-600 mb-4">{error}</p>
+                <Button onClick={fetchSites} variant="outline">
+                  Tentar Novamente
+                </Button>
               </div>
             ) : (
               <Table>

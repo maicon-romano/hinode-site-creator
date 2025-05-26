@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -27,6 +26,7 @@ const ManageUsers = () => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const form = useForm<CreateUserForm>({
@@ -40,15 +40,34 @@ const ManageUsers = () => {
 
   const fetchUsers = async () => {
     try {
+      setError(null);
+      console.log('Tentando carregar usuários...');
+      
       const usersCollection = collection(db, 'users');
       const userSnapshot = await getDocs(usersCollection);
-      const userList = userSnapshot.docs.map(doc => doc.data() as UserData);
+      const userList = userSnapshot.docs.map(doc => {
+        const data = doc.data() as UserData;
+        console.log('Usuário carregado:', data);
+        return data;
+      });
+      
       setUsers(userList);
-    } catch (error) {
+      console.log('Total de usuários carregados:', userList.length);
+    } catch (error: any) {
       console.error('Erro ao carregar usuários:', error);
+      
+      let errorMessage = "Não foi possível carregar os usuários";
+      
+      if (error.code === 'permission-denied') {
+        errorMessage = "Permissão negada. Verifique as regras de segurança do Firestore.";
+      } else if (error.code === 'unavailable') {
+        errorMessage = "Serviço temporariamente indisponível. Tente novamente.";
+      }
+      
+      setError(errorMessage);
       toast({
         title: "Erro",
-        description: "Não foi possível carregar os usuários",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -246,6 +265,13 @@ const ManageUsers = () => {
             {loading ? (
               <div className="flex justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : error ? (
+              <div className="text-center py-8">
+                <p className="text-red-600 mb-4">{error}</p>
+                <Button onClick={fetchUsers} variant="outline">
+                  Tentar Novamente
+                </Button>
               </div>
             ) : (
               <Table>
