@@ -18,7 +18,7 @@ interface CreateUserForm {
   email: string;
   password: string;
   name: string;
-  role: 'admin' | 'cliente';
+  tipo: 'admin' | 'cliente';
 }
 
 const ManageUsers = () => {
@@ -34,7 +34,7 @@ const ManageUsers = () => {
       email: '',
       password: '',
       name: '',
-      role: 'cliente'
+      tipo: 'cliente'
     }
   });
 
@@ -81,7 +81,7 @@ const ManageUsers = () => {
 
   const onSubmit = async (data: CreateUserForm) => {
     try {
-      await createUser(data.email, data.password, data.role, data.name);
+      await createUser(data.email, data.password, data.tipo, data.name);
       toast({
         title: "Sucesso",
         description: "Usuário criado com sucesso!"
@@ -140,7 +140,7 @@ const ManageUsers = () => {
     }
   };
 
-  if (userData?.role !== 'master' && userData?.role !== 'admin') {
+  if (userData?.tipo !== 'admin') {
     return <div>Acesso negado</div>;
   }
 
@@ -231,7 +231,7 @@ const ManageUsers = () => {
                   />
                   <FormField
                     control={form.control}
-                    name="role"
+                    name="tipo"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Tipo de Usuário</FormLabel>
@@ -291,24 +291,21 @@ const ManageUsers = () => {
                       <TableCell>{user.email}</TableCell>
                       <TableCell>
                         <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${
-                          user.role === 'master' ? 'bg-purple-100 text-purple-800' :
-                          user.role === 'admin' ? 'bg-blue-100 text-blue-800' :
+                          user.tipo === 'admin' ? 'bg-blue-100 text-blue-800' :
                           'bg-green-100 text-green-800'
                         }`}>
-                          {user.role}
+                          {user.tipo}
                         </span>
                       </TableCell>
                       <TableCell>{formatDate(user.createdAt)}</TableCell>
                       <TableCell className="text-right">
-                        {user.role !== 'master' && (
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleDeleteUser(user.uid)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteUser(user.uid)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

@@ -186,7 +186,7 @@ const ManageSites = () => {
     setIsDialogOpen(true);
   };
 
-  if (userData?.role !== 'master' && userData?.role !== 'admin') {
+  if (userData?.tipo !== 'admin') {
     return <div>Acesso negado</div>;
   }
 

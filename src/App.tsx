@@ -30,7 +30,7 @@ const App = () => (
             <Route 
               path="/dashboard" 
               element={
-                <ProtectedRoute allowedRoles={['master', 'admin', 'cliente']}>
+                <ProtectedRoute allowedTypes={['admin', 'cliente']}>
                   <Dashboard />
                 </ProtectedRoute>
               } 
@@ -38,7 +38,7 @@ const App = () => (
             <Route 
               path="/manage-users" 
               element={
-                <ProtectedRoute allowedRoles={['master', 'admin']}>
+                <ProtectedRoute allowedTypes={['admin']}>
                   <ManageUsers />
                 </ProtectedRoute>
               } 
@@ -46,7 +46,7 @@ const App = () => (
             <Route 
               path="/manage-sites" 
               element={
-                <ProtectedRoute allowedRoles={['master', 'admin']}>
+                <ProtectedRoute allowedTypes={['admin']}>
                   <ManageSites />
                 </ProtectedRoute>
               } 
@@ -54,13 +54,12 @@ const App = () => (
             <Route 
               path="/system-settings" 
               element={
-                <ProtectedRoute allowedRoles={['master', 'admin']}>
+                <ProtectedRoute allowedTypes={['admin']}>
                   <SystemSettings />
                 </ProtectedRoute>
               } 
             />
             <Route path="/cliente/:id" element={<ClientSite />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

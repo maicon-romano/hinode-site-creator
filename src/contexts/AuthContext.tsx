@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
@@ -7,7 +8,7 @@ import { initializeApp, deleteApp } from 'firebase/app';
 export interface UserData {
   uid: string;
   email: string;
-  role: 'master' | 'admin' | 'cliente';
+  tipo: 'admin' | 'cliente';
   name?: string;
   createdAt: Date;
 }
@@ -17,7 +18,7 @@ interface AuthContextType {
   userData: UserData | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  createUser: (email: string, password: string, role: 'admin' | 'cliente', name?: string) => Promise<void>;
+  createUser: (email: string, password: string, tipo: 'admin' | 'cliente', name?: string) => Promise<void>;
   loading: boolean;
 }
 
@@ -45,7 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUserData(null);
   };
 
-  const createUser = async (email: string, password: string, role: 'admin' | 'cliente', name?: string) => {
+  const createUser = async (email: string, password: string, tipo: 'admin' | 'cliente', name?: string) => {
     // Create a separate Firebase Auth instance to avoid logging out the current user
     const firebaseConfig = {
       apiKey: "AIzaSyC2U6gnrapNB4Trhrzxs6Y3L5dlPz5KP9M",
@@ -67,7 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const newUserData: UserData = {
         uid: user.uid,
         email: user.email!,
-        role,
+        tipo,
         name,
         createdAt: new Date()
       };
@@ -98,17 +99,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (userDoc.exists()) {
         setUserData(userDoc.data() as UserData);
       } else {
-        // Se não existe dados do usuário, pode ser o master admin
+        // Se não existe dados do usuário, pode ser o admin principal
         if (user.email === 'originaldigitaloficial@gmail.com') {
-          const masterData: UserData = {
+          const adminData: UserData = {
             uid: user.uid,
             email: user.email,
-            role: 'master',
-            name: 'Master Admin',
+            tipo: 'admin',
+            name: 'Administrador Principal',
             createdAt: new Date()
           };
-          await setDoc(doc(db, 'users', user.uid), masterData);
-          setUserData(masterData);
+          await setDoc(doc(db, 'users', user.uid), adminData);
+          setUserData(adminData);
         }
       }
     } catch (error) {

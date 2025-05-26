@@ -23,14 +23,14 @@ const Index = () => {
                 Bem-vindo, {userData?.name || userData?.email}!
               </p>
               <div className="space-x-4">
-                {(userData?.role === 'master' || userData?.role === 'admin') && (
+                {userData?.tipo === 'admin' && (
                   <Link to="/dashboard">
                     <Button size="lg">
                       Ir para Dashboard
                     </Button>
                   </Link>
                 )}
-                {userData?.role === 'cliente' && (
+                {userData?.tipo === 'cliente' && (
                   <Link to={`/cliente/${userData.uid}`}>
                     <Button size="lg">
                       Ver Meu Site

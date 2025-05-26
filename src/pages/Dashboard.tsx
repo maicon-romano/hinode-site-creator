@@ -28,7 +28,7 @@ const Dashboard = () => {
               Bem-vindo, {userData?.name || userData?.email}
             </p>
             <span className="inline-block px-2 py-1 text-xs font-semibold text-white bg-blue-600 rounded-full">
-              {userData?.role}
+              {userData?.tipo}
             </span>
           </div>
           <Button onClick={handleLogout} variant="outline">
@@ -37,7 +37,7 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {(userData?.role === 'master' || userData?.role === 'admin') && (
+          {userData?.tipo === 'admin' && (
             <>
               <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/manage-users')}>
                 <CardHeader>
@@ -92,7 +92,7 @@ const Dashboard = () => {
             </>
           )}
 
-          {userData?.role === 'cliente' && (
+          {userData?.tipo === 'cliente' && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -112,7 +112,7 @@ const Dashboard = () => {
           )}
         </div>
 
-        {(userData?.role === 'master' || userData?.role === 'admin') && (
+        {userData?.tipo === 'admin' && (
           <div className="mt-8">
             <Card>
               <CardHeader>
