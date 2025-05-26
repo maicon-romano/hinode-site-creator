@@ -9,6 +9,9 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ClientSite from "./pages/ClientSite";
+import ManageUsers from "./pages/ManageUsers";
+import ManageSites from "./pages/ManageSites";
+import SystemSettings from "./pages/SystemSettings";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -27,8 +30,32 @@ const App = () => (
             <Route 
               path="/dashboard" 
               element={
-                <ProtectedRoute allowedRoles={['master', 'admin']}>
+                <ProtectedRoute allowedRoles={['master', 'admin', 'cliente']}>
                   <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/manage-users" 
+              element={
+                <ProtectedRoute allowedRoles={['master', 'admin']}>
+                  <ManageUsers />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/manage-sites" 
+              element={
+                <ProtectedRoute allowedRoles={['master', 'admin']}>
+                  <ManageSites />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/system-settings" 
+              element={
+                <ProtectedRoute allowedRoles={['master', 'admin']}>
+                  <SystemSettings />
                 </ProtectedRoute>
               } 
             />

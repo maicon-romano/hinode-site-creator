@@ -3,9 +3,12 @@ import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Users, Globe, Settings, Plus, Edit } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const { userData, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
@@ -34,48 +37,105 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Usuários</CardTitle>
-              <CardDescription>
-                Gerenciar usuários do sistema
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full">
-                Gerenciar Usuários
-              </Button>
-            </CardContent>
-          </Card>
+          {(userData?.role === 'master' || userData?.role === 'admin') && (
+            <>
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/manage-users')}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    Usuários
+                  </CardTitle>
+                  <CardDescription>
+                    Gerenciar usuários do sistema
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button className="w-full" onClick={() => navigate('/manage-users')}>
+                    Gerenciar Usuários
+                  </Button>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Sites dos Clientes</CardTitle>
-              <CardDescription>
-                Criar e editar sites dos clientes
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full">
-                Gerenciar Sites
-              </Button>
-            </CardContent>
-          </Card>
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/manage-sites')}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Globe className="h-5 w-5" />
+                    Sites dos Clientes
+                  </CardTitle>
+                  <CardDescription>
+                    Criar e editar sites dos clientes
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button className="w-full" onClick={() => navigate('/manage-sites')}>
+                    Gerenciar Sites
+                  </Button>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Configurações</CardTitle>
-              <CardDescription>
-                Configurações gerais do sistema
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full">
-                Configurações
-              </Button>
-            </CardContent>
-          </Card>
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/system-settings')}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Settings className="h-5 w-5" />
+                    Configurações
+                  </CardTitle>
+                  <CardDescription>
+                    Configurações gerais do sistema
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button className="w-full" onClick={() => navigate('/system-settings')}>
+                    Configurações
+                  </Button>
+                </CardContent>
+              </Card>
+            </>
+          )}
+
+          {userData?.role === 'cliente' && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Edit className="h-5 w-5" />
+                  Meu Site
+                </CardTitle>
+                <CardDescription>
+                  Editar as informações do seu site
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full" onClick={() => navigate(`/cliente/${userData.uid}`)}>
+                  Visualizar Site
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
+
+        {(userData?.role === 'master' || userData?.role === 'admin') && (
+          <div className="mt-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Ações Rápidas</CardTitle>
+                <CardDescription>
+                  Acesso rápido às principais funcionalidades
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-4">
+                  <Button onClick={() => navigate('/manage-users')} className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    Novo Usuário
+                  </Button>
+                  <Button onClick={() => navigate('/manage-sites')} variant="outline" className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    Novo Site
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   );
