@@ -100,6 +100,27 @@ const ManageUsers = () => {
     }
   };
 
+  const formatDate = (date: any) => {
+    if (!date) return 'N/A';
+    
+    // Check if it's a Firestore timestamp with toDate method
+    if (date.toDate && typeof date.toDate === 'function') {
+      return date.toDate().toLocaleDateString();
+    }
+    
+    // Check if it's already a Date object
+    if (date instanceof Date) {
+      return date.toLocaleDateString();
+    }
+    
+    // Try to parse it as a date string
+    try {
+      return new Date(date).toLocaleDateString();
+    } catch {
+      return 'N/A';
+    }
+  };
+
   if (userData?.role !== 'master' && userData?.role !== 'admin') {
     return <div>Acesso negado</div>;
   }
@@ -251,7 +272,7 @@ const ManageUsers = () => {
                           {user.role}
                         </span>
                       </TableCell>
-                      <TableCell>{user.createdAt?.toDate ? user.createdAt.toDate().toLocaleDateString() : 'N/A'}</TableCell>
+                      <TableCell>{formatDate(user.createdAt)}</TableCell>
                       <TableCell className="text-right">
                         {user.role !== 'master' && (
                           <Button
