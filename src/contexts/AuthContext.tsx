@@ -95,21 +95,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUserData = async (user: User) => {
     try {
+      console.log('Fetching user data for UID:', user.uid);
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (userDoc.exists()) {
-        setUserData(userDoc.data() as UserData);
+        const data = userDoc.data() as UserData;
+        console.log('User data loaded:', data);
+        setUserData(data);
       } else {
+        console.log('No user document found for UID:', user.uid);
         // Se não existe dados do usuário, pode ser o admin principal
-        if (user.email === 'originaldigitaloficial@gmail.com') {
+        if (user.email === 'originaldigitaloficial@gmail.com' || user.uid === 'SgzR2AWU67NF1M7iHerNhrsgWbK2') {
           const adminData: UserData = {
             uid: user.uid,
-            email: user.email,
+            email: user.email!,
             tipo: 'admin',
             name: 'Administrador Principal',
             createdAt: new Date()
           };
           await setDoc(doc(db, 'users', user.uid), adminData);
           setUserData(adminData);
+          console.log('Admin data created:', adminData);
         }
       }
     } catch (error) {
@@ -119,6 +124,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      console.log('Auth state changed. User:', user?.uid || 'null');
       setCurrentUser(user);
       if (user) {
         await fetchUserData(user);

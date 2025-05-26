@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { UserData } from '@/contexts/AuthContext';
-import { Plus, Trash2, ArrowLeft } from 'lucide-react';
+import { Plus, Trash2, ArrowLeft, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 
@@ -22,7 +23,7 @@ interface CreateUserForm {
 }
 
 const ManageUsers = () => {
-  const { createUser, userData } = useAuth();
+  const { createUser, userData, currentUser, logout } = useAuth();
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -39,9 +40,16 @@ const ManageUsers = () => {
   });
 
   const fetchUsers = async () => {
+    // Só carrega usuários se estiver autenticado e for admin
+    if (!currentUser || userData?.tipo !== 'admin') {
+      console.log('User not authenticated or not admin, skipping user fetch');
+      setLoading(false);
+      return;
+    }
+
     try {
       setError(null);
-      console.log('Tentando carregar usuários...');
+      console.log('Carregando usuários para admin:', currentUser.uid);
       
       const usersCollection = collection(db, 'users');
       const userSnapshot = await getDocs(usersCollection);
@@ -59,7 +67,7 @@ const ManageUsers = () => {
       let errorMessage = "Não foi possível carregar os usuários";
       
       if (error.code === 'permission-denied') {
-        errorMessage = "Permissão negada. Verifique as regras de segurança do Firestore.";
+        errorMessage = "Você não tem permissão para acessar estes dados. Verifique se você é um administrador.";
       } else if (error.code === 'unavailable') {
         errorMessage = "Serviço temporariamente indisponível. Tente novamente.";
       }
@@ -76,8 +84,16 @@ const ManageUsers = () => {
   };
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    // Aguarda a autenticação completa antes de tentar carregar usuários
+    if (currentUser && userData) {
+      fetchUsers();
+    } else if (currentUser && !userData) {
+      // Usuário autenticado mas userData ainda não carregou
+      setLoading(true);
+    } else {
+      setLoading(false);
+    }
+  }, [currentUser, userData]);
 
   const onSubmit = async (data: CreateUserForm) => {
     try {
@@ -119,6 +135,15 @@ const ManageUsers = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Erro no logout:', error);
+    }
+  };
+
   const formatDate = (date: any) => {
     if (!date) return 'N/A';
     
@@ -141,7 +166,35 @@ const ManageUsers = () => {
   };
 
   if (userData?.tipo !== 'admin') {
-    return <div>Acesso negado</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 p-4 flex items-center justify-center">
+        <Card className="max-w-md">
+          <CardHeader>
+            <CardTitle>Acesso Negado</CardTitle>
+            <CardDescription>
+              Você não tem permissão para acessar esta página. Apenas administradores podem gerenciar usuários.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-gray-600">
+              UID atual: {currentUser?.uid || 'Não autenticado'}
+            </p>
+            <p className="text-sm text-gray-600">
+              Tipo de usuário: {userData?.tipo || 'Não definido'}
+            </p>
+            <div className="flex gap-2">
+              <Button onClick={() => navigate('/dashboard')} variant="outline">
+                Voltar ao Dashboard
+              </Button>
+              <Button onClick={handleLogout} variant="destructive">
+                <LogOut className="h-4 w-4 mr-2" />
+                Fazer Logout
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
@@ -156,6 +209,7 @@ const ManageUsers = () => {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Gerenciar Usuários</h1>
               <p className="text-gray-600">Criar, editar e excluir usuários do sistema</p>
+              <p className="text-sm text-gray-500">UID: {currentUser?.uid}</p>
             </div>
           </div>
           
@@ -269,9 +323,15 @@ const ManageUsers = () => {
             ) : error ? (
               <div className="text-center py-8">
                 <p className="text-red-600 mb-4">{error}</p>
-                <Button onClick={fetchUsers} variant="outline">
-                  Tentar Novamente
-                </Button>
+                <div className="space-y-2">
+                  <Button onClick={fetchUsers} variant="outline">
+                    Tentar Novamente
+                  </Button>
+                  <Button onClick={handleLogout} variant="destructive">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Fazer Logout
+                  </Button>
+                </div>
               </div>
             ) : (
               <Table>
