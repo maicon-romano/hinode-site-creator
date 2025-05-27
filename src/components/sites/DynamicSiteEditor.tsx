@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Eye, EyeOff, Trash2, GripVertical, ChevronUp, ChevronDown } from 'lucide-react';
+import { Eye, EyeOff, Trash2, GripVertical, ChevronUp, ChevronDown, Plus, X } from 'lucide-react';
 import { getSiteModel, SiteModel } from '@/data/siteModels';
 import { ColorSelector } from './ColorSelector';
 import { LogoUpload } from './LogoUpload';
@@ -139,6 +138,125 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
       'produto': 'Produto'
     };
     return sectionNames[sectionType] || sectionType;
+  };
+
+  // Helper function to manage cards (for produtos, etc)
+  const addCard = (sectionType: string) => {
+    const currentCards = form.getValues(`${sectionType}.cards`) || [];
+    const newCard = {
+      id: Date.now().toString(),
+      titulo: '',
+      texto: '',
+      imagem: '',
+      ordem: currentCards.length + 1
+    };
+    form.setValue(`${sectionType}.cards`, [...currentCards, newCard]);
+  };
+
+  const removeCard = (sectionType: string, cardId: string) => {
+    const currentCards = form.getValues(`${sectionType}.cards`) || [];
+    const updatedCards = currentCards.filter((card: any) => card.id !== cardId);
+    form.setValue(`${sectionType}.cards`, updatedCards);
+  };
+
+  const renderCardEditor = (sectionType: string, fieldLabel: string) => {
+    const cards = form.watch(`${sectionType}.cards`) || [];
+    
+    return (
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <FormLabel>{fieldLabel}</FormLabel>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => addCard(sectionType)}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Adicionar Item
+          </Button>
+        </div>
+        
+        {cards.map((card: any, index: number) => (
+          <Card key={card.id} className="p-4">
+            <div className="flex justify-between items-start mb-4">
+              <h4 className="font-medium">Item {index + 1}</h4>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => removeCard(sectionType, card.id)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-4">
+              <FormField
+                control={form.control}
+                name={`${sectionType}.cards.${index}.titulo`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Título</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Título do item" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name={`${sectionType}.cards.${index}.texto`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Descrição do item" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name={`${sectionType}.cards.${index}.imagem`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Imagem</FormLabel>
+                    <FormControl>
+                      <div className="space-y-2">
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = (event) => {
+                                field.onChange(event.target?.result);
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                        {field.value && (
+                          <img
+                            src={field.value}
+                            alt="Preview"
+                            className="w-32 h-32 object-cover rounded border"
+                          />
+                        )}
+                      </div>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+          </Card>
+        ))}
+      </div>
+    );
   };
 
   const renderSectionField = (fieldKey: string, sectionType: string, fieldLabel: string, fieldType: 'text' | 'textarea' | 'url' | 'image' = 'text') => {
@@ -283,6 +401,16 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
         );
 
       case 'produtos-destaque':
+        return (
+          <>
+            {renderSectionField('titulo', sectionType, 'Título da Seção')}
+            {renderSectionField('subtitulo', sectionType, 'Subtítulo')}
+            {renderSectionField('descricao', sectionType, 'Descrição', 'textarea')}
+            {renderCardEditor(sectionType, 'Produtos')}
+            {renderSectionField('lista', sectionType, 'Lista de Produtos (fallback - um por linha)', 'textarea')}
+          </>
+        );
+
       case 'beneficios':
       case 'servicos':
       case 'habilidades':

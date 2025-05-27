@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { SiteSection } from '@/data/siteModels';
 import { ContactForm } from './ContactForm';
+import { Star, Users, Award, ArrowRight } from 'lucide-react';
 
 interface SectionRendererProps {
   section: SiteSection;
@@ -21,16 +21,26 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
     
     return (
       <div className={className}>
-        {cards.sort((a, b) => a.ordem - b.ordem).map((card) => (
-          <div key={card.id} className="bg-white p-6 rounded-lg shadow-sm border">
+        {cards.sort((a, b) => a.ordem - b.ordem).map((card, index) => (
+          <div 
+            key={card.id} 
+            className="bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition-all duration-300 animate-fade-in group"
+            style={{ animationDelay: `${index * 100}ms` }}
+          >
             {card.imagem && (
-              <img src={card.imagem} alt={card.titulo} className="w-full h-32 object-cover rounded-lg mb-4" />
+              <div className="overflow-hidden rounded-lg mb-4">
+                <img 
+                  src={card.imagem} 
+                  alt={card.titulo} 
+                  className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300" 
+                />
+              </div>
             )}
-            <h3 className="font-semibold text-lg mb-2" style={{ color: siteData.cores.texto }}>
+            <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors" style={{ color: siteData.cores.texto }}>
               {card.titulo}
             </h3>
             {card.texto && (
-              <p className="text-gray-600">{card.texto}</p>
+              <p className="text-gray-600 leading-relaxed">{card.texto}</p>
             )}
           </div>
         ))}
@@ -44,35 +54,43 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
     case 'apresentacao-pessoal':
       return (
         <section 
-          className={`py-16 lg:py-20 px-4 ${isPreview ? 'min-h-[300px]' : 'min-h-screen'} flex items-center`}
+          className={`relative py-16 lg:py-20 px-4 ${isPreview ? 'min-h-[400px]' : 'min-h-screen'} flex items-center overflow-hidden`}
           style={{ backgroundColor: siteData.cores.fundo, color: siteData.cores.texto }}
         >
-          <div className="container mx-auto max-w-6xl">
+          {/* Background decoration for Hinode */}
+          {type === 'hero-hinode' && (
+            <div className="absolute inset-0 overflow-hidden">
+              <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-yellow-400/20 to-orange-500/20 rounded-full blur-3xl animate-float"></div>
+              <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-blue-400/20 to-purple-500/20 rounded-full blur-3xl animate-float animation-delay-2000"></div>
+            </div>
+          )}
+          
+          <div className="container mx-auto max-w-6xl relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div className="text-center lg:text-left">
                 {siteData.logoPath && (
                   <img 
                     src={siteData.logoPath} 
                     alt="Logo" 
-                    className="h-16 w-auto mb-8 mx-auto lg:mx-0"
+                    className="h-16 w-auto mb-8 mx-auto lg:mx-0 animate-fade-in"
                   />
                 )}
                 
                 <h1 
-                  className="text-4xl lg:text-6xl font-bold leading-tight mb-6"
+                  className="text-4xl lg:text-6xl font-bold leading-tight mb-6 animate-fade-in"
                   style={{ color: siteData.cores.principal }}
                 >
                   {conteudo.titulo}
                 </h1>
                 
                 {conteudo.subtitulo && (
-                  <p className="text-xl lg:text-2xl opacity-90 mb-6">
+                  <p className="text-xl lg:text-2xl opacity-90 mb-6 animate-fade-in animation-delay-1000">
                     {conteudo.subtitulo}
                   </p>
                 )}
 
                 {conteudo.texto && (
-                  <p className="text-lg opacity-80 mb-8">
+                  <p className="text-lg opacity-80 mb-8 animate-fade-in animation-delay-2000">
                     {conteudo.texto}
                   </p>
                 )}
@@ -80,37 +98,211 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
                 {conteudo.botaoTexto && conteudo.botaoLink && (
                   <a
                     href={conteudo.botaoLink}
-                    className="inline-block px-8 py-4 text-lg font-semibold rounded-lg transition-transform hover:scale-105 text-white"
+                    className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-xl text-white animate-fade-in animation-delay-2000 group"
                     style={{ backgroundColor: siteData.cores.destaque }}
                     target={conteudo.botaoLink.includes('wa.me') ? '_blank' : '_self'}
                   >
                     {conteudo.botaoTexto}
+                    <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                   </a>
                 )}
               </div>
 
               <div className="order-first lg:order-last">
                 {conteudo.video && (
-                  <div className="aspect-video rounded-lg overflow-hidden shadow-xl">
-                    <iframe
-                      src={conteudo.video.replace('watch?v=', 'embed/')}
-                      className="w-full h-full"
-                      allowFullScreen
-                    />
+                  <div className="animate-scale-in">
+                    <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20">
+                      <iframe
+                        src={conteudo.video.replace('watch?v=', 'embed/')}
+                        className="w-full h-full"
+                        allowFullScreen
+                      />
+                    </div>
                   </div>
                 )}
                 
                 {!conteudo.video && conteudo.imagem && (
-                  <img 
-                    src={conteudo.imagem} 
-                    alt="Hero" 
-                    className="w-full rounded-lg shadow-xl"
-                  />
+                  <div className="animate-scale-in">
+                    <img 
+                      src={conteudo.imagem} 
+                      alt="Hero" 
+                      className="w-full rounded-2xl shadow-2xl border-4 border-white/20"
+                    />
+                  </div>
                 )}
 
                 {!conteudo.video && !conteudo.imagem && (
-                  <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg shadow-xl flex items-center justify-center">
+                  <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-2xl flex items-center justify-center animate-scale-in">
                     <span className="text-gray-400 text-lg">Vídeo ou Imagem Principal</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+
+    case 'sobre-hinode':
+      return (
+        <section className="py-20 px-4 relative overflow-hidden" style={{ backgroundColor: `${siteData.cores.principal}05` }}>
+          <div className="absolute inset-0">
+            <div className="absolute top-20 right-20 w-32 h-32 bg-gradient-to-br from-yellow-400/10 to-orange-500/10 rounded-full blur-xl"></div>
+            <div className="absolute bottom-20 left-20 w-32 h-32 bg-gradient-to-tr from-blue-400/10 to-purple-500/10 rounded-full blur-xl"></div>
+          </div>
+          
+          <div className="container mx-auto max-w-6xl relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl lg:text-5xl font-bold mb-6 animate-fade-in" style={{ color: siteData.cores.principal }}>
+                {conteudo.titulo}
+              </h2>
+              {conteudo.subtitulo && (
+                <h3 className="text-2xl mb-8 animate-fade-in animation-delay-1000" style={{ color: siteData.cores.destaque }}>
+                  {conteudo.subtitulo}
+                </h3>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <div className="animate-fade-in animation-delay-2000">
+                {conteudo.imagem ? (
+                  <div className="relative">
+                    <img src={conteudo.imagem} alt="Hinode" className="w-full rounded-2xl shadow-xl" />
+                    <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-xl">
+                      <Award className="h-8 w-8 text-white" />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-full aspect-square bg-gradient-to-br from-yellow-400/20 to-orange-500/20 rounded-2xl shadow-xl flex items-center justify-center">
+                    <div className="text-center">
+                      <Award className="h-16 w-16 mx-auto mb-4" style={{ color: siteData.cores.principal }} />
+                      <span className="text-gray-600 text-lg">Logo Hinode</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-6">
+                {conteudo.texto && (
+                  <div className="text-lg leading-relaxed space-y-4 animate-fade-in animation-delay-1000" style={{ color: siteData.cores.texto }}>
+                    {conteudo.texto.split('\n').map((paragraph: string, index: number) => (
+                      <p key={index} className="animate-fade-in" style={{ animationDelay: `${(index + 3) * 300}ms` }}>
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+                )}
+
+                <div className="grid grid-cols-3 gap-4 mt-8">
+                  <div className="text-center p-4 bg-white rounded-xl shadow-sm animate-scale-in animation-delay-2000">
+                    <Users className="h-8 w-8 mx-auto mb-2" style={{ color: siteData.cores.destaque }} />
+                    <div className="font-bold text-2xl" style={{ color: siteData.cores.principal }}>10+</div>
+                    <div className="text-sm text-gray-600">Anos</div>
+                  </div>
+                  <div className="text-center p-4 bg-white rounded-xl shadow-sm animate-scale-in animation-delay-2000">
+                    <Star className="h-8 w-8 mx-auto mb-2" style={{ color: siteData.cores.destaque }} />
+                    <div className="font-bold text-2xl" style={{ color: siteData.cores.principal }}>1M+</div>
+                    <div className="text-sm text-gray-600">Clientes</div>
+                  </div>
+                  <div className="text-center p-4 bg-white rounded-xl shadow-sm animate-scale-in animation-delay-2000">
+                    <Award className="h-8 w-8 mx-auto mb-2" style={{ color: siteData.cores.destaque }} />
+                    <div className="font-bold text-2xl" style={{ color: siteData.cores.principal }}>100%</div>
+                    <div className="text-sm text-gray-600">Nacional</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+
+    case 'produtos-destaque':
+      return (
+        <section className="py-20 px-4" style={{ backgroundColor: siteData.cores.fundo }}>
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-16">
+              {conteudo.titulo && (
+                <h2 className="text-4xl lg:text-5xl font-bold mb-6 animate-fade-in" style={{ color: siteData.cores.principal }}>
+                  {conteudo.titulo}
+                </h2>
+              )}
+              
+              {conteudo.subtitulo && (
+                <p className="text-xl lg:text-2xl mb-8 animate-fade-in animation-delay-1000" style={{ color: siteData.cores.destaque }}>
+                  {conteudo.subtitulo}
+                </p>
+              )}
+
+              {conteudo.descricao && (
+                <p className="text-lg max-w-3xl mx-auto animate-fade-in animation-delay-2000" style={{ color: siteData.cores.texto }}>
+                  {conteudo.descricao}
+                </p>
+              )}
+            </div>
+
+            {/* Cards de produtos */}
+            {conteudo.cards && renderCards(conteudo.cards, "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8")}
+
+            {/* Lista de produtos (fallback) */}
+            {conteudo.lista && !conteudo.cards && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {conteudo.lista.split('\n').filter((item: string) => item.trim()).map((item: string, index: number) => (
+                  <div 
+                    key={index} 
+                    className="bg-white p-8 rounded-2xl shadow-sm border hover:shadow-lg transition-all duration-300 text-center group animate-fade-in"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <div className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center text-white font-bold group-hover:scale-110 transition-transform" style={{ backgroundColor: siteData.cores.destaque }}>
+                      {index + 1}
+                    </div>
+                    <h3 className="font-semibold text-xl mb-3 group-hover:text-primary transition-colors" style={{ color: siteData.cores.texto }}>
+                      {item}
+                    </h3>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      );
+
+    case 'bio':
+      return (
+        <section className="py-20 px-4 relative" style={{ backgroundColor: siteData.cores.fundo }}>
+          <div className="container mx-auto max-w-6xl">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <div className="order-2 lg:order-1">
+                {conteudo.titulo && (
+                  <h2 className="text-4xl lg:text-5xl font-bold mb-6 animate-fade-in" style={{ color: siteData.cores.principal }}>
+                    {conteudo.titulo}
+                  </h2>
+                )}
+
+                {conteudo.subtitulo && (
+                  <h3 className="text-2xl mb-8 animate-fade-in animation-delay-1000" style={{ color: siteData.cores.destaque }}>
+                    {conteudo.subtitulo}
+                  </h3>
+                )}
+
+                {conteudo.texto && (
+                  <div className="text-lg leading-relaxed space-y-4 animate-fade-in animation-delay-2000" style={{ color: siteData.cores.texto }}>
+                    {conteudo.texto.split('\n').map((paragraph: string, index: number) => (
+                      <p key={index} className="animate-fade-in" style={{ animationDelay: `${(index + 3) * 200}ms` }}>
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </div>
+              
+              <div className="order-1 lg:order-2">
+                {conteudo.imagem ? (
+                  <div className="relative animate-scale-in">
+                    <img src={conteudo.imagem} alt="Biografia" className="w-full rounded-2xl shadow-2xl" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent rounded-2xl"></div>
+                  </div>
+                ) : (
+                  <div className="w-full aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-2xl flex items-center justify-center animate-scale-in">
+                    <span className="text-gray-400 text-lg">Sua foto aqui</span>
                   </div>
                 )}
               </div>
@@ -122,7 +314,6 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
     case 'beneficios':
     case 'servicos':
     case 'habilidades':
-    case 'produtos-destaque':
       return (
         <section className="py-16 px-4" style={{ backgroundColor: `${siteData.cores.principal}05` }}>
           <div className="container mx-auto max-w-6xl">
@@ -178,9 +369,7 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
       );
 
     case 'sobre':
-    case 'sobre-hinode':
     case 'sobre-distribuidor':
-    case 'bio':
     case 'produto':
       return (
         <section className="py-16 px-4" style={{ backgroundColor: siteData.cores.fundo }}>
