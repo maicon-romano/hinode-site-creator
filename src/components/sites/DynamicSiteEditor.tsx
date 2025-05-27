@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,8 +43,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     texto: initialData?.cores?.texto || '#333333'
   });
 
-  // Move useForm() para dentro deste componente para garantir o contexto adequado
-  const methods = useForm({
+  const form = useForm({
     defaultValues: {
       clientId,
       clientName,
@@ -66,7 +65,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
 
   const handleColorChange = (colorType: string, color: string) => {
     setColors(prev => ({ ...prev, [colorType]: color }));
-    methods.setValue('cores', { ...colors, [colorType]: color });
+    form.setValue('cores', { ...colors, [colorType]: color });
   };
 
   const toggleSection = (sectionKey: string) => {
@@ -87,7 +86,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
         return (
           <FormField
             key={fieldName}
-            control={methods.control}
+            control={form.control}
             name={fieldName}
             render={({ field: formField }) => (
               <FormItem className="flex flex-row items-start space-x-3 space-y-0">
@@ -112,7 +111,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
         return (
           <FormField
             key={fieldName}
-            control={methods.control}
+            control={form.control}
             name={fieldName}
             rules={{ required: field.required ? `${field.label} é obrigatório` : false }}
             render={({ field: formField }) => (
@@ -142,7 +141,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
         return (
           <FormField
             key={fieldName}
-            control={methods.control}
+            control={form.control}
             name={fieldName}
             rules={{ required: field.required ? `${field.label} é obrigatório` : false }}
             render={({ field: formField }) => (
@@ -168,7 +167,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
         return (
           <FormField
             key={fieldName}
-            control={methods.control}
+            control={form.control}
             name={fieldName}
             render={({ field: formField }) => (
               <FormItem>
@@ -200,7 +199,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
         return (
           <FormField
             key={fieldName}
-            control={methods.control}
+            control={form.control}
             name={fieldName}
             render={({ field: formField }) => (
               <FormItem>
@@ -240,7 +239,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
         return (
           <FormField
             key={fieldName}
-            control={methods.control}
+            control={form.control}
             name={fieldName}
             rules={{ required: field.required ? `${field.label} é obrigatório` : false }}
             render={({ field: formField }) => (
@@ -273,110 +272,108 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
   };
 
   return (
-    <FormProvider {...methods}>
-      <Form {...methods}>
-        <form onSubmit={methods.handleSubmit(handleSubmit)} className="space-y-6">
-          {/* Informações Básicas */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                Informações Básicas
-                <Badge variant="secondary">{templateSchema.name}</Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <FormField
-                control={methods.control}
-                name="nomeDoSite"
-                rules={{ required: "Nome do site é obrigatório" }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome do Site</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Meu Site Incrível" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        {/* Informações Básicas */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              Informações Básicas
+              <Badge variant="secondary">{templateSchema.name}</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FormField
+              control={form.control}
+              name="nomeDoSite"
+              rules={{ required: "Nome do site é obrigatório" }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome do Site</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Meu Site Incrível" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <LogoUpload
-                clientId={clientId}
-                currentLogo={methods.watch('logoPath')}
-                onLogoChange={(logoPath) => methods.setValue('logoPath', logoPath)}
-              />
-            </CardContent>
-          </Card>
+            <LogoUpload
+              clientId={clientId}
+              currentLogo={form.watch('logoPath')}
+              onLogoChange={(logoPath) => form.setValue('logoPath', logoPath)}
+            />
+          </CardContent>
+        </Card>
 
-          {/* Cores do Site */}
-          <ColorSelector
-            colors={colors}
-            onColorChange={handleColorChange}
-          />
+        {/* Cores do Site */}
+        <ColorSelector
+          colors={colors}
+          onColorChange={handleColorChange}
+        />
 
-          {/* Seções do Template */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Conteúdo do Site</h3>
-            <p className="text-sm text-gray-600">
-              Configure cada seção do seu site. Use os controles para ativar/desativar ou remover seções.
-            </p>
+        {/* Seções do Template */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Conteúdo do Site</h3>
+          <p className="text-sm text-gray-600">
+            Configure cada seção do seu site. Use os controles para ativar/desativar ou remover seções.
+          </p>
 
-            {templateSchema.sections.map((section: SectionSchema) => {
-              const isActive = activeSections.has(section.key);
-              
-              return (
-                <Card key={section.key} className={!isActive ? 'opacity-60' : ''}>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
-                        <div>
-                          <CardTitle className="text-base">{section.label}</CardTitle>
-                          {section.description && (
-                            <p className="text-sm text-gray-600 mt-1">{section.description}</p>
-                          )}
-                        </div>
+          {templateSchema.sections.map((section: SectionSchema) => {
+            const isActive = activeSections.has(section.key);
+            
+            return (
+              <Card key={section.key} className={!isActive ? 'opacity-60' : ''}>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
+                      <div>
+                        <CardTitle className="text-base">{section.label}</CardTitle>
+                        {section.description && (
+                          <p className="text-sm text-gray-600 mt-1">{section.description}</p>
+                        )}
                       </div>
-                      <div className="flex items-center gap-2">
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => toggleSection(section.key)}
+                      >
+                        {isActive ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
+                      {section.removable && (
                         <Button
                           type="button"
                           variant="outline"
                           size="sm"
                           onClick={() => toggleSection(section.key)}
                         >
-                          {isActive ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          <Trash2 className="h-4 w-4" />
                         </Button>
-                        {section.removable && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => toggleSection(section.key)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
+                      )}
                     </div>
-                  </CardHeader>
-                  
-                  {isActive && (
-                    <CardContent className="space-y-4">
-                      {section.fields.map((field: FieldSchema) => renderField(field, section.key))}
-                    </CardContent>
-                  )}
-                </Card>
-              );
-            })}
-          </div>
+                  </div>
+                </CardHeader>
+                
+                {isActive && (
+                  <CardContent className="space-y-4">
+                    {section.fields.map((field: FieldSchema) => renderField(field, section.key))}
+                  </CardContent>
+                )}
+              </Card>
+            );
+          })}
+        </div>
 
-          <Separator />
+        <Separator />
 
-          <Button type="submit" className="w-full" size="lg">
-            {isEditing ? 'Atualizar Site' : 'Criar Site'}
-          </Button>
-        </form>
-      </Form>
-    </FormProvider>
+        <Button type="submit" className="w-full" size="lg">
+          {isEditing ? 'Atualizar Site' : 'Criar Site'}
+        </Button>
+      </form>
+    </Form>
   );
 };
