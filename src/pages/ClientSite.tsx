@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { TemplateRenderer } from '@/components/templates/TemplateRenderer';
 
@@ -15,6 +15,7 @@ interface SiteData {
   videoUrl: string;
   whatsapp: string;
   template: string;
+  variation?: string;
   logoPath: string;
   cores: {
     principal: string;
@@ -46,14 +47,27 @@ const ClientSite = () => {
       }
 
       try {
-        // Buscar site pelo clientId
+        // First try to get site by document ID
         const siteDoc = await getDoc(doc(db, 'sites', id));
         
         if (siteDoc.exists()) {
           const data = { id: siteDoc.id, ...siteDoc.data() } as SiteData;
           setSiteData(data);
         } else {
-          setError('Site não encontrado');
+          // If not found by document ID, try to find by clientId
+          const sitesQuery = query(
+            collection(db, 'sites'),
+            where('clientId', '==', id)
+          );
+          const sitesSnapshot = await getDocs(sitesQuery);
+          
+          if (!sitesSnapshot.empty) {
+            const siteDoc = sitesSnapshot.docs[0];
+            const data = { id: siteDoc.id, ...siteDoc.data() } as SiteData;
+            setSiteData(data);
+          } else {
+            setError('Site não encontrado');
+          }
         }
       } catch (error) {
         console.error('Erro ao carregar dados do site:', error);

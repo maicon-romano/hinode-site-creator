@@ -45,6 +45,8 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
   const renderTemplate = () => {
     const variation = siteData.variation || 'default';
     
+    console.log('Rendering template:', siteData.template, 'variation:', variation);
+    
     switch (siteData.template) {
       case 'landing':
         switch (variation) {

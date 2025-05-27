@@ -19,6 +19,7 @@ interface SiteFormData {
   videoUrl: string;
   whatsapp: string;
   template: string;
+  variation: string;
   logoPath: string;
   cores: {
     principal: string;
@@ -65,6 +66,7 @@ export const SiteForm: React.FC<SiteFormProps> = ({
       videoUrl: initialData?.videoUrl || '',
       whatsapp: initialData?.whatsapp || '',
       template: initialData?.template || 'landing',
+      variation: initialData?.variation || 'default',
       logoPath: initialData?.logoPath || '',
       cores: colors,
       secoes: {
@@ -85,6 +87,27 @@ export const SiteForm: React.FC<SiteFormProps> = ({
 
   const handleSubmit = (data: SiteFormData) => {
     onSubmit({ ...data, cores: colors });
+  };
+
+  const selectedTemplate = form.watch('template');
+
+  const getVariationOptions = (template: string) => {
+    if (template === 'landing') {
+      return [
+        { value: 'default', label: 'Padrão' },
+        { value: 'video', label: 'Com Vídeo' },
+        { value: 'minimal', label: 'Minimalista' },
+        { value: 'modern', label: 'Moderno' }
+      ];
+    } else if (template === 'institucional') {
+      return [
+        { value: 'default', label: 'Padrão' },
+        { value: 'banner', label: 'Com Banner' },
+        { value: 'corporate', label: 'Corporativo' },
+        { value: 'creative', label: 'Criativo' }
+      ];
+    }
+    return [{ value: 'default', label: 'Padrão' }];
   };
 
   // Dados atuais do formulário para preview
@@ -130,17 +153,18 @@ export const SiteForm: React.FC<SiteFormProps> = ({
             name="template"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Template</FormLabel>
+                <FormLabel>Tipo de Template</FormLabel>
                 <FormControl>
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select value={field.value} onValueChange={(value) => {
+                    field.onChange(value);
+                    form.setValue('variation', 'default');
+                  }}>
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione um template" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="landing">Landing Page</SelectItem>
                       <SelectItem value="institucional">Institucional</SelectItem>
-                      <SelectItem value="ecommerce">E-commerce</SelectItem>
-                      <SelectItem value="portfolio">Portfólio</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -149,6 +173,31 @@ export const SiteForm: React.FC<SiteFormProps> = ({
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="variation"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Variação do Template</FormLabel>
+              <FormControl>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione uma variação" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getVariationOptions(selectedTemplate).map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* Preview do Template */}
         <TemplatePreview
