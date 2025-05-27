@@ -4,11 +4,14 @@ import { LandingPageTemplate } from './LandingPageTemplate';
 import { LandingPageVideoTemplate } from './variations/LandingPageVideoTemplate';
 import { LandingPageMinimalTemplate } from './variations/LandingPageMinimalTemplate';
 import { LandingPageModernTemplate } from './variations/LandingPageModernTemplate';
+import { LandingPremiumTemplate } from './variations/LandingPremiumTemplate';
 import { InstitucionalTemplate } from './InstitucionalTemplate';
 import { InstitucionalBannerTemplate } from './variations/InstitucionalBannerTemplate';
 import { InstitucionalCorporateTemplate } from './variations/InstitucionalCorporateTemplate';
 import { InstitucionalCreativeTemplate } from './variations/InstitucionalCreativeTemplate';
+import { PortfolioCreativeTemplate } from './variations/PortfolioCreativeTemplate';
 import { HinodeLandingTemplate } from './variations/HinodeLandingTemplate';
+import { HinodePremiumTemplate } from './variations/HinodePremiumTemplate';
 import { ContactForm } from './ContactForm';
 
 interface SiteSection {
@@ -34,9 +37,11 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
     console.log('Renderizando template:', templateId, siteData);
     
     switch (templateId) {
-      case 'hinode-01':
-      case 'hinode-landing':
-        return <HinodeLandingTemplate siteData={siteData} isPreview={isPreview} />;
+      // Landing Page Templates
+      case 'landing-premium':
+        return <LandingPremiumTemplate siteData={siteData} isPreview={isPreview} />;
+      case 'landing-conversion':
+        return <LandingPremiumTemplate siteData={siteData} isPreview={isPreview} />;
       case 'landing-01':
       case 'landing-basico':
         return <LandingPageTemplate siteData={siteData} isPreview={isPreview} />;
@@ -49,6 +54,10 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
       case 'landing-04':
       case 'landing-modern':
         return <LandingPageModernTemplate siteData={siteData} isPreview={isPreview} />;
+      
+      // Institutional Templates
+      case 'institucional-corporate':
+        return <InstitucionalCorporateTemplate siteData={siteData} isPreview={isPreview} />;
       case 'institucional-01':
       case 'institucional-basico':
         return <InstitucionalTemplate siteData={siteData} isPreview={isPreview} />;
@@ -56,11 +65,25 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
       case 'institucional-banner':
         return <InstitucionalBannerTemplate siteData={siteData} isPreview={isPreview} />;
       case 'institucional-03':
-      case 'institucional-corporate':
+      case 'institucional-corporate-old':
         return <InstitucionalCorporateTemplate siteData={siteData} isPreview={isPreview} />;
       case 'institucional-04':
       case 'institucional-creative':
         return <InstitucionalCreativeTemplate siteData={siteData} isPreview={isPreview} />;
+      
+      // Portfolio Templates
+      case 'portfolio-creative':
+        return <PortfolioCreativeTemplate siteData={siteData} isPreview={isPreview} />;
+      case 'portfolio-developer':
+        return <PortfolioCreativeTemplate siteData={siteData} isPreview={isPreview} />;
+      
+      // Hinode Templates
+      case 'hinode-premium':
+        return <HinodePremiumTemplate siteData={siteData} isPreview={isPreview} />;
+      case 'hinode-01':
+      case 'hinode-landing':
+        return <HinodeLandingTemplate siteData={siteData} isPreview={isPreview} />;
+      
       default:
         console.log('Template não encontrado, usando template padrão para:', templateId);
         return <LandingPageTemplate siteData={siteData} isPreview={isPreview} />;

@@ -1,3 +1,4 @@
+
 export interface FieldSchema {
   key: string;
   label: string;
@@ -19,54 +20,38 @@ export interface SectionSchema {
 export interface TemplateSchema {
   id: string;
   name: string;
-  type: 'landing' | 'institucional';
+  type: 'landing' | 'institucional' | 'portfolio' | 'hinode';
   description: string;
   thumbnail: string;
   sections: SectionSchema[];
 }
 
 export const templateSchemas: TemplateSchema[] = [
-  // Hinode Template - Novo template moderno
+  // Landing Page Templates - Moderno e Dinâmico
   {
-    id: 'hinode-01',
-    name: 'Hinode Landing Page',
+    id: 'landing-premium',
+    name: 'Landing Premium Moderna',
     type: 'landing',
-    description: 'Template moderno com navegação, vídeo em destaque e design premium',
-    thumbnail: '/templates/hinode-01.jpg',
+    description: 'Template premium com animações 3D, glassmorphism e design futurista',
+    thumbnail: '/templates/landing-premium.jpg',
     sections: [
       {
         key: 'hero',
-        label: 'Seção Principal (Hero)',
+        label: 'Hero Section',
         fields: [
-          { key: 'titulo', label: 'Título Principal', type: 'text', required: true, placeholder: 'Transforme sua vida hoje!' },
-          { key: 'subtitulo', label: 'Descrição', type: 'textarea', placeholder: 'Descubra como nossa solução pode revolucionar seus resultados' },
-          { key: 'videoUrl', label: 'URL do Vídeo (YouTube)', type: 'url', placeholder: 'https://youtube.com/watch?v=...' },
-          { key: 'logoPath', label: 'Logo da Empresa', type: 'image' }
+          { key: 'titulo', label: 'Título Principal', type: 'text', required: true, placeholder: 'Transforme Seus Sonhos em Realidade' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text', placeholder: 'Descubra o futuro dos negócios digitais' },
+          { key: 'videoUrl', label: 'URL do Vídeo', type: 'url', placeholder: 'https://youtube.com/watch?v=...' },
+          { key: 'botaoTexto', label: 'Texto do Botão', type: 'text', placeholder: 'Começar Agora' },
+          { key: 'imagemHero', label: 'Imagem Hero', type: 'image' }
         ]
       },
       {
-        key: 'biografia',
-        label: 'Sobre Mim/Biografia',
-        removable: true,
+        key: 'beneficios',
+        label: 'Benefícios Premium',
         fields: [
-          { key: 'texto', label: 'Biografia/Apresentação', type: 'textarea', placeholder: 'Conte sua história e experiência...' }
-        ]
-      },
-      {
-        key: 'produtos',
-        label: 'Produtos/Serviços',
-        removable: true,
-        fields: [
-          { key: 'lista', label: 'Lista de Produtos (Nome: Descrição: Preço; separados por nova linha)', type: 'textarea', placeholder: 'Produto Premium: Nossa solução completa: R$ 197\nProduto Básico: Ideal para começar: R$ 97' }
-        ]
-      },
-      {
-        key: 'depoimentos',
-        label: 'Depoimentos',
-        removable: true,
-        fields: [
-          { key: 'titulo', label: 'Título da Seção', type: 'text', placeholder: 'O que nossos clientes dizem' },
-          { key: 'ativo', label: 'Exibir Depoimentos', type: 'boolean' }
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Por Que Nos Escolher?' },
+          { key: 'lista', label: 'Lista de Benefícios', type: 'textarea', placeholder: 'Tecnologia Avançada\nResultados Garantidos\nSupporte 24/7' }
         ]
       },
       {
@@ -74,426 +59,274 @@ export const templateSchemas: TemplateSchema[] = [
         label: 'Contato',
         fields: [
           { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Vamos Conversar?' },
-          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true, placeholder: '5511999999999' },
-          { key: 'email', label: 'E-mail', type: 'text', placeholder: 'contato@empresa.com' }
+          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true, placeholder: '5511999999999' }
         ]
       }
     ]
   },
-  // Landing Page Templates
   {
-    id: 'landing-01',
-    name: 'Landing Clássica Premium',
+    id: 'landing-conversion',
+    name: 'Landing de Alta Conversão',
     type: 'landing',
-    description: 'Template premium com design moderno, benefícios e CTA otimizado',
-    thumbnail: '/templates/landing-01.jpg',
+    description: 'Focada em conversão com elementos psicológicos e urgência',
+    thumbnail: '/templates/landing-conversion.jpg',
     sections: [
-      // ... keep existing code (alertaTopo section)
       {
-        key: 'alertaTopo',
-        label: 'Alerta no Topo',
-        description: 'Barra de aviso configurável',
-        removable: true,
+        key: 'urgencia',
+        label: 'Barra de Urgência',
         fields: [
-          { key: 'ativo', label: 'Exibir Alerta', type: 'boolean' },
-          { key: 'texto', label: 'Texto do Alerta', type: 'text', placeholder: '🔥 Últimos dias de promoção!' },
-          { key: 'cor', label: 'Cor de Fundo', type: 'color' }
+          { key: 'texto', label: 'Texto de Urgência', type: 'text', placeholder: '🔥 Oferta termina em 24h!' },
+          { key: 'ativo', label: 'Exibir Urgência', type: 'boolean' }
         ]
       },
       {
         key: 'hero',
-        label: 'Seção Principal (Hero)',
+        label: 'Proposta de Valor',
         fields: [
-          { key: 'titulo', label: 'Título Principal', type: 'text', required: true, placeholder: 'Transforme sua vida hoje!' },
-          { key: 'subtitulo', label: 'Subtítulo', type: 'text', placeholder: 'Descubra como nosso produto pode ajudar você' },
-          { key: 'botaoTexto', label: 'Texto do Botão', type: 'text', placeholder: 'Começar Agora' },
-          { key: 'botaoLink', label: 'Link do Botão', type: 'url', placeholder: 'https://wa.me/5511999999999' },
-          { key: 'imagemHero', label: 'Imagem Principal', type: 'image' },
-          { key: 'posicao', label: 'Posição do Texto', type: 'select', options: [
-            { value: 'left', label: 'Esquerda' },
-            { value: 'center', label: 'Centro' },
-            { value: 'right', label: 'Direita' }
-          ]}
-        ]
-      },
-      // ... keep existing code (other sections with same structure)
-      {
-        key: 'beneficios',
-        label: 'Benefícios',
-        removable: true,
-        fields: [
-          { key: 'titulo', label: 'Título da Seção', type: 'text', placeholder: 'Por que escolher nossa solução?' },
-          { key: 'lista', label: 'Lista de Benefícios (um por linha)', type: 'textarea', placeholder: 'Resultados garantidos\nQualidade premium\nSuporte dedicado' }
+          { key: 'titulo', label: 'Título Impactante', type: 'text', required: true, placeholder: 'Aumente Suas Vendas em 300%' },
+          { key: 'subtitulo', label: 'Benefício Principal', type: 'text', placeholder: 'Sistema comprovado usado por +10.000 empresas' },
+          { key: 'garantia', label: 'Garantia', type: 'text', placeholder: '30 dias ou seu dinheiro de volta' }
         ]
       },
       {
-        key: 'sobre',
-        label: 'Sobre Nós',
-        removable: true,
+        key: 'social-proof',
+        label: 'Prova Social',
         fields: [
-          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Nossa História' },
-          { key: 'texto', label: 'Descrição', type: 'textarea', placeholder: 'Nossa história e missão...' },
-          { key: 'imagem', label: 'Imagem da Seção', type: 'image' }
-        ]
-      },
-      {
-        key: 'depoimentos',
-        label: 'Depoimentos',
-        removable: true,
-        fields: [
-          { key: 'titulo', label: 'Título da Seção', type: 'text', placeholder: 'O que nossos clientes dizem' },
-          { key: 'lista', label: 'Depoimentos (Nome: Texto; separados por nova linha)', type: 'textarea', placeholder: 'João Silva: Excelente produto!\nMaria Santos: Recomendo muito!' }
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Mais de 50.000 Clientes Satisfeitos' },
+          { key: 'numero', label: 'Número Impactante', type: 'text', placeholder: '50.000+' }
         ]
       },
       {
         key: 'contato',
-        label: 'Contato',
+        label: 'Call to Action',
         fields: [
-          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Fale Conosco Agora' },
-          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true, placeholder: '5511999999999' },
-          { key: 'telefone', label: 'Telefone', type: 'text', placeholder: '(11) 99999-9999' },
-          { key: 'email', label: 'E-mail', type: 'text', placeholder: 'contato@empresa.com' },
-          { key: 'endereco', label: 'Endereço', type: 'text', placeholder: 'Rua das Flores, 123' }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'landing-02',
-    name: 'Landing com Vídeo Premium',
-    type: 'landing',
-    description: 'Template premium focado em vídeo promocional com design moderno',
-    thumbnail: '/templates/landing-02.jpg',
-    sections: [
-      {
-        key: 'alertaTopo',
-        label: 'Alerta no Topo',
-        removable: true,
-        fields: [
-          { key: 'ativo', label: 'Exibir Alerta', type: 'boolean' },
-          { key: 'texto', label: 'Texto do Alerta', type: 'text', placeholder: '🔥 Oferta especial!' },
-          { key: 'cor', label: 'Cor de Fundo', type: 'color' }
-        ]
-      },
-      {
-        key: 'hero',
-        label: 'Seção Principal',
-        fields: [
-          { key: 'titulo', label: 'Título Principal', type: 'text', required: true },
-          { key: 'subtitulo', label: 'Subtítulo', type: 'text' },
-          { key: 'videoUrl', label: 'URL do Vídeo (YouTube)', type: 'url', placeholder: 'https://youtube.com/watch?v=...' },
-          { key: 'botaoTexto', label: 'Texto do Botão', type: 'text' },
-          { key: 'botaoLink', label: 'Link do Botão', type: 'url' }
-        ]
-      },
-      {
-        key: 'recursos',
-        label: 'Recursos do Produto',
-        removable: true,
-        fields: [
-          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Recursos Incríveis' },
-          { key: 'lista', label: 'Lista de Recursos', type: 'textarea' }
-        ]
-      },
-      {
-        key: 'cta',
-        label: 'Chamada para Ação',
-        fields: [
-          { key: 'titulo', label: 'Título da CTA', type: 'text', placeholder: 'Pronto para começar?' },
-          { key: 'texto', label: 'Texto Motivacional', type: 'textarea' },
-          { key: 'botaoTexto', label: 'Texto do Botão', type: 'text' },
-          { key: 'botaoLink', label: 'Link do Botão', type: 'url' }
-        ]
-      },
-      {
-        key: 'contato',
-        label: 'Contato',
-        fields: [
-          { key: 'titulo', label: 'Título', type: 'text' },
-          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true },
-          { key: 'email', label: 'E-mail', type: 'text' }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'landing-03',
-    name: 'Landing Minimalista Premium',
-    type: 'landing',
-    description: 'Design limpo e premium focado na conversão',
-    thumbnail: '/templates/landing-03.jpg',
-    sections: [
-      {
-        key: 'hero',
-        label: 'Seção Principal',
-        fields: [
-          { key: 'titulo', label: 'Título Principal', type: 'text', required: true },
-          { key: 'subtitulo', label: 'Subtítulo', type: 'text' },
-          { key: 'botaoTexto', label: 'Texto do Botão', type: 'text' },
-          { key: 'botaoLink', label: 'Link do Botão', type: 'url' },
-          { key: 'imagemHero', label: 'Imagem Principal', type: 'image' }
-        ]
-      },
-      {
-        key: 'caracteristicas',
-        label: 'Características',
-        fields: [
-          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Principais Características' },
-          { key: 'lista', label: 'Lista de Características', type: 'textarea' }
-        ]
-      },
-      {
-        key: 'contato',
-        label: 'Contato',
-        fields: [
-          { key: 'titulo', label: 'Título', type: 'text' },
-          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true },
-          { key: 'email', label: 'E-mail', type: 'text' }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'landing-04',
-    name: 'Landing Promocional Premium',
-    type: 'landing',
-    description: 'Template premium ideal para promoções e ofertas especiais',
-    thumbnail: '/templates/landing-04.jpg',
-    sections: [
-      {
-        key: 'oferta',
-        label: 'Oferta Especial',
-        fields: [
-          { key: 'titulo', label: 'Título da Oferta', type: 'text', required: true },
-          { key: 'desconto', label: 'Percentual de Desconto', type: 'text' },
-          { key: 'prazo', label: 'Prazo da Oferta', type: 'text' },
-          { key: 'botaoTexto', label: 'Texto do Botão', type: 'text' },
-          { key: 'botaoLink', label: 'Link do Botão', type: 'url' }
-        ]
-      },
-      {
-        key: 'produto',
-        label: 'Sobre o Produto',
-        fields: [
-          { key: 'titulo', label: 'Nome do Produto', type: 'text' },
-          { key: 'descricao', label: 'Descrição', type: 'textarea' },
-          { key: 'imagem', label: 'Imagem do Produto', type: 'image' }
-        ]
-      },
-      {
-        key: 'contato',
-        label: 'Contato',
-        fields: [
-          { key: 'titulo', label: 'Título', type: 'text' },
+          { key: 'titulo', label: 'CTA Principal', type: 'text', placeholder: 'Quero Aumentar Minhas Vendas Agora!' },
           { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true }
         ]
       }
     ]
   },
-  // Institucional Templates
+
+  // Site Institucional - Corporativo e Elegante
   {
-    id: 'institucional-01',
-    name: 'Institucional Clássico Premium',
+    id: 'institucional-corporate',
+    name: 'Corporativo Premium',
     type: 'institucional',
-    description: 'Template corporativo premium com design moderno',
-    thumbnail: '/templates/institucional-01.jpg',
+    description: 'Design corporativo elegante com animações sutis e layout profissional',
+    thumbnail: '/templates/institucional-corporate.jpg',
     sections: [
       {
         key: 'hero',
-        label: 'Seção Principal',
+        label: 'Apresentação Empresarial',
         fields: [
-          { key: 'titulo', label: 'Título da Empresa', type: 'text', required: true },
-          { key: 'subtitulo', label: 'Slogan/Descrição', type: 'text' },
-          { key: 'imagemHero', label: 'Imagem Principal', type: 'image' }
+          { key: 'titulo', label: 'Nome da Empresa', type: 'text', required: true, placeholder: 'Sua Empresa S.A.' },
+          { key: 'slogan', label: 'Slogan', type: 'text', placeholder: 'Inovação que transforma o futuro' },
+          { key: 'anos', label: 'Anos de Mercado', type: 'text', placeholder: '15' },
+          { key: 'imagemCorporativa', label: 'Imagem Corporativa', type: 'image' }
         ]
       },
       {
         key: 'sobre',
         label: 'Sobre a Empresa',
         fields: [
-          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Sobre Nós' },
-          { key: 'historia', label: 'Nossa História', type: 'textarea' },
-          { key: 'missao', label: 'Missão', type: 'textarea' },
-          { key: 'visao', label: 'Visão', type: 'textarea' },
-          { key: 'valores', label: 'Valores', type: 'textarea' }
+          { key: 'historia', label: 'Nossa História', type: 'textarea', placeholder: 'Fundada em 2009...' },
+          { key: 'missao', label: 'Missão', type: 'textarea', placeholder: 'Nossa missão é...' },
+          { key: 'visao', label: 'Visão', type: 'textarea', placeholder: 'Nossa visão é...' }
         ]
       },
       {
         key: 'servicos',
         label: 'Serviços',
         fields: [
-          { key: 'titulo', label: 'Título da Seção', type: 'text', placeholder: 'Nossos Serviços' },
-          { key: 'lista', label: 'Lista de Serviços', type: 'textarea' },
-          { key: 'descricao', label: 'Descrição Geral', type: 'textarea' }
-        ]
-      },
-      {
-        key: 'equipe',
-        label: 'Nossa Equipe',
-        removable: true,
-        fields: [
-          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Nossa Equipe' },
-          { key: 'texto', label: 'Descrição da Equipe', type: 'textarea' }
-        ]
-      },
-      {
-        key: 'contato',
-        label: 'Contato',
-        fields: [
-          { key: 'titulo', label: 'Título', type: 'text' },
-          { key: 'endereco', label: 'Endereço', type: 'text' },
-          { key: 'telefone', label: 'Telefone', type: 'text' },
-          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true },
-          { key: 'email', label: 'E-mail', type: 'text' },
-          { key: 'horarioFuncionamento', label: 'Horário de Funcionamento', type: 'text' }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'institucional-02',
-    name: 'Institucional Moderno Premium',
-    type: 'institucional',
-    description: 'Template com design contemporâneo e recursos avançados',
-    thumbnail: '/templates/institucional-02.jpg',
-    sections: [
-      {
-        key: 'hero',
-        label: 'Seção Principal',
-        fields: [
-          { key: 'titulo', label: 'Título Principal', type: 'text', required: true },
-          { key: 'subtitulo', label: 'Subtítulo', type: 'text' },
-          { key: 'imagemFundo', label: 'Imagem de Fundo', type: 'image' },
-          { key: 'botaoTexto', label: 'Texto do Botão', type: 'text' },
-          { key: 'botaoLink', label: 'Link do Botão', type: 'url' }
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Nossos Serviços' },
+          { key: 'lista', label: 'Lista de Serviços', type: 'textarea', placeholder: 'Consultoria Estratégica\nDesenvolvimento de Software\nMarketing Digital' }
         ]
       },
       {
         key: 'numeros',
         label: 'Números da Empresa',
-        removable: true,
         fields: [
-          { key: 'anosAtuacao', label: 'Anos de Atuação', type: 'text' },
-          { key: 'clientesAtendidos', label: 'Clientes Atendidos', type: 'text' },
-          { key: 'projetosRealizados', label: 'Projetos Realizados', type: 'text' },
-          { key: 'premios', label: 'Prêmios Recebidos', type: 'text' }
+          { key: 'clientes', label: 'Número de Clientes', type: 'text', placeholder: '500+' },
+          { key: 'projetos', label: 'Projetos Realizados', type: 'text', placeholder: '1000+' },
+          { key: 'satisfacao', label: '% Satisfação', type: 'text', placeholder: '98%' }
         ]
       },
       {
-        key: 'diferenciais',
-        label: 'Nossos Diferenciais',
+        key: 'contato',
+        label: 'Contato Empresarial',
         fields: [
-          { key: 'titulo', label: 'Título', type: 'text' },
-          { key: 'lista', label: 'Lista de Diferenciais', type: 'textarea' }
+          { key: 'endereco', label: 'Endereço', type: 'text', placeholder: 'Av. Paulista, 1000 - São Paulo' },
+          { key: 'telefone', label: 'Telefone', type: 'text', placeholder: '(11) 3000-0000' },
+          { key: 'email', label: 'Email', type: 'text', placeholder: 'contato@empresa.com.br' },
+          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true }
+        ]
+      }
+    ]
+  },
+
+  // Portfólio - Criativo e Visual
+  {
+    id: 'portfolio-creative',
+    name: 'Portfólio Criativo',
+    type: 'portfolio',
+    description: 'Design criativo para profissionais de design, fotografia e artes',
+    thumbnail: '/templates/portfolio-creative.jpg',
+    sections: [
+      {
+        key: 'hero',
+        label: 'Apresentação Pessoal',
+        fields: [
+          { key: 'nome', label: 'Seu Nome', type: 'text', required: true, placeholder: 'João Silva' },
+          { key: 'profissao', label: 'Profissão', type: 'text', placeholder: 'Designer Gráfico & Fotógrafo' },
+          { key: 'descricao', label: 'Descrição', type: 'textarea', placeholder: 'Transformo ideias em experiências visuais memoráveis' },
+          { key: 'foto', label: 'Sua Foto', type: 'image' }
+        ]
+      },
+      {
+        key: 'sobre',
+        label: 'Sobre Mim',
+        fields: [
+          { key: 'biografia', label: 'Biografia', type: 'textarea', placeholder: 'Sou um profissional apaixonado por...' },
+          { key: 'experiencia', label: 'Anos de Experiência', type: 'text', placeholder: '8' },
+          { key: 'especializacao', label: 'Especialização', type: 'text', placeholder: 'Branding & Design Digital' }
+        ]
+      },
+      {
+        key: 'habilidades',
+        label: 'Habilidades',
+        fields: [
+          { key: 'lista', label: 'Lista de Habilidades', type: 'textarea', placeholder: 'Photoshop - 95%\nIllustrator - 90%\nFigma - 85%\nFotografia - 80%' }
         ]
       },
       {
         key: 'portfolio',
-        label: 'Portfólio',
-        removable: true,
+        label: 'Trabalhos',
         fields: [
-          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Nossos Trabalhos' },
-          { key: 'descricao', label: 'Descrição', type: 'textarea' }
+          { key: 'titulo', label: 'Título da Seção', type: 'text', placeholder: 'Meus Trabalhos' },
+          { key: 'descricao', label: 'Descrição', type: 'textarea', placeholder: 'Alguns dos meus projetos mais recentes' }
         ]
       },
       {
         key: 'contato',
         label: 'Contato',
         fields: [
-          { key: 'titulo', label: 'Título', type: 'text' },
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Vamos Trabalhar Juntos?' },
+          { key: 'email', label: 'Email', type: 'text', placeholder: 'joao@designer.com' },
           { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true },
-          { key: 'email', label: 'E-mail', type: 'text' },
-          { key: 'linkedin', label: 'LinkedIn', type: 'url' },
-          { key: 'instagram', label: 'Instagram', type: 'url' }
+          { key: 'instagram', label: 'Instagram', type: 'url', placeholder: 'https://instagram.com/seuuser' }
         ]
       }
     ]
   },
   {
-    id: 'institucional-03',
-    name: 'Institucional Criativo Premium',
-    type: 'institucional',
-    description: 'Design diferenciado premium para empresas inovadoras',
-    thumbnail: '/templates/institucional-03.jpg',
+    id: 'portfolio-developer',
+    name: 'Portfólio Developer',
+    type: 'portfolio',
+    description: 'Template técnico para desenvolvedores com tema cyberpunk',
+    thumbnail: '/templates/portfolio-developer.jpg',
     sections: [
       {
         key: 'hero',
-        label: 'Seção Principal',
+        label: 'Perfil Developer',
         fields: [
-          { key: 'titulo', label: 'Título Principal', type: 'text', required: true },
-          { key: 'subtitulo', label: 'Subtítulo', type: 'text' },
-          { key: 'imagemHero', label: 'Imagem Principal', type: 'image' }
+          { key: 'nome', label: 'Nome', type: 'text', required: true, placeholder: 'Maria Santos' },
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Full Stack Developer' },
+          { key: 'especializacao', label: 'Especialização', type: 'text', placeholder: 'React • Node.js • TypeScript' },
+          { key: 'github', label: 'GitHub', type: 'url', placeholder: 'https://github.com/usuario' }
         ]
       },
       {
-        key: 'inovacao',
-        label: 'Inovação',
+        key: 'tecnologias',
+        label: 'Stack Tecnológico',
         fields: [
-          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Nossa Inovação' },
-          { key: 'descricao', label: 'Descrição', type: 'textarea' }
+          { key: 'frontend', label: 'Frontend', type: 'text', placeholder: 'React, Vue, Angular' },
+          { key: 'backend', label: 'Backend', type: 'text', placeholder: 'Node.js, Python, PHP' },
+          { key: 'database', label: 'Database', type: 'text', placeholder: 'MongoDB, PostgreSQL, MySQL' },
+          { key: 'cloud', label: 'Cloud & DevOps', type: 'text', placeholder: 'AWS, Docker, Kubernetes' }
         ]
       },
       {
         key: 'projetos',
-        label: 'Projetos Especiais',
-        removable: true,
+        label: 'Projetos',
         fields: [
-          { key: 'titulo', label: 'Título', type: 'text' },
-          { key: 'lista', label: 'Lista de Projetos', type: 'textarea' }
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Projetos em Destaque' },
+          { key: 'quantidade', label: 'Projetos Realizados', type: 'text', placeholder: '50+' }
         ]
       },
       {
         key: 'contato',
         label: 'Contato',
         fields: [
-          { key: 'titulo', label: 'Título', type: 'text' },
-          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true },
-          { key: 'email', label: 'E-mail', type: 'text' }
+          { key: 'email', label: 'Email', type: 'text', placeholder: 'dev@email.com' },
+          { key: 'linkedin', label: 'LinkedIn', type: 'url', placeholder: 'https://linkedin.com/in/usuario' },
+          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true }
         ]
       }
     ]
   },
+
+  // Hinode - Representante de Perfumes
   {
-    id: 'institucional-04',
-    name: 'Institucional Profissional Premium',
-    type: 'institucional',
-    description: 'Template premium sóbrio para empresas tradicionais',
-    thumbnail: '/templates/institucional-04.jpg',
+    id: 'hinode-premium',
+    name: 'Representante Hinode Premium',
+    type: 'hinode',
+    description: 'Template elegante para representantes Hinode com foco em perfumes e cosméticos',
+    thumbnail: '/templates/hinode-premium.jpg',
     sections: [
       {
         key: 'hero',
-        label: 'Apresentação',
+        label: 'Apresentação Representante',
         fields: [
-          { key: 'titulo', label: 'Nome da Empresa', type: 'text', required: true },
-          { key: 'area', label: 'Área de Atuação', type: 'text' },
-          { key: 'experiencia', label: 'Tempo de Experiência', type: 'text' }
+          { key: 'nome', label: 'Seu Nome', type: 'text', required: true, placeholder: 'Ana Beatriz' },
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Consultora de Beleza Hinode' },
+          { key: 'experiencia', label: 'Tempo de Experiência', type: 'text', placeholder: '5 anos' },
+          { key: 'foto', label: 'Sua Foto', type: 'image' }
         ]
       },
       {
-        key: 'competencias',
-        label: 'Competências',
+        key: 'sobre-hinode',
+        label: 'Sobre a Hinode',
         fields: [
-          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Nossas Competências' },
-          { key: 'lista', label: 'Lista de Competências', type: 'textarea' }
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Por que Hinode?' },
+          { key: 'descricao', label: 'Descrição', type: 'textarea', placeholder: 'A Hinode é líder em cosméticos e perfumaria no Brasil...' },
+          { key: 'logoHinode', label: 'Logo Hinode', type: 'image' }
         ]
       },
       {
-        key: 'certificacoes',
-        label: 'Certificações',
-        removable: true,
+        key: 'produtos-destaque',
+        label: 'Produtos em Destaque',
         fields: [
-          { key: 'titulo', label: 'Título', type: 'text' },
-          { key: 'lista', label: 'Lista de Certificações', type: 'textarea' }
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Nossos Best Sellers' },
+          { key: 'categoria1', label: 'Categoria 1', type: 'text', placeholder: 'Perfumes Importados' },
+          { key: 'categoria2', label: 'Categoria 2', type: 'text', placeholder: 'Maquiagem Premium' },
+          { key: 'categoria3', label: 'Categoria 3', type: 'text', placeholder: 'Cuidados com a Pele' }
+        ]
+      },
+      {
+        key: 'seja-representante',
+        label: 'Seja um Representante',
+        fields: [
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Seja um Consultor Hinode' },
+          { key: 'beneficios', label: 'Benefícios', type: 'textarea', placeholder: 'Renda Extra Garantida\nProdutos com Desconto\nTreinamentos Gratuitos\nSupporte Completo' },
+          { key: 'comissao', label: 'Comissão', type: 'text', placeholder: 'Até 40% de comissão' }
+        ]
+      },
+      {
+        key: 'depoimentos',
+        label: 'Depoimentos de Clientes',
+        fields: [
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'O que nossos clientes dizem' },
+          { key: 'ativo', label: 'Exibir Depoimentos', type: 'boolean' }
         ]
       },
       {
         key: 'contato',
         label: 'Contato',
         fields: [
-          { key: 'titulo', label: 'Título', type: 'text' },
-          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true },
-          { key: 'endereco', label: 'Endereço', type: 'text' },
-          { key: 'telefone', label: 'Telefone', type: 'text' }
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Faça seu Pedido ou Tire suas Dúvidas' },
+          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true, placeholder: '5511999999999' },
+          { key: 'instagram', label: 'Instagram', type: 'url', placeholder: 'https://instagram.com/seuperfil' },
+          { key: 'localizacao', label: 'Localização', type: 'text', placeholder: 'São Paulo - SP' }
         ]
       }
     ]
@@ -504,6 +337,6 @@ export const getTemplateSchema = (templateId: string): TemplateSchema | null => 
   return templateSchemas.find(template => template.id === templateId) || null;
 };
 
-export const getTemplatesByType = (type: 'landing' | 'institucional'): TemplateSchema[] => {
+export const getTemplatesByType = (type: 'landing' | 'institucional' | 'portfolio' | 'hinode'): TemplateSchema[] => {
   return templateSchemas.filter(template => template.type === type);
 };
