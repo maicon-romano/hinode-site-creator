@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Eye, EyeOff, Trash2, GripVertical } from 'lucide-react';
+import { Eye, EyeOff, Trash2, GripVertical, ChevronUp, ChevronDown } from 'lucide-react';
 import { getSiteModel, SiteModel } from '@/data/siteModels';
 import { ColorSelector } from './ColorSelector';
 import { LogoUpload } from './LogoUpload';
@@ -35,6 +36,9 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
   const siteModel = getSiteModel(templateId);
   const [activeSections, setActiveSections] = useState<Set<string>>(
     new Set(siteModel?.secoesPadrao.map(s => s.type) || [])
+  );
+  const [sectionsOrder, setSectionsOrder] = useState<string[]>(
+    siteModel?.secoesPadrao.map(s => s.type) || []
   );
   const [showPreview, setShowPreview] = useState(false);
   const [colors, setColors] = useState({
@@ -87,6 +91,24 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
       newActiveSections.add(sectionType);
     }
     setActiveSections(newActiveSections);
+  };
+
+  const moveSectionUp = (sectionType: string) => {
+    const currentIndex = sectionsOrder.indexOf(sectionType);
+    if (currentIndex > 0) {
+      const newOrder = [...sectionsOrder];
+      [newOrder[currentIndex], newOrder[currentIndex - 1]] = [newOrder[currentIndex - 1], newOrder[currentIndex]];
+      setSectionsOrder(newOrder);
+    }
+  };
+
+  const moveSectionDown = (sectionType: string) => {
+    const currentIndex = sectionsOrder.indexOf(sectionType);
+    if (currentIndex < sectionsOrder.length - 1) {
+      const newOrder = [...sectionsOrder];
+      [newOrder[currentIndex], newOrder[currentIndex + 1]] = [newOrder[currentIndex + 1], newOrder[currentIndex]];
+      setSectionsOrder(newOrder);
+    }
   };
 
   // Helper function to get section display name
@@ -230,28 +252,128 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     }
   };
 
+  const renderSectionFields = (sectionType: string) => {
+    switch (sectionType) {
+      case 'hero':
+      case 'hero-hinode':
+        return (
+          <>
+            {renderSectionField('titulo', sectionType, 'Título Principal')}
+            {renderSectionField('subtitulo', sectionType, 'Subtítulo', 'textarea')}
+            {renderSectionField('texto', sectionType, 'Texto Adicional', 'textarea')}
+            {renderSectionField('video', sectionType, 'URL do Vídeo', 'url')}
+            {renderSectionField('botaoTexto', sectionType, 'Texto do Botão')}
+            {renderSectionField('botaoLink', sectionType, 'Link do Botão', 'url')}
+            {renderSectionField('whatsapp', sectionType, 'WhatsApp')}
+            {renderSectionField('imagem', sectionType, 'Imagem Principal', 'image')}
+          </>
+        );
+
+      case 'sobre':
+      case 'sobre-hinode':
+      case 'sobre-distribuidor':
+      case 'bio':
+        return (
+          <>
+            {renderSectionField('titulo', sectionType, 'Título')}
+            {renderSectionField('subtitulo', sectionType, 'Subtítulo')}
+            {renderSectionField('texto', sectionType, 'Descrição', 'textarea')}
+            {renderSectionField('imagem', sectionType, 'Imagem da Seção', 'image')}
+          </>
+        );
+
+      case 'produtos-destaque':
+      case 'beneficios':
+      case 'servicos':
+      case 'habilidades':
+        return (
+          <>
+            {renderSectionField('titulo', sectionType, 'Título da Seção')}
+            {renderSectionField('subtitulo', sectionType, 'Subtítulo')}
+            {renderSectionField('descricao', sectionType, 'Descrição', 'textarea')}
+            {renderSectionField('lista', sectionType, 'Lista de Itens (um por linha)', 'textarea')}
+          </>
+        );
+
+      case 'como-funciona':
+      case 'etapas-comecar':
+        return (
+          <>
+            {renderSectionField('titulo', sectionType, 'Título da Seção')}
+            {renderSectionField('subtitulo', sectionType, 'Subtítulo')}
+            {renderSectionField('descricao', sectionType, 'Descrição', 'textarea')}
+            {renderSectionField('lista', sectionType, 'Etapas (uma por linha)', 'textarea')}
+          </>
+        );
+
+      case 'depoimentos':
+        return (
+          <>
+            {renderSectionField('titulo', sectionType, 'Título da Seção')}
+            {renderSectionField('subtitulo', sectionType, 'Subtítulo')}
+            {renderSectionField('lista', sectionType, 'Depoimentos (Nome: Texto; separados por nova linha)', 'textarea')}
+          </>
+        );
+
+      case 'contato':
+        return (
+          <>
+            {renderSectionField('titulo', sectionType, 'Título')}
+            {renderSectionField('subtitulo', sectionType, 'Subtítulo')}
+            {renderSectionField('whatsapp', sectionType, 'WhatsApp')}
+            {renderSectionField('telefone', sectionType, 'Telefone')}
+            {renderSectionField('email', sectionType, 'E-mail')}
+            {renderSectionField('endereco', sectionType, 'Endereço')}
+          </>
+        );
+
+      case 'rodape':
+      case 'rodape-hinode':
+        return (
+          <>
+            {renderSectionField('texto', sectionType, 'Texto do Rodapé', 'textarea')}
+          </>
+        );
+
+      default:
+        return (
+          <>
+            {renderSectionField('titulo', sectionType, 'Título')}
+            {renderSectionField('texto', sectionType, 'Texto', 'textarea')}
+          </>
+        );
+    }
+  };
+
   const handleSubmit = (data: any) => {
-    const layout = siteModel.secoesPadrao.map(secao => ({
-      ...secao,
-      enabled: activeSections.has(secao.type),
-      conteudo: data[secao.type] || {}
-    }));
+    const layout = sectionsOrder.map(sectionType => {
+      const secao = siteModel.secoesPadrao.find(s => s.type === sectionType);
+      return {
+        ...secao,
+        enabled: activeSections.has(sectionType),
+        conteudo: data[sectionType] || {}
+      };
+    });
 
     onSubmit({
       ...data,
       cores: colors,
       layout,
-      modelId: templateId
+      modelId: templateId,
+      sectionsOrder
     });
   };
 
   const getCurrentSiteData = () => {
     const formData = form.getValues();
-    const layout = siteModel.secoesPadrao.map(secao => ({
-      ...secao,
-      enabled: activeSections.has(secao.type),
-      conteudo: formData[secao.type] || {}
-    }));
+    const layout = sectionsOrder.map(sectionType => {
+      const secao = siteModel.secoesPadrao.find(s => s.type === sectionType);
+      return {
+        ...secao,
+        enabled: activeSections.has(sectionType),
+        conteudo: formData[sectionType] || {}
+      };
+    });
 
     return {
       modelId: templateId,
@@ -259,7 +381,8 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
       logoPath: formData.logoPath,
       cores: colors,
       layout,
-      whatsapp: formData.hero?.whatsapp || '5511999999999',
+      whatsapp: formData.hero?.whatsapp || formData.contato?.whatsapp || '5511999999999',
+      sectionsOrder,
       ...formData
     };
   };
@@ -310,18 +433,41 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
         <div className="space-y-4">
           <h3 className="text-lg font-medium">Conteúdo do Site</h3>
           <p className="text-sm text-gray-600">
-            Configure cada seção do seu site. Use os controles para ativar/desativar seções.
+            Configure cada seção do seu site. Use os controles para ativar/desativar e reordenar seções.
           </p>
 
-          {siteModel.secoesPadrao.map((secao) => {
-            const isActive = activeSections.has(secao.type);
-            const sectionDisplayName = getSectionDisplayName(secao.type);
+          {sectionsOrder.map((sectionType) => {
+            const isActive = activeSections.has(sectionType);
+            const sectionDisplayName = getSectionDisplayName(sectionType);
+            const currentIndex = sectionsOrder.indexOf(sectionType);
             
             return (
-              <Card key={secao.type} className={!isActive ? 'opacity-60' : ''}>
+              <Card key={sectionType} className={!isActive ? 'opacity-60' : ''}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
+                      <div className="flex flex-col gap-1">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => moveSectionUp(sectionType)}
+                          disabled={currentIndex === 0}
+                          title="Mover para cima"
+                        >
+                          <ChevronUp className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => moveSectionDown(sectionType)}
+                          disabled={currentIndex === sectionsOrder.length - 1}
+                          title="Mover para baixo"
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </div>
                       <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
                       <div>
                         <CardTitle className="text-base">{sectionDisplayName}</CardTitle>
@@ -335,7 +481,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => toggleSection(secao.type)}
+                        onClick={() => toggleSection(sectionType)}
                         title={isActive ? 'Ocultar seção' : 'Mostrar seção'}
                       >
                         {isActive ? (
@@ -350,58 +496,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
                 
                 {isActive && (
                   <CardContent className="space-y-4">
-                    {/* Campos básicos para cada tipo de seção */}
-                    {secao.type === 'hero' && (
-                      <>
-                        {renderSectionField('titulo', 'hero', 'Título Principal')}
-                        {renderSectionField('subtitulo', 'hero', 'Subtítulo', 'textarea')}
-                        {renderSectionField('botaoTexto', 'hero', 'Texto do Botão')}
-                        {renderSectionField('whatsapp', 'hero', 'WhatsApp')}
-                        {renderSectionField('imagem', 'hero', 'Imagem Principal', 'image')}
-                      </>
-                    )}
-
-                    {secao.type === 'beneficios' && (
-                      <>
-                        {renderSectionField('titulo', 'beneficios', 'Título da Seção')}
-                        {renderSectionField('lista', 'beneficios', 'Lista de Benefícios (um por linha)', 'textarea')}
-                      </>
-                    )}
-
-                    {secao.type === 'sobre' && (
-                      <>
-                        {renderSectionField('titulo', 'sobre', 'Título')}
-                        {renderSectionField('texto', 'sobre', 'Descrição', 'textarea')}
-                        {renderSectionField('imagem', 'sobre', 'Imagem da Seção', 'image')}
-                      </>
-                    )}
-
-                    {secao.type === 'servicos' && (
-                      <>
-                        {renderSectionField('titulo', 'servicos', 'Título da Seção')}
-                        {renderSectionField('descricao', 'servicos', 'Descrição', 'textarea')}
-                        {renderSectionField('lista', 'servicos', 'Lista de Serviços (um por linha)', 'textarea')}
-                      </>
-                    )}
-
-                    {secao.type === 'depoimentos' && (
-                      <>
-                        {renderSectionField('titulo', 'depoimentos', 'Título da Seção')}
-                        {renderSectionField('lista', 'depoimentos', 'Depoimentos (Nome: Texto; separados por nova linha)', 'textarea')}
-                      </>
-                    )}
-
-                    {secao.type === 'contato' && (
-                      <>
-                        {renderSectionField('titulo', 'contato', 'Título')}
-                        {renderSectionField('whatsapp', 'contato', 'WhatsApp')}
-                        {renderSectionField('telefone', 'contato', 'Telefone')}
-                        {renderSectionField('email', 'contato', 'E-mail')}
-                        {renderSectionField('endereco', 'contato', 'Endereço')}
-                      </>
-                    )}
-
-                    {/* Adicionar campos para outros tipos de seção conforme necessário */}
+                    {renderSectionFields(sectionType)}
                   </CardContent>
                 )}
               </Card>

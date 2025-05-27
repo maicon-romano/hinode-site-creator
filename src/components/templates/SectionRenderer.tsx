@@ -47,62 +47,74 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
           className={`py-16 lg:py-20 px-4 ${isPreview ? 'min-h-[300px]' : 'min-h-screen'} flex items-center`}
           style={{ backgroundColor: siteData.cores.fundo, color: siteData.cores.texto }}
         >
-          <div className="container mx-auto max-w-6xl text-center">
-            {siteData.logoPath && (
-              <img 
-                src={siteData.logoPath} 
-                alt="Logo" 
-                className="h-16 w-auto mb-8 mx-auto"
-              />
-            )}
-            
-            <h1 
-              className="text-4xl lg:text-6xl font-bold leading-tight mb-6"
-              style={{ color: siteData.cores.principal }}
-            >
-              {conteudo.titulo}
-            </h1>
-            
-            {conteudo.subtitulo && (
-              <p className="text-xl lg:text-2xl opacity-90 mb-6">
-                {conteudo.subtitulo}
-              </p>
-            )}
+          <div className="container mx-auto max-w-6xl">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+              <div className="text-center lg:text-left">
+                {siteData.logoPath && (
+                  <img 
+                    src={siteData.logoPath} 
+                    alt="Logo" 
+                    className="h-16 w-auto mb-8 mx-auto lg:mx-0"
+                  />
+                )}
+                
+                <h1 
+                  className="text-4xl lg:text-6xl font-bold leading-tight mb-6"
+                  style={{ color: siteData.cores.principal }}
+                >
+                  {conteudo.titulo}
+                </h1>
+                
+                {conteudo.subtitulo && (
+                  <p className="text-xl lg:text-2xl opacity-90 mb-6">
+                    {conteudo.subtitulo}
+                  </p>
+                )}
 
-            {conteudo.texto && (
-              <p className="text-lg opacity-80 mb-8">
-                {conteudo.texto}
-              </p>
-            )}
-
-            {conteudo.video && (
-              <div className="aspect-video rounded-lg overflow-hidden shadow-xl mb-8 max-w-2xl mx-auto">
-                <iframe
-                  src={conteudo.video.replace('watch?v=', 'embed/')}
-                  className="w-full h-full"
-                  allowFullScreen
-                />
+                {conteudo.texto && (
+                  <p className="text-lg opacity-80 mb-8">
+                    {conteudo.texto}
+                  </p>
+                )}
+                
+                {conteudo.botaoTexto && conteudo.botaoLink && (
+                  <a
+                    href={conteudo.botaoLink}
+                    className="inline-block px-8 py-4 text-lg font-semibold rounded-lg transition-transform hover:scale-105 text-white"
+                    style={{ backgroundColor: siteData.cores.destaque }}
+                    target={conteudo.botaoLink.includes('wa.me') ? '_blank' : '_self'}
+                  >
+                    {conteudo.botaoTexto}
+                  </a>
+                )}
               </div>
-            )}
 
-            {conteudo.imagem && (
-              <img 
-                src={conteudo.imagem} 
-                alt="Hero" 
-                className="w-full max-w-2xl mx-auto rounded-lg shadow-xl mb-8"
-              />
-            )}
-            
-            {conteudo.botaoTexto && conteudo.botaoLink && (
-              <a
-                href={conteudo.botaoLink}
-                className="inline-block px-8 py-4 text-lg font-semibold rounded-lg transition-transform hover:scale-105 text-white"
-                style={{ backgroundColor: siteData.cores.destaque }}
-                target={conteudo.botaoLink.includes('wa.me') ? '_blank' : '_self'}
-              >
-                {conteudo.botaoTexto}
-              </a>
-            )}
+              <div className="order-first lg:order-last">
+                {conteudo.video && (
+                  <div className="aspect-video rounded-lg overflow-hidden shadow-xl">
+                    <iframe
+                      src={conteudo.video.replace('watch?v=', 'embed/')}
+                      className="w-full h-full"
+                      allowFullScreen
+                    />
+                  </div>
+                )}
+                
+                {!conteudo.video && conteudo.imagem && (
+                  <img 
+                    src={conteudo.imagem} 
+                    alt="Hero" 
+                    className="w-full rounded-lg shadow-xl"
+                  />
+                )}
+
+                {!conteudo.video && !conteudo.imagem && (
+                  <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg shadow-xl flex items-center justify-center">
+                    <span className="text-gray-400 text-lg">Vídeo ou Imagem Principal</span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </section>
       );
@@ -115,11 +127,37 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
         <section className="py-16 px-4" style={{ backgroundColor: `${siteData.cores.principal}05` }}>
           <div className="container mx-auto max-w-6xl">
             {conteudo.titulo && (
-              <h2 className="text-3xl font-bold text-center mb-12" style={{ color: siteData.cores.principal }}>
+              <h2 className="text-3xl font-bold text-center mb-4" style={{ color: siteData.cores.principal }}>
                 {conteudo.titulo}
               </h2>
             )}
-            {renderCards(conteudo.cards)}
+            
+            {conteudo.subtitulo && (
+              <p className="text-xl text-center mb-8" style={{ color: siteData.cores.texto }}>
+                {conteudo.subtitulo}
+              </p>
+            )}
+
+            {conteudo.descricao && (
+              <p className="text-center mb-12 max-w-3xl mx-auto" style={{ color: siteData.cores.texto }}>
+                {conteudo.descricao}
+              </p>
+            )}
+
+            {conteudo.lista && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {conteudo.lista.split('\n').filter((item: string) => item.trim()).map((item: string, index: number) => (
+                  <div key={index} className="bg-white p-6 rounded-lg shadow-sm border text-center">
+                    <div className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center text-white font-bold" style={{ backgroundColor: siteData.cores.destaque }}>
+                      {index + 1}
+                    </div>
+                    <h3 className="font-semibold text-lg" style={{ color: siteData.cores.texto }}>{item}</h3>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {conteudo.cards && renderCards(conteudo.cards)}
           </div>
         </section>
       );
@@ -150,10 +188,17 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
                 {conteudo.titulo && (
-                  <h2 className="text-3xl font-bold mb-6" style={{ color: siteData.cores.principal }}>
+                  <h2 className="text-3xl font-bold mb-4" style={{ color: siteData.cores.principal }}>
                     {conteudo.titulo}
                   </h2>
                 )}
+
+                {conteudo.subtitulo && (
+                  <h3 className="text-xl mb-6" style={{ color: siteData.cores.destaque }}>
+                    {conteudo.subtitulo}
+                  </h3>
+                )}
+
                 {conteudo.texto && (
                   <div className="text-lg leading-relaxed" style={{ color: siteData.cores.texto }}>
                     {conteudo.texto.split('\n').map((paragraph: string, index: number) => (
@@ -283,6 +328,37 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
                 {conteudo.subtitulo}
               </p>
             )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {conteudo.whatsapp && (
+                <div className="text-center p-6 bg-white rounded-lg shadow-sm">
+                  <h4 className="font-semibold mb-2" style={{ color: siteData.cores.texto }}>WhatsApp</h4>
+                  <a 
+                    href={`https://wa.me/${conteudo.whatsapp}`} 
+                    className="text-green-600 hover:underline font-medium"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {conteudo.whatsapp}
+                  </a>
+                </div>
+              )}
+              {conteudo.telefone && (
+                <div className="text-center p-6 bg-white rounded-lg shadow-sm">
+                  <h4 className="font-semibold mb-2" style={{ color: siteData.cores.texto }}>Telefone</h4>
+                  <p style={{ color: siteData.cores.texto }}>{conteudo.telefone}</p>
+                </div>
+              )}
+              {conteudo.email && (
+                <div className="text-center p-6 bg-white rounded-lg shadow-sm">
+                  <h4 className="font-semibold mb-2" style={{ color: siteData.cores.texto }}>E-mail</h4>
+                  <a href={`mailto:${conteudo.email}`} className="hover:underline" style={{ color: siteData.cores.destaque }}>
+                    {conteudo.email}
+                  </a>
+                </div>
+              )}
+            </div>
+
             <ContactForm 
               clientId={siteData.clientId || ''} 
               isPreview={isPreview}

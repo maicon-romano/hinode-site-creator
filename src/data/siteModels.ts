@@ -298,10 +298,22 @@ export const siteModels: SiteModel[] = [
         type: 'hero-hinode',
         enabled: true,
         conteudo: {
-          titulo: 'Seja Bem-vindo à Hinode',
-          subtitulo: 'Transforme sua vida com produtos de qualidade',
-          texto: 'Olá! Eu sou [Seu Nome], sua consultora Hinode.',
+          titulo: 'Transforme Sua Vida com a Hinode',
+          subtitulo: 'Olá! Eu sou [Seu Nome], sua consultora Hinode',
+          texto: 'Descubra uma oportunidade única de empreender e alcançar seus sonhos',
           video: '',
+          botaoTexto: 'Falar Comigo',
+          botaoLink: '',
+          imagem: ''
+        }
+      },
+      {
+        type: 'bio',
+        enabled: true,
+        conteudo: {
+          titulo: 'Minha História',
+          subtitulo: 'Como a Hinode mudou minha vida',
+          texto: 'Eu sou [Seu Nome] e há [X] anos descobri na Hinode uma oportunidade de transformar minha vida. Desde então, tenho ajudado centenas de pessoas a alcançarem seus objetivos através dos produtos e do plano de negócios da Hinode.',
           imagem: ''
         }
       },
@@ -310,16 +322,8 @@ export const siteModels: SiteModel[] = [
         enabled: true,
         conteudo: {
           titulo: 'Sobre a Hinode',
-          texto: 'A Hinode é uma empresa brasileira líder em cosméticos e produtos de bem-estar.',
-          imagem: ''
-        }
-      },
-      {
-        type: 'sobre-distribuidor',
-        enabled: true,
-        conteudo: {
-          titulo: 'Sobre Mim',
-          texto: 'Sou consultora Hinode há [X] anos e ajudo pessoas a alcançarem seus objetivos.',
+          subtitulo: 'Uma empresa brasileira de sucesso',
+          texto: 'A Hinode é uma empresa brasileira líder em cosméticos, fragrâncias e produtos de bem-estar. Com mais de 10 anos de mercado, oferece produtos de alta qualidade e um plano de negócios inovador que já transformou milhares de vidas.',
           imagem: ''
         }
       },
@@ -327,24 +331,9 @@ export const siteModels: SiteModel[] = [
         type: 'produtos-destaque',
         enabled: true,
         conteudo: {
-          titulo: 'Produtos em Destaque',
-          cards: [
-            { id: '1', titulo: 'Perfumes', texto: 'Fragrâncias exclusivas', imagem: '', ordem: 1 },
-            { id: '2', titulo: 'Cosméticos', texto: 'Cuidados com a pele', imagem: '', ordem: 2 },
-            { id: '3', titulo: 'Suplementos', texto: 'Saúde e bem-estar', imagem: '', ordem: 3 }
-          ]
-        }
-      },
-      {
-        type: 'etapas-comecar',
-        enabled: true,
-        conteudo: {
-          titulo: 'Como Começar na Hinode',
-          cards: [
-            { id: '1', titulo: 'Etapa 1', texto: 'Entre em contato comigo', ordem: 1 },
-            { id: '2', titulo: 'Etapa 2', texto: 'Escolha seu kit inicial', ordem: 2 },
-            { id: '3', titulo: 'Etapa 3', texto: 'Comece a empreender', ordem: 3 }
-          ]
+          titulo: 'Produtos que Fazem a Diferença',
+          subtitulo: 'Qualidade premium para você e sua família',
+          lista: 'Perfumes Importados\nCosméticos de Alta Performance\nSuplementos Nutricionais\nProdutos de Cuidados Pessoais\nItens para Casa e Decoração'
         }
       },
       {
@@ -352,7 +341,10 @@ export const siteModels: SiteModel[] = [
         enabled: true,
         conteudo: {
           titulo: 'Vamos Conversar?',
-          subtitulo: 'Tire suas dúvidas e saiba como começar'
+          subtitulo: 'Tire suas dúvidas e descubra como começar na Hinode',
+          whatsapp: '',
+          telefone: '',
+          email: ''
         }
       },
       {
