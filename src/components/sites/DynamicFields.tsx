@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface FieldConfig {
   key: string;
@@ -25,6 +25,8 @@ export const DynamicFields: React.FC<DynamicFieldsProps> = ({
   variation, 
   form 
 }) => {
+  const { register, formState: { errors } } = form;
+
   const getFieldsForTemplate = (): FieldConfig[] => {
     // Campos base que aparecem em todos os templates
     const baseFields: FieldConfig[] = [
@@ -131,38 +133,36 @@ export const DynamicFields: React.FC<DynamicFieldsProps> = ({
       
       <div className="grid gap-4">
         {fields.map((field) => (
-          <FormField
-            key={field.key}
-            control={form.control}
-            name={field.key}
-            rules={{ required: field.required ? `${field.label} é obrigatório` : false }}
-            render={({ field: formField }) => (
-              <FormItem>
-                <FormLabel className="flex items-center gap-2">
-                  {field.label}
-                  {field.required && <span className="text-red-500">*</span>}
-                </FormLabel>
-                <FormControl>
-                  {field.type === 'textarea' ? (
-                    <Textarea 
-                      placeholder={field.placeholder || `Digite ${field.label.toLowerCase()}...`}
-                      className="min-h-[80px]"
-                      {...formField}
-                    />
-                  ) : (
-                    <Input 
-                      placeholder={field.placeholder || `Digite ${field.label.toLowerCase()}...`}
-                      {...formField} 
-                    />
-                  )}
-                </FormControl>
-                {field.description && (
-                  <p className="text-xs text-gray-500">{field.description}</p>
-                )}
-                <FormMessage />
-              </FormItem>
+          <div key={field.key} className="space-y-2">
+            <Label className="flex items-center gap-2">
+              {field.label}
+              {field.required && <span className="text-red-500">*</span>}
+            </Label>
+            {field.type === 'textarea' ? (
+              <Textarea 
+                placeholder={field.placeholder || `Digite ${field.label.toLowerCase()}...`}
+                className="min-h-[80px]"
+                {...register(field.key, { 
+                  required: field.required ? `${field.label} é obrigatório` : false 
+                })}
+              />
+            ) : (
+              <Input 
+                placeholder={field.placeholder || `Digite ${field.label.toLowerCase()}...`}
+                {...register(field.key, { 
+                  required: field.required ? `${field.label} é obrigatório` : false 
+                })}
+              />
             )}
-          />
+            {field.description && (
+              <p className="text-xs text-gray-500">{field.description}</p>
+            )}
+            {errors[field.key] && (
+              <p className="text-sm font-medium text-destructive">
+                {errors[field.key]?.message}
+              </p>
+            )}
+          </div>
         ))}
       </div>
     </div>
