@@ -7,6 +7,8 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { ClientSelector } from './ClientSelector';
 import { TemplateSelector } from './TemplateSelector';
 import { DynamicSiteEditor } from './DynamicSiteEditor';
+import { Form } from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
 
 interface SiteBuilderProps {
   initialData?: any;
@@ -26,6 +28,11 @@ export const SiteBuilder: React.FC<SiteBuilderProps> = ({
     initialData?.templateId?.startsWith('landing') ? 'landing' : 'institucional'
   );
   const [selectedTemplate, setSelectedTemplate] = useState(initialData?.templateId || '');
+
+  // Form for the final step
+  const form = useForm({
+    defaultValues: initialData || {}
+  });
 
   const steps = [
     { number: 1, title: 'Cliente', description: 'Selecione o cliente' },
@@ -162,14 +169,16 @@ export const SiteBuilder: React.FC<SiteBuilderProps> = ({
           )}
 
           {step === 4 && selectedTemplate && (
-            <DynamicSiteEditor
-              templateId={selectedTemplate}
-              clientId={selectedClient}
-              clientName={clientName}
-              initialData={initialData}
-              onSubmit={onSubmit}
-              isEditing={isEditing}
-            />
+            <Form {...form}>
+              <DynamicSiteEditor
+                templateId={selectedTemplate}
+                clientId={selectedClient}
+                clientName={clientName}
+                initialData={initialData}
+                onSubmit={onSubmit}
+                isEditing={isEditing}
+              />
+            </Form>
           )}
         </CardContent>
       </Card>
