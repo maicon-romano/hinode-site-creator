@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -148,8 +149,8 @@ const ManageSites = () => {
     try {
       console.log('Dados originais recebidos:', data);
       
-      // Garantir que o diretório de sites existe
-      createSitesDirectory();
+      // Garantir que o diretório de sites existe - passar o clientId
+      createSitesDirectory(data.clientId);
       
       // Detectar imagens base64 no objeto
       const base64Images = detectBase64Images(data);
