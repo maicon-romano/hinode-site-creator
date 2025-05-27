@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Phone } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 
 interface WhatsAppButtonProps {
   whatsapp: string;
@@ -26,7 +26,7 @@ export const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
       style={{ backgroundColor: color }}
       title="Fale conosco no WhatsApp"
     >
-      <Phone className="h-7 w-7 text-white" />
+      <MessageCircle className="h-7 w-7 text-white" />
     </button>
   );
 };

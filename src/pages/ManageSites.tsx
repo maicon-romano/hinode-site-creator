@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -16,12 +15,8 @@ interface SiteData {
   id?: string;
   clientId: string;
   clientName: string;
+  templateId: string;
   nomeDoSite: string;
-  headline: string;
-  descricao: string;
-  videoUrl: string;
-  whatsapp: string;
-  template: string;
   logoPath: string;
   cores: {
     principal: string;
@@ -29,14 +24,9 @@ interface SiteData {
     destaque: string;
     texto: string;
   };
-  secoes: {
-    video: boolean;
-    formulario: boolean;
-    depoimentos: boolean;
-    sobre: boolean;
-    contato: boolean;
-  };
+  activeSections: string[];
   createdAt: Date;
+  [key: string]: any;
 }
 
 const ManageSites = () => {
@@ -177,18 +167,15 @@ const ManageSites = () => {
   const handleDownloadSite = async (site: SiteData) => {
     setDownloading(site.id!);
     try {
-      // Simular processo de build e download
       console.log(`Iniciando build do site ${site.clientId}...`);
       
-      // Em um ambiente real, isso faria uma chamada para API
-      await new Promise(resolve => setTimeout(resolve, 3000)); // Simular build
+      await new Promise(resolve => setTimeout(resolve, 3000));
       
       toast({
         title: "Site buildado com sucesso!",
         description: `O site ${site.nomeDoSite} foi empacotado e está pronto para download.`
       });
       
-      // Simular download
       console.log(`Download do arquivo /dist/${site.clientId}.zip iniciado`);
       
     } catch (error) {
@@ -259,25 +246,25 @@ const ManageSites = () => {
               Voltar
             </Button>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Gerenciar Sites</h1>
-              <p className="text-gray-600">Criar, editar e gerenciar sites dos clientes</p>
+              <h1 className="text-3xl font-bold text-gray-900">Construtor de Sites</h1>
+              <p className="text-gray-600">Criar, editar e gerenciar sites dos clientes com templates dinâmicos</p>
             </div>
           </div>
           
           <Button onClick={openCreateDialog} size="lg">
             <Plus className="h-4 w-4 mr-2" />
-            Novo Site
+            Criar Novo Site
           </Button>
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingSite ? 'Editar Site' : 'Criar Novo Site'}
               </DialogTitle>
               <DialogDescription>
-                {editingSite ? 'Edite as configurações do site.' : 'Configure um novo site para o cliente.'}
+                {editingSite ? 'Edite as configurações do site usando o construtor visual.' : 'Use o construtor de sites para criar um site personalizado.'}
               </DialogDescription>
             </DialogHeader>
             <SiteForm
@@ -290,9 +277,9 @@ const ManageSites = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Lista de Sites</CardTitle>
+            <CardTitle>Sites Criados</CardTitle>
             <CardDescription>
-              Visualize e gerencie todos os sites dos clientes
+              Gerencie todos os sites criados com o construtor
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -321,7 +308,7 @@ const ManageSites = () => {
                     <TableHead>Nome do Site</TableHead>
                     <TableHead>Cliente</TableHead>
                     <TableHead>Template</TableHead>
-                    <TableHead>WhatsApp</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -343,8 +330,12 @@ const ManageSites = () => {
                       </TableCell>
                       <TableCell className="font-medium">{site.nomeDoSite}</TableCell>
                       <TableCell>{site.clientName}</TableCell>
-                      <TableCell className="capitalize">{site.template}</TableCell>
-                      <TableCell>{site.whatsapp}</TableCell>
+                      <TableCell className="capitalize">{site.templateId}</TableCell>
+                      <TableCell>
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                          Ativo
+                        </span>
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex gap-2 justify-end">
                           <Button
@@ -399,7 +390,7 @@ const ManageSites = () => {
                   {sites.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-8 text-gray-500">
-                        Nenhum site cadastrado ainda. Clique em "Novo Site" para começar.
+                        Nenhum site criado ainda. Clique em "Criar Novo Site" para começar.
                       </TableCell>
                     </TableRow>
                   )}
