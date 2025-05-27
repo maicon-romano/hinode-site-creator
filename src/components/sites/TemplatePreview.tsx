@@ -16,7 +16,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
   showPreview,
   onTogglePreview
 }) => {
-  // Dados padrão para preview quando não há dados suficientes
+  // Dados padrão mais completos para preview
   const previewData = {
     templateId: siteData.templateId || 'landing-01',
     nomeDoSite: siteData.nomeDoSite || 'Exemplo Site',
@@ -27,18 +27,29 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
       destaque: siteData.cores?.destaque || '#0066cc',
       texto: siteData.cores?.texto || '#333333',
     },
-    activeSections: siteData.activeSections || ['hero', 'contato'],
-    // Hero padrão
+    activeSections: siteData.activeSections || ['hero', 'beneficios', 'sobre', 'contato'],
+    // Hero com dados de exemplo
     hero: {
-      titulo: siteData.hero?.titulo || siteData.nomeDoSite || 'Seu Site Incrível',
-      subtitulo: siteData.hero?.subtitulo || 'Transforme sua presença digital hoje mesmo',
+      titulo: siteData.hero?.titulo || 'Transforme Sua Presença Digital',
+      subtitulo: siteData.hero?.subtitulo || 'Crie sites profissionais com nossa plataforma inovadora',
       botaoTexto: siteData.hero?.botaoTexto || 'Fale Conosco',
       botaoLink: siteData.hero?.botaoLink || 'https://wa.me/5511999999999',
       imagemHero: siteData.hero?.imagemHero || '',
       posicao: siteData.hero?.posicao || 'center',
       videoUrl: siteData.hero?.videoUrl || ''
     },
-    // Contato padrão
+    // Benefícios com dados de exemplo
+    beneficios: {
+      titulo: siteData.beneficios?.titulo || 'Por que escolher nossos serviços?',
+      lista: siteData.beneficios?.lista || 'Design Profissional\nSuper Rápido\nSuporte 24/7\nPreço Justo'
+    },
+    // Sobre com dados de exemplo
+    sobre: {
+      titulo: siteData.sobre?.titulo || 'Sobre Nossa Empresa',
+      texto: siteData.sobre?.texto || 'Somos especialistas em criar experiências digitais excepcionais. Nossa equipe combina criatividade e tecnologia para entregar resultados que superam expectativas.',
+      imagem: siteData.sobre?.imagem || ''
+    },
+    // Contato com dados de exemplo
     contato: {
       titulo: siteData.contato?.titulo || 'Entre em Contato',
       whatsapp: siteData.contato?.whatsapp || '5511999999999',
@@ -46,20 +57,30 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
       email: siteData.contato?.email || 'contato@exemplo.com',
       endereco: siteData.contato?.endereco || 'São Paulo, SP'
     },
-    // Outras seções com dados padrão
-    sobre: siteData.sobre || {
-      titulo: 'Sobre Nós',
-      texto: 'Somos uma empresa dedicada a oferecer os melhores serviços.',
-      imagem: ''
+    // Serviços para templates institucionais
+    servicos: {
+      titulo: siteData.servicos?.titulo || 'Nossos Serviços',
+      lista: siteData.servicos?.lista || 'Desenvolvimento Web\nDesign Digital\nConsultoria\nSuporte Técnico',
+      descricao: siteData.servicos?.descricao || 'Oferecemos soluções completas para transformar sua presença digital.'
     },
-    beneficios: siteData.beneficios || {
-      titulo: 'Por que escolher nosso serviço?',
-      lista: 'Qualidade garantida\nEntrega rápida\nSuporte 24h'
+    // Dados específicos para outros templates
+    recursos: {
+      titulo: 'Recursos Incríveis',
+      lista: 'Interface Intuitiva\nTecnologia Avançada\nSegurança Garantida'
     },
-    servicos: siteData.servicos || {
-      titulo: 'Nossos Serviços',
-      lista: 'Consultoria\nDesenvolvimento\nSuporte',
-      descricao: 'Oferecemos soluções completas para seu negócio.'
+    cta: {
+      titulo: 'Pronto para começar?',
+      texto: 'Junte-se a milhares de clientes satisfeitos',
+      botaoTexto: 'Começar Agora',
+      botaoLink: 'https://wa.me/5511999999999'
+    },
+    caracteristicas: {
+      titulo: 'Principais Características',
+      lista: 'Responsivo\nOtimizado\nModerno'
+    },
+    depoimentos: {
+      titulo: 'O que nossos clientes dizem',
+      lista: 'João Silva: Excelente serviço!\nMaria Santos: Superou minhas expectativas!\nPedro Costa: Muito profissional!'
     },
     ...siteData
   };
@@ -89,7 +110,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
       </div>
 
       {showPreview && (
-        <Card className="max-h-[800px] overflow-y-auto">
+        <Card className="overflow-hidden">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-gray-600 flex items-center justify-between">
               <span>Preview - {previewData.templateId}</span>
@@ -99,8 +120,10 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="transform scale-[0.4] origin-top-left w-[250%] h-[250%] overflow-hidden border-t">
-              <DynamicSiteRenderer siteData={previewData} isPreview={true} />
+            <div className="w-full h-[600px] overflow-hidden bg-white border rounded">
+              <div className="transform scale-[0.3] origin-top-left w-[333.33%] h-[333.33%] overflow-auto">
+                <DynamicSiteRenderer siteData={previewData} isPreview={true} />
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -112,6 +135,9 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
             <div className="text-center text-gray-500">
               <Eye className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p className="text-sm">Clique em "Mostrar Preview" para visualizar seu site</p>
+              <p className="text-xs mt-2 text-gray-400">
+                Template: {previewData.templateId}
+              </p>
             </div>
           </CardContent>
         </Card>
