@@ -10,7 +10,7 @@ import { Plus, Edit, Trash2, ArrowLeft, Eye, LogOut, Download, Copy } from 'luci
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { SiteForm } from '@/components/sites/SiteForm';
-import { processImageData, createSitesDirectory } from '@/lib/imageUtils';
+import { processImageData, createSitesDirectory, detectBase64Images } from '@/lib/imageUtils';
 
 interface SiteData {
   id?: string;
@@ -132,7 +132,7 @@ const ManageSites = () => {
           sanitized[key] = sanitizedArray;
         }
       } else {
-        // Handle primitive values - mas agora excluindo base64 que já foi processado
+        // Handle primitive values - mas agora excluindo base64 que já foi processada
         if (typeof value === 'string' && value.startsWith('data:image/')) {
           console.warn('Base64 image encontrada durante sanitização - deveria ter sido processada antes');
           continue; // Pular imagens base64 que não foram processadas
@@ -150,6 +150,9 @@ const ManageSites = () => {
       
       // Garantir que o diretório de sites existe
       createSitesDirectory();
+      
+      // Detectar imagens base64 no objeto
+      const base64Images = detectBase64Images(data);
       
       // Processar imagens antes de sanitizar para Firestore
       const processedData = processImageData(data, data.clientId);
