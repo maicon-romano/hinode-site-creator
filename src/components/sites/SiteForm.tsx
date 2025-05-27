@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ClientSelector } from './ClientSelector';
 import { ColorSelector } from './ColorSelector';
 import { LogoUpload } from './LogoUpload';
+import { TemplatePreview } from './TemplatePreview';
 
 interface SiteFormData {
   clientId: string;
@@ -53,6 +53,8 @@ export const SiteForm: React.FC<SiteFormProps> = ({
     texto: initialData?.cores?.texto || '#333333'
   });
 
+  const [showPreview, setShowPreview] = useState(false);
+
   const form = useForm<SiteFormData>({
     defaultValues: {
       clientId: initialData?.clientId || '',
@@ -83,6 +85,12 @@ export const SiteForm: React.FC<SiteFormProps> = ({
 
   const handleSubmit = (data: SiteFormData) => {
     onSubmit({ ...data, cores: colors });
+  };
+
+  // Dados atuais do formulário para preview
+  const currentFormData = {
+    ...form.watch(),
+    cores: colors
   };
 
   return (
@@ -141,6 +149,13 @@ export const SiteForm: React.FC<SiteFormProps> = ({
             )}
           />
         </div>
+
+        {/* Preview do Template */}
+        <TemplatePreview
+          siteData={currentFormData}
+          showPreview={showPreview}
+          onTogglePreview={() => setShowPreview(!showPreview)}
+        />
 
         <FormField
           control={form.control}
