@@ -26,19 +26,17 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
     setUploading(true);
     
     try {
-      // Simular salvamento local - em um ambiente real, seria necessário um endpoint
-      const logoPath = `/public/sites/${clientId}/logo.png`;
-      
-      // Criar preview
+      // Criar preview imediato
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
         setPreview(result);
-        onLogoChange(logoPath);
+        // Usar o data URL diretamente como logo path
+        onLogoChange(result);
+        console.log('Logo carregado com sucesso');
       };
       reader.readAsDataURL(file);
       
-      console.log(`Logo seria salvo em: ${logoPath}`);
     } catch (error) {
       console.error('Erro ao fazer upload do logo:', error);
     } finally {
@@ -61,7 +59,7 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
               <img 
                 src={preview} 
                 alt="Preview do logo" 
-                className="w-32 h-32 object-contain border rounded-lg"
+                className="w-32 h-32 object-contain border rounded-lg bg-white"
               />
               <Button
                 type="button"
@@ -89,6 +87,12 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
             disabled={uploading || !clientId}
             className="cursor-pointer"
           />
+          
+          {uploading && (
+            <p className="text-sm text-blue-600">
+              Fazendo upload...
+            </p>
+          )}
           
           {!clientId && (
             <p className="text-sm text-orange-600">
