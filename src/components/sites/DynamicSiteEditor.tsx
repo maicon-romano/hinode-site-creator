@@ -34,10 +34,10 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
 }) => {
   const siteModel = getSiteModel(templateId);
   const [activeSections, setActiveSections] = useState<Set<string>>(
-    new Set(siteModel?.secoesPadrao.map(s => s.type) || [])
+    new Set(initialData?.activeSections || siteModel?.secoesPadrao.map(s => s.type) || [])
   );
   const [sectionsOrder, setSectionsOrder] = useState<string[]>(
-    siteModel?.secoesPadrao.map(s => s.type) || []
+    initialData?.sectionsOrder || siteModel?.secoesPadrao.map(s => s.type) || []
   );
   const [showPreview, setShowPreview] = useState(false);
   const [colors, setColors] = useState({
@@ -46,28 +46,59 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     destaque: initialData?.cores?.destaque || '#0066cc',
     texto: initialData?.cores?.texto || '#333333'
   });
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Use the form context from the parent SiteBuilder
   const form = useFormContext();
 
-  // Update form values when props change
+  // Initialize form values only once
   useEffect(() => {
-    form.setValue('clientId', clientId);
-    form.setValue('clientName', clientName);
-    form.setValue('modelId', templateId);
-    form.setValue('nomeDoSite', initialData?.nomeDoSite || '');
-    form.setValue('logoPath', initialData?.logoPath || '');
-    form.setValue('cores', colors);
-    
-    // Set initial values for all sections
-    if (initialData) {
-      Object.keys(initialData).forEach(key => {
-        if (!['clientId', 'clientName', 'modelId', 'nomeDoSite', 'logoPath', 'cores'].includes(key)) {
-          form.setValue(key, initialData[key]);
+    if (!isInitialized) {
+      console.log('Inicializando formulário com dados:', { clientId, clientName, templateId, initialData });
+      
+      form.setValue('clientId', clientId);
+      form.setValue('clientName', clientName);
+      form.setValue('modelId', templateId);
+      form.setValue('cores', colors);
+      form.setValue('activeSections', Array.from(activeSections));
+      form.setValue('sectionsOrder', sectionsOrder);
+      
+      // Set initial values for sections if editing
+      if (initialData) {
+        // Set basic fields
+        if (initialData.nomeDoSite) {
+          form.setValue('nomeDoSite', initialData.nomeDoSite);
         }
-      });
+        if (initialData.logoPath) {
+          form.setValue('logoPath', initialData.logoPath);
+        }
+        
+        // Set section data
+        Object.keys(initialData).forEach(key => {
+          if (!['clientId', 'clientName', 'modelId', 'nomeDoSite', 'logoPath', 'cores', 'activeSections', 'sectionsOrder', 'layout'].includes(key)) {
+            form.setValue(key, initialData[key]);
+          }
+        });
+      }
+      
+      setIsInitialized(true);
     }
-  }, [clientId, clientName, templateId, initialData, colors, form]);
+  }, []);
+
+  // Update colors in form when they change
+  useEffect(() => {
+    form.setValue('cores', colors);
+  }, [colors, form]);
+
+  // Update activeSections in form when they change
+  useEffect(() => {
+    form.setValue('activeSections', Array.from(activeSections));
+  }, [activeSections, form]);
+
+  // Update sectionsOrder in form when they change
+  useEffect(() => {
+    form.setValue('sectionsOrder', sectionsOrder);
+  }, [sectionsOrder, form]);
 
   if (!siteModel) {
     return (
@@ -79,7 +110,6 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
 
   const handleColorChange = (colorType: string, color: string) => {
     setColors(prev => ({ ...prev, [colorType]: color }));
-    form.setValue('cores', { ...colors, [colorType]: color });
   };
 
   const toggleSection = (sectionType: string) => {
@@ -158,6 +188,8 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     const updatedCards = currentCards.filter((card: any) => card.id !== cardId);
     form.setValue(`${sectionType}.cards`, updatedCards);
   };
+
+  // ... keep existing code (renderCardEditor, renderSectionField, renderSectionFields functions)
 
   const renderCardEditor = (sectionType: string, fieldLabel: string) => {
     const cards = form.watch(`${sectionType}.cards`) || [];
@@ -488,7 +520,8 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
       cores: colors,
       layout,
       modelId: templateId,
-      sectionsOrder
+      sectionsOrder,
+      activeSections: Array.from(activeSections)
     });
   };
 
@@ -511,6 +544,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
       layout,
       whatsapp: formData.hero?.whatsapp || formData.contato?.whatsapp || '5511999999999',
       sectionsOrder,
+      activeSections: Array.from(activeSections),
       ...formData
     };
   };
@@ -536,7 +570,11 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
                 <FormItem>
                   <FormLabel>Nome do Site</FormLabel>
                   <FormControl>
-                    <Input placeholder="Meu Site Incrível" {...field} />
+                    <Input 
+                      placeholder="Meu Site Incrível" 
+                      {...field} 
+                      value={field.value || ''}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
