@@ -89,6 +89,36 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     setActiveSections(newActiveSections);
   };
 
+  // Helper function to get section display name
+  const getSectionDisplayName = (sectionType: string) => {
+    const sectionNames: { [key: string]: string } = {
+      'hero': 'Seção Principal',
+      'hero-hinode': 'Seção Principal Hinode',
+      'apresentacao-pessoal': 'Apresentação Pessoal',
+      'beneficios': 'Benefícios',
+      'sobre': 'Sobre',
+      'sobre-hinode': 'Sobre Hinode',
+      'sobre-distribuidor': 'Sobre Distribuidor',
+      'bio': 'Biografia',
+      'servicos': 'Serviços',
+      'habilidades': 'Habilidades',
+      'produtos-destaque': 'Produtos em Destaque',
+      'como-funciona': 'Como Funciona',
+      'etapas-comecar': 'Etapas para Começar',
+      'depoimentos': 'Depoimentos',
+      'faq': 'Perguntas Frequentes',
+      'equipe': 'Equipe',
+      'projetos': 'Projetos',
+      'mapa': 'Mapa',
+      'contato': 'Contato',
+      'rodape': 'Rodapé',
+      'rodape-hinode': 'Rodapé Hinode',
+      'banner-institucional': 'Banner Institucional',
+      'produto': 'Produto'
+    };
+    return sectionNames[sectionType] || sectionType;
+  };
+
   const renderSectionField = (fieldKey: string, sectionType: string, fieldLabel: string, fieldType: 'text' | 'textarea' | 'url' | 'image' = 'text') => {
     const fieldName = `${sectionType}.${fieldKey}`;
 
@@ -285,6 +315,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
 
           {siteModel.secoesPadrao.map((secao) => {
             const isActive = activeSections.has(secao.type);
+            const sectionDisplayName = getSectionDisplayName(secao.type);
             
             return (
               <Card key={secao.type} className={!isActive ? 'opacity-60' : ''}>
@@ -293,10 +324,10 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
                     <div className="flex items-center gap-3">
                       <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
                       <div>
-                        <CardTitle className="text-base">{secao.nome}</CardTitle>
-                        {secao.descricao && (
-                          <p className="text-sm text-gray-600 mt-1">{secao.descricao}</p>
-                        )}
+                        <CardTitle className="text-base">{sectionDisplayName}</CardTitle>
+                        <p className="text-sm text-gray-600 mt-1">
+                          Configurar seção {sectionDisplayName.toLowerCase()}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
