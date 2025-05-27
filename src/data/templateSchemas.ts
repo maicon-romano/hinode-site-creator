@@ -274,59 +274,96 @@ export const templateSchemas: TemplateSchema[] = [
     thumbnail: '/templates/hinode-premium.jpg',
     sections: [
       {
-        key: 'hero',
-        label: 'Apresentação Representante',
+        key: 'hero-hinode',
+        label: 'Seção do Topo',
         fields: [
-          { key: 'nome', label: 'Seu Nome', type: 'text', required: true, placeholder: 'Ana Beatriz' },
-          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Consultora de Beleza Hinode' },
-          { key: 'experiencia', label: 'Tempo de Experiência', type: 'text', placeholder: '5 anos' },
-          { key: 'foto', label: 'Sua Foto', type: 'image' }
+          { key: 'titulo', label: 'Headline (Título)', type: 'text', required: true, placeholder: 'Seja um Representante Hinode' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text', placeholder: 'Transforme sua vida com perfumes de luxo' },
+          { key: 'video', label: 'URL do Vídeo', type: 'url', placeholder: 'https://youtube.com/watch?v=...' },
+          { key: 'botaoTexto', label: 'Texto do Botão', type: 'text', placeholder: 'Quero ser Representante' },
+          { key: 'imagem', label: 'Imagem de Fundo', type: 'image' }
         ]
       },
       {
-        key: 'sobre-hinode',
-        label: 'Sobre a Hinode',
+        key: 'sobre-negocio',
+        label: 'Sobre o Negócio Hinode',
         fields: [
-          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Por que Hinode?' },
-          { key: 'descricao', label: 'Descrição', type: 'textarea', placeholder: 'A Hinode é líder em cosméticos e perfumaria no Brasil...' },
-          { key: 'logoHinode', label: 'Logo Hinode', type: 'image' }
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Sobre a Hinode' },
+          { key: 'texto', label: 'Texto sobre o Negócio', type: 'textarea', placeholder: 'A Hinode é líder em cosméticos e perfumaria no Brasil...' },
+          { key: 'botaoTexto', label: 'Texto do Botão', type: 'text', placeholder: 'Conhecer Mais' },
+          { key: 'imagem', label: 'Imagem (lado esquerdo)', type: 'image' }
+        ]
+      },
+      {
+        key: 'biografia-representante',
+        label: 'Biografia do Representante',
+        fields: [
+          { key: 'nome', label: 'Seu Nome', type: 'text', required: true, placeholder: 'Ana Silva' },
+          { key: 'titulo', label: 'Seu Título', type: 'text', placeholder: 'Consultora de Beleza Hinode' },
+          { key: 'texto', label: 'Sua Biografia', type: 'textarea', placeholder: 'Sou consultora Hinode há 5 anos...' },
+          { key: 'experiencia', label: 'Tempo de Experiência', type: 'text', placeholder: '5 anos' },
+          { key: 'botaoTexto', label: 'Texto do Botão', type: 'text', placeholder: 'Falar Comigo' },
+          { key: 'foto', label: 'Sua Foto (lado direito)', type: 'image' }
+        ]
+      },
+      {
+        key: 'produtos-hinode',
+        label: 'Produtos Hinode',
+        fields: [
+          { key: 'titulo', label: 'Título da Seção', type: 'text', placeholder: 'Nossos Produtos' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text', placeholder: 'Conheça nossa linha completa' },
+          { key: 'produtos', label: 'Lista de Produtos', type: 'textarea', placeholder: 'Perfumes Importados - Fragrâncias exclusivas\nMaquiagem Premium - Beleza que dura\nCuidados com a Pele - Produtos naturais' }
+        ]
+      },
+      {
+        key: 'contato-hinode',
+        label: 'Contato',
+        fields: [
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Entre em Contato' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text', placeholder: 'Tire suas dúvidas ou faça seu pedido' },
+          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true, placeholder: '5511999999999' },
+          { key: 'mostrarFormulario', label: 'Mostrar Formulário de Contato', type: 'boolean' }
+        ]
+      },
+      {
+        key: 'rodape-hinode',
+        label: 'Rodapé',
+        fields: [
+          { key: 'texto', label: 'Texto do Rodapé', type: 'text', placeholder: 'Consultora Hinode - Transformando vidas através da beleza' },
+          { key: 'ano', label: 'Ano', type: 'text', placeholder: '2024' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'hinode-landing',
+    name: 'Hinode Landing Simples',
+    type: 'hinode',
+    description: 'Landing page focada em conversão para produtos Hinode',
+    thumbnail: '/templates/hinode-landing.jpg',
+    sections: [
+      {
+        key: 'hero-hinode',
+        label: 'Hero Hinode',
+        fields: [
+          { key: 'titulo', label: 'Título Principal', type: 'text', required: true, placeholder: 'Descubra o Mundo Hinode' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text', placeholder: 'Perfumes e cosméticos de qualidade internacional' },
+          { key: 'botaoTexto', label: 'Texto do Botão', type: 'text', placeholder: 'Conhecer Produtos' }
         ]
       },
       {
         key: 'produtos-destaque',
         label: 'Produtos em Destaque',
         fields: [
-          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Nossos Best Sellers' },
-          { key: 'categoria1', label: 'Categoria 1', type: 'text', placeholder: 'Perfumes Importados' },
-          { key: 'categoria2', label: 'Categoria 2', type: 'text', placeholder: 'Maquiagem Premium' },
-          { key: 'categoria3', label: 'Categoria 3', type: 'text', placeholder: 'Cuidados com a Pele' }
-        ]
-      },
-      {
-        key: 'seja-representante',
-        label: 'Seja um Representante',
-        fields: [
-          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Seja um Consultor Hinode' },
-          { key: 'beneficios', label: 'Benefícios', type: 'textarea', placeholder: 'Renda Extra Garantida\nProdutos com Desconto\nTreinamentos Gratuitos\nSupporte Completo' },
-          { key: 'comissao', label: 'Comissão', type: 'text', placeholder: 'Até 40% de comissão' }
-        ]
-      },
-      {
-        key: 'depoimentos',
-        label: 'Depoimentos de Clientes',
-        fields: [
-          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'O que nossos clientes dizem' },
-          { key: 'ativo', label: 'Exibir Depoimentos', type: 'boolean' }
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Produtos em Destaque' },
+          { key: 'lista', label: 'Lista de Produtos', type: 'textarea', placeholder: 'Perfumes Importados\nCosméticos Premium\nCuidados Pessoais' }
         ]
       },
       {
         key: 'contato',
         label: 'Contato',
         fields: [
-          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Faça seu Pedido ou Tire suas Dúvidas' },
-          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true, placeholder: '5511999999999' },
-          { key: 'instagram', label: 'Instagram', type: 'url', placeholder: 'https://instagram.com/seuperfil' },
-          { key: 'localizacao', label: 'Localização', type: 'text', placeholder: 'São Paulo - SP' }
+          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true }
         ]
       }
     ]

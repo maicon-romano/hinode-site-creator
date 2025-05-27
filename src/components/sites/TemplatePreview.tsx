@@ -16,7 +16,6 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
   showPreview,
   onTogglePreview
 }) => {
-  // Criar dados específicos baseados no templateId/modelId selecionado
   const createPreviewData = (templateId: string) => {
     const baseData = {
       templateId,
@@ -33,7 +32,6 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
       ...siteData
     };
 
-    // Configurar dados específicos para cada template
     switch (templateId) {
       case 'landing-premium':
         return {
@@ -48,10 +46,6 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
           beneficios: {
             titulo: 'Benefícios Exclusivos',
             lista: 'Design Premium\nTecnologia Avançada\nSuporte VIP\nResultados Garantidos'
-          },
-          contato: {
-            titulo: 'Contato Premium',
-            whatsapp: '5511999999999'
           }
         };
 
@@ -77,7 +71,6 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
             titulo: 'Sua Empresa do Futuro',
             subtitulo: 'Soluções corporativas de excelência',
             botaoTexto: 'Conhecer Mais',
-            imagemHero: '',
           },
           sobre: {
             titulo: 'Sobre Nossa Empresa',
@@ -89,21 +82,6 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
           }
         };
 
-      case 'institucional-premium':
-        return {
-          ...baseData,
-          hero: {
-            titulo: 'Excelência Institucional',
-            subtitulo: 'Tradição e inovação em perfeita harmonia',
-            botaoTexto: 'Descobrir Mais',
-            imagemHero: '',
-          },
-          sobre: {
-            titulo: 'Nossa História',
-            texto: 'Décadas de experiência e compromisso com a qualidade',
-          }
-        };
-
       case 'portfolio-creative':
         return {
           ...baseData,
@@ -112,14 +90,12 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
             subtitulo: 'Designer & Desenvolvedor Criativo',
             texto: 'Transformo ideias em experiências digitais únicas',
             botaoTexto: 'Ver Portfolio',
-            imagem: '',
           },
           projetos: {
             titulo: 'Projetos Criativos',
             cards: [
               { id: 1, titulo: 'App Mobile', texto: 'Design inovador', ordem: 1 },
-              { id: 2, titulo: 'Website', texto: 'UX/UI moderno', ordem: 2 },
-              { id: 3, titulo: 'Branding', texto: 'Identidade visual', ordem: 3 }
+              { id: 2, titulo: 'Website', texto: 'UX/UI moderno', ordem: 2 }
             ]
           }
         };
@@ -132,7 +108,6 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
             subtitulo: 'Código Limpo & Soluções Eficientes',
             texto: 'Especialista em criar aplicações web modernas e escaláveis',
             botaoTexto: 'Ver Projetos',
-            imagem: '',
           },
           habilidades: {
             titulo: 'Tecnologias',
@@ -146,20 +121,38 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
           'hero-hinode': {
             titulo: 'Seja um Representante Hinode Premium',
             subtitulo: 'Transforme sua vida com perfumes de luxo',
-            texto: 'Junte-se à família Hinode e construa seu próprio negócio',
+            video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
             botaoTexto: 'Quero ser Representante',
-            video: '',
             imagem: '',
           },
-          'sobre-hinode': {
-            titulo: 'Hinode Premium',
-            subtitulo: 'Excelência em Perfumaria',
-            texto: 'A Hinode é líder em cosméticos e perfumaria no Brasil, oferecendo produtos de alta qualidade e oportunidade de negócio única.'
+          'sobre-negocio': {
+            titulo: 'Sobre a Hinode',
+            texto: 'A Hinode é líder em cosméticos e perfumaria no Brasil, oferecendo produtos de alta qualidade e oportunidade de negócio única.',
+            botaoTexto: 'Conhecer Mais',
+            imagem: ''
           },
-          'produtos-destaque': {
-            titulo: 'Perfumes Premium',
-            subtitulo: 'Fragrâncias exclusivas',
-            descricao: 'Linha completa de perfumes importados e nacionais'
+          'biografia-representante': {
+            nome: 'Ana Beatriz Silva',
+            titulo: 'Consultora de Beleza Hinode',
+            texto: 'Sou consultora Hinode há 5 anos e amo poder transformar a vida das pessoas através da beleza e da oportunidade de negócio.',
+            experiencia: '5 anos',
+            botaoTexto: 'Falar Comigo',
+            foto: ''
+          },
+          'produtos-hinode': {
+            titulo: 'Nossos Produtos',
+            subtitulo: 'Linha completa de beleza e cuidados',
+            produtos: 'Perfumes Importados - Fragrâncias exclusivas e marcantes\nMaquiagem Premium - Beleza que dura o dia todo\nCuidados com a Pele - Produtos naturais e eficazes'
+          },
+          'contato-hinode': {
+            titulo: 'Entre em Contato',
+            subtitulo: 'Tire suas dúvidas ou faça seu pedido',
+            whatsapp: '5511999999999',
+            mostrarFormulario: true
+          },
+          'rodape-hinode': {
+            texto: 'Consultora Hinode - Transformando vidas através da beleza',
+            ano: '2024'
           }
         };
 
@@ -169,10 +162,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
           'hero-hinode': {
             titulo: 'Descubra o Mundo Hinode',
             subtitulo: 'Perfumes e cosméticos de qualidade internacional',
-            texto: 'Produtos que encantam e oportunidade que transforma vidas',
             botaoTexto: 'Conhecer Produtos',
-            video: '',
-            imagem: '',
           },
           'produtos-destaque': {
             titulo: 'Produtos em Destaque',
@@ -187,17 +177,12 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
             titulo: 'Bem-vindo ao ' + (baseData.nomeDoSite || 'Nosso Site'),
             subtitulo: 'Template padrão com design moderno',
             botaoTexto: 'Saiba Mais',
-            imagemHero: '',
-          },
-          sobre: {
-            titulo: 'Sobre Nós',
-            texto: 'Conheça mais sobre nossos serviços e história',
           }
         };
     }
   };
 
-  const templateId = siteData.templateId || siteData.modelId || 'landing-01';
+  const templateId = siteData.templateId || siteData.modelId || 'landing-premium';
   const previewData = createPreviewData(templateId);
 
   console.log('TemplatePreview - Template selecionado:', templateId);
@@ -240,7 +225,11 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
           <CardContent className="p-0">
             <div className="w-full h-[600px] overflow-hidden bg-white border rounded">
               <div className="transform scale-[0.3] origin-top-left w-[333.33%] h-[333.33%] overflow-auto">
-                <DynamicSiteRenderer siteData={previewData} isPreview={true} />
+                <DynamicSiteRenderer 
+                  key={`preview-${templateId}-${Date.now()}`}
+                  siteData={previewData} 
+                  isPreview={true} 
+                />
               </div>
             </div>
           </CardContent>

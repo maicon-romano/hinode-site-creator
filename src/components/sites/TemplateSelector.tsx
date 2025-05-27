@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { getTemplatesByType, TemplateSchema } from '@/data/templateSchemas';
 
 interface TemplateSelectorProps {
-  selectedType: 'landing' | 'institucional';
+  selectedType: 'landing' | 'institucional' | 'portfolio' | 'hinode';
   selectedTemplate: string;
   onTemplateSelect: (templateId: string) => void;
 }
@@ -18,11 +18,21 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
 }) => {
   const templates = getTemplatesByType(selectedType);
 
+  const getTypeDisplayName = (type: string) => {
+    const names = {
+      'landing': 'Landing Page',
+      'institucional': 'Institucional',
+      'portfolio': 'Portfólio',
+      'hinode': 'Representante Hinode'
+    };
+    return names[type] || type;
+  };
+
   return (
     <div className="space-y-4">
       <div>
         <h3 className="text-lg font-medium mb-2">
-          Escolha um Template {selectedType === 'landing' ? 'de Landing Page' : 'Institucional'}
+          Escolha um Template {getTypeDisplayName(selectedType)}
         </h3>
         <p className="text-sm text-gray-600">
           Selecione o design que melhor se adequa ao seu projeto
@@ -50,8 +60,14 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="aspect-video bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
-                <span className="text-gray-400 text-sm">Preview</span>
+              <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-purple-400/20"></div>
+                <div className="relative z-10 text-center">
+                  <div className="text-xs font-medium text-gray-600 mb-1">{template.name}</div>
+                  <div className="w-16 h-2 bg-white/50 rounded mb-1"></div>
+                  <div className="w-12 h-1 bg-white/30 rounded mb-1"></div>
+                  <div className="w-20 h-1 bg-white/30 rounded"></div>
+                </div>
               </div>
               <Button 
                 variant={selectedTemplate === template.id ? "default" : "outline"}
