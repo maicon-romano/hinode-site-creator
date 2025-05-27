@@ -104,11 +104,52 @@ const ManageSites = () => {
     }
   };
 
+  const sanitizeDataForFirestore = (data: any): any => {
+    const sanitized: any = {};
+    
+    for (const [key, value] of Object.entries(data)) {
+      if (value === null || value === undefined) {
+        continue;
+      }
+      
+      if (typeof value === 'object' && !Array.isArray(value) && !(value instanceof Date)) {
+        // Handle nested objects recursively
+        const nestedSanitized = sanitizeDataForFirestore(value);
+        if (Object.keys(nestedSanitized).length > 0) {
+          sanitized[key] = nestedSanitized;
+        }
+      } else if (Array.isArray(value)) {
+        // Handle arrays
+        const sanitizedArray = value.map(item => {
+          if (typeof item === 'object' && item !== null) {
+            return sanitizeDataForFirestore(item);
+          }
+          return item;
+        }).filter(item => item !== null && item !== undefined);
+        
+        if (sanitizedArray.length > 0) {
+          sanitized[key] = sanitizedArray;
+        }
+      } else {
+        // Handle primitive values
+        sanitized[key] = value;
+      }
+    }
+    
+    return sanitized;
+  };
+
   const onSubmit = async (data: any) => {
     try {
+      console.log('Dados originais recebidos:', data);
+      
+      // Sanitize data for Firestore
+      const sanitizedData = sanitizeDataForFirestore(data);
+      console.log('Dados sanitizados para Firestore:', sanitizedData);
+      
       if (editingSite) {
         await updateDoc(doc(db, 'sites', editingSite.id!), {
-          ...data,
+          ...sanitizedData,
           updatedAt: new Date()
         });
         toast({
@@ -117,7 +158,7 @@ const ManageSites = () => {
         });
       } else {
         await addDoc(collection(db, 'sites'), {
-          ...data,
+          ...sanitizedData,
           createdAt: new Date()
         });
         toast({
@@ -129,11 +170,11 @@ const ManageSites = () => {
       setIsDialogOpen(false);
       setEditingSite(null);
       fetchSites();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao salvar site:', error);
       toast({
         title: "Erro",
-        description: "Não foi possível salvar o site",
+        description: `Não foi possível salvar o site: ${error.message}`,
         variant: "destructive"
       });
     }
