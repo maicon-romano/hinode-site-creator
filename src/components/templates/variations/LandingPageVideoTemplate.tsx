@@ -53,18 +53,10 @@ export const LandingPageVideoTemplate: React.FC<LandingPageVideoTemplateProps> =
     <div className="min-h-screen" style={styles}>
       <WhatsAppButton whatsapp={siteData.whatsapp} isPreview={isPreview} color={cores.destaque} />
       
-      {/* Hero Section with Video Background Concept */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-gradient-to-br from-black/50 to-black/30 z-10"
-          style={{ backgroundColor: `${cores.principal}20` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-r" style={{ 
-          background: `linear-gradient(135deg, ${cores.principal}15, ${cores.destaque}15)` 
-        }} />
-        
-        <div className="relative z-20 container mx-auto px-6 text-center">
-          <div className="animate-fade-in">
+      {/* Hero Section with Video */}
+      <section className="py-20 px-6">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-12">
             {siteData.logoPath && (
               <img 
                 src={siteData.logoPath} 
@@ -72,18 +64,15 @@ export const LandingPageVideoTemplate: React.FC<LandingPageVideoTemplateProps> =
                 className="h-16 w-auto mx-auto mb-8 animate-scale-in"
               />
             )}
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white leading-tight">
+            <h1 className="text-4xl md:text-6xl font-bold mb-8 leading-tight" style={{ color: cores.principal }}>
               {siteData.headline}
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
-              {siteData.descricao}
-            </p>
             
-            {/* Video Preview */}
+            {/* Video Section */}
             {secoes.video && siteData.videoUrl && (
               <div className="mb-8">
-                <div className="relative max-w-2xl mx-auto">
-                  <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl bg-black/20 backdrop-blur-sm border border-white/20">
+                <div className="max-w-4xl mx-auto">
+                  <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl bg-black">
                     <iframe
                       src={siteData.videoUrl}
                       className="w-full h-full"
@@ -92,12 +81,13 @@ export const LandingPageVideoTemplate: React.FC<LandingPageVideoTemplateProps> =
                       title="Vídeo Demonstrativo"
                     />
                   </div>
-                  <div className="absolute -top-4 -right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold animate-pulse">
-                    ASSISTA
-                  </div>
                 </div>
               </div>
             )}
+            
+            <p className="text-xl md:text-2xl mb-8 max-w-4xl mx-auto" style={{ color: cores.texto }}>
+              {siteData.descricao}
+            </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button 
@@ -114,10 +104,11 @@ export const LandingPageVideoTemplate: React.FC<LandingPageVideoTemplateProps> =
                 <Button 
                   variant="outline" 
                   size="lg"
-                  className="text-white border-white hover:bg-white hover:text-black text-lg px-8 py-4 rounded-full backdrop-blur-sm"
+                  style={{ borderColor: cores.principal, color: cores.principal }}
+                  className="hover:bg-gray-50 text-lg px-8 py-4 rounded-full"
                 >
                   <Play className="h-5 w-5 mr-2" />
-                  Ver Demonstração
+                  Assistir Novamente
                 </Button>
               )}
             </div>
