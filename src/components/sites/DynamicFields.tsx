@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
@@ -159,7 +158,7 @@ export const DynamicFields: React.FC<DynamicFieldsProps> = ({
             )}
             {errors[field.key] && (
               <p className="text-sm font-medium text-destructive">
-                {errors[field.key]?.message}
+                {String(errors[field.key]?.message) || `${field.label} é obrigatório`}
               </p>
             )}
           </div>
