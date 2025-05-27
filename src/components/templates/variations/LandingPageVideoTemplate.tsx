@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Phone, Mail, MapPin, Star, Play, CheckCircle } from 'lucide-react';
 import { WhatsAppButton } from '../WhatsAppButton';
+import { convertYouTubeToEmbed } from '@/lib/imageUtils';
 
 interface SiteData {
   nomeDoSite: string;
@@ -50,30 +50,8 @@ export const LandingPageVideoTemplate: React.FC<LandingPageVideoTemplateProps> =
     }
   };
 
-  // Função para converter URL do YouTube para embed
-  const getEmbedUrl = (url: string) => {
-    if (!url) return '';
-    
-    // Se já é uma URL de embed, retorna como está
-    if (url.includes('youtube.com/embed/')) {
-      return url;
-    }
-    
-    // Extrai o ID do vídeo de diferentes formatos de URL do YouTube
-    let videoId = '';
-    
-    if (url.includes('youtube.com/watch?v=')) {
-      videoId = url.split('v=')[1]?.split('&')[0];
-    } else if (url.includes('youtu.be/')) {
-      videoId = url.split('youtu.be/')[1]?.split('?')[0];
-    } else if (url.includes('youtube.com/embed/')) {
-      return url;
-    }
-    
-    return videoId ? `https://www.youtube.com/embed/${videoId}` : '';
-  };
-
-  const embedUrl = getEmbedUrl(siteData.videoUrl || '');
+  // Garantir que a URL do vídeo está no formato correto para embed
+  const embedUrl = siteData.videoUrl ? convertYouTubeToEmbed(siteData.videoUrl) : '';
 
   return (
     <div className="min-h-screen" style={styles}>

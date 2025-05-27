@@ -30,6 +30,48 @@ const isBase64Image = (value: any): boolean => {
   return typeof value === 'string' && value.startsWith('data:image/');
 };
 
+const isYouTubeUrl = (value: any): boolean => {
+  if (typeof value !== 'string') return false;
+  return value.includes('youtube.com') || value.includes('youtu.be');
+};
+
+export const convertYouTubeToEmbed = (url: string): string => {
+  if (!isYouTubeUrl(url)) return url;
+  
+  console.log('Converting YouTube URL to embed format:', url);
+  
+  // Se já é uma URL de embed, retorna como está
+  if (url.includes('youtube.com/embed/')) {
+    return url;
+  }
+  
+  let videoId = '';
+  
+  try {
+    // Diferentes formatos de URL do YouTube
+    if (url.includes('youtube.com/watch?v=')) {
+      const urlParams = new URLSearchParams(url.split('?')[1]);
+      videoId = urlParams.get('v') || '';
+    } else if (url.includes('youtube.com/live/')) {
+      videoId = url.split('/live/')[1]?.split('?')[0] || '';
+    } else if (url.includes('youtu.be/')) {
+      videoId = url.split('youtu.be/')[1]?.split('?')[0] || '';
+    } else if (url.includes('youtube.com/embed/')) {
+      return url; // Já está no formato correto
+    }
+    
+    if (videoId) {
+      const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+      console.log('YouTube URL converted:', url, '->', embedUrl);
+      return embedUrl;
+    }
+  } catch (error) {
+    console.error('Error converting YouTube URL:', error);
+  }
+  
+  return url; // Retorna a URL original se não conseguir converter
+};
+
 export const processImageData = (data: any, clienteId: string): any => {
   const processedData = { ...data };
   
@@ -51,6 +93,11 @@ export const processImageData = (data: any, clienteId: string): any => {
         processed[key] = imagePath;
         
         console.log(`Base64 image converted to: ${imagePath}`);
+      } else if (isYouTubeUrl(value)) {
+        // This is a YouTube URL - convert to embed format
+        console.log(`Converting YouTube URL for field: ${key}`);
+        const embedUrl = convertYouTubeToEmbed(value as string);
+        processed[key] = embedUrl;
       } else if (Array.isArray(value)) {
         // Process arrays (like product cards)
         processed[key] = value.map((item, index) => {
