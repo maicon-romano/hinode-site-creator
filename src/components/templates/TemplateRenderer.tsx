@@ -2,9 +2,16 @@
 import React from 'react';
 import { LandingPageTemplate } from './LandingPageTemplate';
 import { InstitucionalTemplate } from './InstitucionalTemplate';
+import { LandingPageVideoTemplate } from './variations/LandingPageVideoTemplate';
+import { LandingPageMinimalTemplate } from './variations/LandingPageMinimalTemplate';
+import { LandingPageModernTemplate } from './variations/LandingPageModernTemplate';
+import { InstitucionalBannerTemplate } from './variations/InstitucionalBannerTemplate';
+import { InstitucionalCorporateTemplate } from './variations/InstitucionalCorporateTemplate';
+import { InstitucionalCreativeTemplate } from './variations/InstitucionalCreativeTemplate';
 
 interface SiteData {
   template: string;
+  variation?: string;
   nomeDoSite: string;
   headline: string;
   descricao: string;
@@ -36,11 +43,31 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
   isPreview = false 
 }) => {
   const renderTemplate = () => {
+    const variation = siteData.variation || 'default';
+    
     switch (siteData.template) {
       case 'landing':
-        return <LandingPageTemplate siteData={siteData} isPreview={isPreview} />;
+        switch (variation) {
+          case 'video':
+            return <LandingPageVideoTemplate siteData={siteData} isPreview={isPreview} />;
+          case 'minimal':
+            return <LandingPageMinimalTemplate siteData={siteData} isPreview={isPreview} />;
+          case 'modern':
+            return <LandingPageModernTemplate siteData={siteData} isPreview={isPreview} />;
+          default:
+            return <LandingPageTemplate siteData={siteData} isPreview={isPreview} />;
+        }
       case 'institucional':
-        return <InstitucionalTemplate siteData={siteData} isPreview={isPreview} />;
+        switch (variation) {
+          case 'banner':
+            return <InstitucionalBannerTemplate siteData={siteData} isPreview={isPreview} />;
+          case 'corporate':
+            return <InstitucionalCorporateTemplate siteData={siteData} isPreview={isPreview} />;
+          case 'creative':
+            return <InstitucionalCreativeTemplate siteData={siteData} isPreview={isPreview} />;
+          default:
+            return <InstitucionalTemplate siteData={siteData} isPreview={isPreview} />;
+        }
       default:
         return <LandingPageTemplate siteData={siteData} isPreview={isPreview} />;
     }
