@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Phone, Mail, MapPin, Star, Play, CheckCircle } from 'lucide-react';
 import { WhatsAppButton } from '../WhatsAppButton';
 import { convertYouTubeToEmbed } from '@/lib/imageUtils';
+import { Image } from '@/components/ui/image';
 
 interface SiteData {
   nomeDoSite: string;
@@ -62,7 +63,7 @@ export const LandingPageVideoTemplate: React.FC<LandingPageVideoTemplateProps> =
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
             {siteData.logoPath && (
-              <img 
+              <Image 
                 src={siteData.logoPath} 
                 alt="Logo" 
                 className="h-16 w-auto mx-auto mb-8 animate-scale-in"

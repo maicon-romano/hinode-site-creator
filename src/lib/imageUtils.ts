@@ -1,29 +1,85 @@
-
 export const saveBase64Image = (base64: string, clienteId: string, fileName: string): string => {
-  // Since this is a frontend application, we'll simulate the file saving
+  // Since this is a frontend application, we'll create a blob URL for immediate use
   // In a real implementation, this would send the base64 to a backend API
-  console.log(`Saving base64 image for client ${clienteId} as ${fileName}`);
+  console.log(`Processing base64 image for client ${clienteId} as ${fileName}`);
   
-  // Determine extension based on base64 prefix
-  let extension = '.jpg';
-  if (base64.startsWith('data:image/png')) {
-    extension = '.png';
-  } else if (base64.startsWith('data:image/gif')) {
-    extension = '.gif';
-  } else if (base64.startsWith('data:image/webp')) {
-    extension = '.webp';
+  try {
+    // Determine extension based on base64 prefix
+    let extension = '.jpg';
+    if (base64.startsWith('data:image/png')) {
+      extension = '.png';
+    } else if (base64.startsWith('data:image/gif')) {
+      extension = '.gif';
+    } else if (base64.startsWith('data:image/webp')) {
+      extension = '.webp';
+    }
+    
+    // Ensure fileName has extension
+    const fileNameWithExt = fileName.includes('.') ? fileName : `${fileName}${extension}`;
+    
+    // Create blob from base64
+    const byteCharacters = atob(base64.split(',')[1]);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    
+    // Determine MIME type
+    const mimeType = base64.split(',')[0].split(':')[1].split(';')[0];
+    const blob = new Blob([byteArray], { type: mimeType });
+    
+    // Create object URL for immediate use
+    const blobUrl = URL.createObjectURL(blob);
+    
+    // Store the blob URL in a global map for later retrieval
+    if (!window.imageCache) {
+      window.imageCache = new Map();
+    }
+    const publicPath = `/sites/${clienteId}/${fileNameWithExt}`;
+    window.imageCache.set(publicPath, blobUrl);
+    
+    console.log(`Base64 image converted to blob URL: ${publicPath} -> ${blobUrl}`);
+    
+    // Return the expected public path
+    return publicPath;
+  } catch (error) {
+    console.error('Error processing base64 image:', error);
+    // Return a fallback or null to avoid 404s
+    return '';
   }
-  
-  // Ensure fileName has extension
-  const fileNameWithExt = fileName.includes('.') ? fileName : `${fileName}${extension}`;
-  
-  // Return the expected public path
-  return `/sites/${clienteId}/${fileNameWithExt}`;
 };
 
 export const createSitesDirectory = (clienteId: string) => {
   console.log(`Creating sites directory for client: ${clienteId}`);
   // This would be handled by backend in a real implementation
+  // For now, we just ensure our imageCache is initialized
+  if (!window.imageCache) {
+    window.imageCache = new Map();
+  }
+};
+
+// Helper function to get the actual URL for an image path
+export const getImageUrl = (imagePath: string): string => {
+  if (!imagePath) return '';
+  
+  // If it's already a blob URL or full URL, return as is
+  if (imagePath.startsWith('blob:') || imagePath.startsWith('http')) {
+    return imagePath;
+  }
+  
+  // Check our image cache for blob URLs
+  if (window.imageCache && window.imageCache.has(imagePath)) {
+    return window.imageCache.get(imagePath);
+  }
+  
+  // If it starts with /sites/, it's our expected format
+  if (imagePath.startsWith('/sites/')) {
+    // For now, return the path as-is and let the browser handle 404s gracefully
+    return imagePath;
+  }
+  
+  return imagePath;
 };
 
 const isBase64Image = (value: any): boolean => {
@@ -90,9 +146,11 @@ export const processImageData = (data: any, clienteId: string): any => {
         
         // Save the image and get the file path
         const imagePath = saveBase64Image(value as string, clienteId, fileName);
-        processed[key] = imagePath;
         
-        console.log(`Base64 image converted to: ${imagePath}`);
+        // If saving failed, use empty string instead of base64 to avoid Firestore issues
+        processed[key] = imagePath || '';
+        
+        console.log(`Base64 image converted to: ${imagePath || 'fallback'}`);
       } else if (isYouTubeUrl(value)) {
         // This is a YouTube URL - convert to embed format
         console.log(`Converting YouTube URL for field: ${key}`);
@@ -143,3 +201,10 @@ export const detectBase64Images = (obj: any, path = ''): string[] => {
   
   return images;
 };
+
+// Extend window interface for TypeScript
+declare global {
+  interface Window {
+    imageCache: Map<string, string>;
+  }
+}
