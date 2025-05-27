@@ -11,7 +11,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Eye, EyeOff, Trash2, GripVertical } from 'lucide-react';
-import { getTemplateSchema, TemplateSchema, SectionSchema, FieldSchema } from '@/data/templateSchemas';
+import { getSiteModelById, SiteModel } from '@/data/siteModels';
 import { ColorSelector } from './ColorSelector';
 import { LogoUpload } from './LogoUpload';
 import { TemplatePreview } from './TemplatePreview';
@@ -33,9 +33,9 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
   onSubmit,
   isEditing = false
 }) => {
-  const templateSchema = getTemplateSchema(templateId);
+  const siteModel = getSiteModelById(templateId);
   const [activeSections, setActiveSections] = useState<Set<string>>(
-    new Set(templateSchema?.sections.map(s => s.key) || [])
+    new Set(siteModel?.secoesPadrao.map(s => s.type) || [])
   );
   const [showPreview, setShowPreview] = useState(false);
   const [colors, setColors] = useState({
@@ -52,7 +52,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
   useEffect(() => {
     form.setValue('clientId', clientId);
     form.setValue('clientName', clientName);
-    form.setValue('templateId', templateId);
+    form.setValue('modelId', templateId);
     form.setValue('nomeDoSite', initialData?.nomeDoSite || '');
     form.setValue('logoPath', initialData?.logoPath || '');
     form.setValue('cores', colors);
@@ -60,17 +60,17 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     // Set initial values for all sections
     if (initialData) {
       Object.keys(initialData).forEach(key => {
-        if (key !== 'clientId' && key !== 'clientName' && key !== 'templateId' && key !== 'nomeDoSite' && key !== 'logoPath' && key !== 'cores') {
+        if (!['clientId', 'clientName', 'modelId', 'nomeDoSite', 'logoPath', 'cores'].includes(key)) {
           form.setValue(key, initialData[key]);
         }
       });
     }
   }, [clientId, clientName, templateId, initialData, colors, form]);
 
-  if (!templateSchema) {
+  if (!siteModel) {
     return (
       <div className="text-center py-8">
-        <p className="text-red-600">Template não encontrado</p>
+        <p className="text-red-600">Modelo de site não encontrado: {templateId}</p>
       </div>
     );
   }
@@ -80,126 +80,57 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     form.setValue('cores', { ...colors, [colorType]: color });
   };
 
-  const toggleSection = (sectionKey: string) => {
+  const toggleSection = (sectionType: string) => {
     const newActiveSections = new Set(activeSections);
-    if (newActiveSections.has(sectionKey)) {
-      newActiveSections.delete(sectionKey);
+    if (newActiveSections.has(sectionType)) {
+      newActiveSections.delete(sectionType);
     } else {
-      newActiveSections.add(sectionKey);
+      newActiveSections.add(sectionType);
     }
     setActiveSections(newActiveSections);
   };
 
-  const renderField = (field: FieldSchema, sectionKey: string) => {
-    const fieldName = `${sectionKey}.${field.key}`;
+  const renderSectionField = (fieldKey: string, sectionType: string, fieldLabel: string, fieldType: 'text' | 'textarea' | 'url' | 'image' = 'text') => {
+    const fieldName = `${sectionType}.${fieldKey}`;
 
-    switch (field.type) {
-      case 'boolean':
-        return (
-          <FormField
-            key={fieldName}
-            control={form.control}
-            name={fieldName}
-            render={({ field: formField }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                <FormControl>
-                  <Checkbox
-                    checked={formField.value}
-                    onCheckedChange={formField.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>{field.label}</FormLabel>
-                  {field.description && (
-                    <p className="text-xs text-gray-500">{field.description}</p>
-                  )}
-                </div>
-              </FormItem>
-            )}
-          />
-        );
-
-      case 'select':
-        return (
-          <FormField
-            key={fieldName}
-            control={form.control}
-            name={fieldName}
-            rules={{ required: field.required ? `${field.label} é obrigatório` : false }}
-            render={({ field: formField }) => (
-              <FormItem>
-                <FormLabel>{field.label}</FormLabel>
-                <FormControl>
-                  <Select value={formField.value} onValueChange={formField.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder={field.placeholder} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {field.options?.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        );
-
+    switch (fieldType) {
       case 'textarea':
         return (
           <FormField
             key={fieldName}
             control={form.control}
             name={fieldName}
-            rules={{ required: field.required ? `${field.label} é obrigatório` : false }}
-            render={({ field: formField }) => (
+            render={({ field }) => (
               <FormItem>
-                <FormLabel>{field.label}</FormLabel>
+                <FormLabel>{fieldLabel}</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder={field.placeholder}
+                    placeholder={`Digite ${fieldLabel.toLowerCase()}`}
                     className="min-h-[100px]"
-                    {...formField}
+                    {...field}
                   />
                 </FormControl>
-                {field.description && (
-                  <p className="text-xs text-gray-500">{field.description}</p>
-                )}
                 <FormMessage />
               </FormItem>
             )}
           />
         );
 
-      case 'color':
+      case 'url':
         return (
           <FormField
             key={fieldName}
             control={form.control}
             name={fieldName}
-            render={({ field: formField }) => (
+            render={({ field }) => (
               <FormItem>
-                <FormLabel>{field.label}</FormLabel>
+                <FormLabel>{fieldLabel}</FormLabel>
                 <FormControl>
-                  <div className="flex items-center gap-3">
-                    <Input
-                      type="color"
-                      value={formField.value || '#000000'}
-                      onChange={formField.onChange}
-                      className="w-16 h-10 border rounded cursor-pointer"
-                    />
-                    <Input
-                      type="text"
-                      value={formField.value || ''}
-                      onChange={formField.onChange}
-                      placeholder="#000000"
-                      className="flex-1"
-                    />
-                  </div>
+                  <Input
+                    type="url"
+                    placeholder="https://exemplo.com"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -213,9 +144,9 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
             key={fieldName}
             control={form.control}
             name={fieldName}
-            render={({ field: formField }) => (
+            render={({ field }) => (
               <FormItem>
-                <FormLabel>{field.label}</FormLabel>
+                <FormLabel>{fieldLabel}</FormLabel>
                 <FormControl>
                   <div className="space-y-2">
                     <Input
@@ -226,15 +157,15 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
                         if (file) {
                           const reader = new FileReader();
                           reader.onload = (event) => {
-                            formField.onChange(event.target?.result);
+                            field.onChange(event.target?.result);
                           };
                           reader.readAsDataURL(file);
                         }
                       }}
                     />
-                    {formField.value && (
+                    {field.value && (
                       <img
-                        src={formField.value}
+                        src={field.value}
                         alt="Preview"
                         className="w-32 h-32 object-cover rounded border"
                       />
@@ -253,20 +184,15 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
             key={fieldName}
             control={form.control}
             name={fieldName}
-            rules={{ required: field.required ? `${field.label} é obrigatório` : false }}
-            render={({ field: formField }) => (
+            render={({ field }) => (
               <FormItem>
-                <FormLabel>{field.label}</FormLabel>
+                <FormLabel>{fieldLabel}</FormLabel>
                 <FormControl>
                   <Input
-                    type={field.type === 'url' ? 'url' : 'text'}
-                    placeholder={field.placeholder}
-                    {...formField}
+                    placeholder={`Digite ${fieldLabel.toLowerCase()}`}
+                    {...field}
                   />
                 </FormControl>
-                {field.description && (
-                  <p className="text-xs text-gray-500">{field.description}</p>
-                )}
                 <FormMessage />
               </FormItem>
             )}
@@ -276,21 +202,35 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
   };
 
   const handleSubmit = (data: any) => {
+    const layout = siteModel.secoesPadrao.map(secao => ({
+      ...secao,
+      enabled: activeSections.has(secao.type),
+      conteudo: data[secao.type] || {}
+    }));
+
     onSubmit({
       ...data,
       cores: colors,
-      activeSections: Array.from(activeSections)
+      layout,
+      modelId: templateId
     });
   };
 
   const getCurrentSiteData = () => {
     const formData = form.getValues();
+    const layout = siteModel.secoesPadrao.map(secao => ({
+      ...secao,
+      enabled: activeSections.has(secao.type),
+      conteudo: formData[secao.type] || {}
+    }));
+
     return {
-      templateId,
+      modelId: templateId,
       nomeDoSite: formData.nomeDoSite || 'Exemplo Site',
       logoPath: formData.logoPath,
       cores: colors,
-      activeSections: Array.from(activeSections),
+      layout,
+      whatsapp: formData.hero?.whatsapp || '5511999999999',
       ...formData
     };
   };
@@ -304,7 +244,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               Informações Básicas
-              <Badge variant="secondary">{templateSchema.name}</Badge>
+              <Badge variant="secondary">{siteModel.nome}</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -337,26 +277,26 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
           onColorChange={handleColorChange}
         />
 
-        {/* Seções do Template */}
+        {/* Seções do Site */}
         <div className="space-y-4">
           <h3 className="text-lg font-medium">Conteúdo do Site</h3>
           <p className="text-sm text-gray-600">
-            Configure cada seção do seu site. Use os controles para ativar/desativar ou remover seções.
+            Configure cada seção do seu site. Use os controles para ativar/desativar seções.
           </p>
 
-          {templateSchema.sections.map((section: SectionSchema) => {
-            const isActive = activeSections.has(section.key);
+          {siteModel.secoesPadrao.map((secao) => {
+            const isActive = activeSections.has(secao.type);
             
             return (
-              <Card key={section.key} className={!isActive ? 'opacity-60' : ''}>
+              <Card key={secao.type} className={!isActive ? 'opacity-60' : ''}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
                       <div>
-                        <CardTitle className="text-base">{section.label}</CardTitle>
-                        {section.description && (
-                          <p className="text-sm text-gray-600 mt-1">{section.description}</p>
+                        <CardTitle className="text-base">{secao.nome}</CardTitle>
+                        {secao.descricao && (
+                          <p className="text-sm text-gray-600 mt-1">{secao.descricao}</p>
                         )}
                       </div>
                     </div>
@@ -365,7 +305,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => toggleSection(section.key)}
+                        onClick={() => toggleSection(secao.type)}
                         title={isActive ? 'Ocultar seção' : 'Mostrar seção'}
                       >
                         {isActive ? (
@@ -374,24 +314,64 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
                           <EyeOff className="h-4 w-4" />
                         )}
                       </Button>
-                      {section.removable && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => toggleSection(section.key)}
-                          title="Remover seção"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
                     </div>
                   </div>
                 </CardHeader>
                 
                 {isActive && (
                   <CardContent className="space-y-4">
-                    {section.fields.map((field: FieldSchema) => renderField(field, section.key))}
+                    {/* Campos básicos para cada tipo de seção */}
+                    {secao.type === 'hero' && (
+                      <>
+                        {renderSectionField('titulo', 'hero', 'Título Principal')}
+                        {renderSectionField('subtitulo', 'hero', 'Subtítulo', 'textarea')}
+                        {renderSectionField('botaoTexto', 'hero', 'Texto do Botão')}
+                        {renderSectionField('whatsapp', 'hero', 'WhatsApp')}
+                        {renderSectionField('imagem', 'hero', 'Imagem Principal', 'image')}
+                      </>
+                    )}
+
+                    {secao.type === 'beneficios' && (
+                      <>
+                        {renderSectionField('titulo', 'beneficios', 'Título da Seção')}
+                        {renderSectionField('lista', 'beneficios', 'Lista de Benefícios (um por linha)', 'textarea')}
+                      </>
+                    )}
+
+                    {secao.type === 'sobre' && (
+                      <>
+                        {renderSectionField('titulo', 'sobre', 'Título')}
+                        {renderSectionField('texto', 'sobre', 'Descrição', 'textarea')}
+                        {renderSectionField('imagem', 'sobre', 'Imagem da Seção', 'image')}
+                      </>
+                    )}
+
+                    {secao.type === 'servicos' && (
+                      <>
+                        {renderSectionField('titulo', 'servicos', 'Título da Seção')}
+                        {renderSectionField('descricao', 'servicos', 'Descrição', 'textarea')}
+                        {renderSectionField('lista', 'servicos', 'Lista de Serviços (um por linha)', 'textarea')}
+                      </>
+                    )}
+
+                    {secao.type === 'depoimentos' && (
+                      <>
+                        {renderSectionField('titulo', 'depoimentos', 'Título da Seção')}
+                        {renderSectionField('lista', 'depoimentos', 'Depoimentos (Nome: Texto; separados por nova linha)', 'textarea')}
+                      </>
+                    )}
+
+                    {secao.type === 'contato' && (
+                      <>
+                        {renderSectionField('titulo', 'contato', 'Título')}
+                        {renderSectionField('whatsapp', 'contato', 'WhatsApp')}
+                        {renderSectionField('telefone', 'contato', 'Telefone')}
+                        {renderSectionField('email', 'contato', 'E-mail')}
+                        {renderSectionField('endereco', 'contato', 'Endereço')}
+                      </>
+                    )}
+
+                    {/* Adicionar campos para outros tipos de seção conforme necessário */}
                   </CardContent>
                 )}
               </Card>
