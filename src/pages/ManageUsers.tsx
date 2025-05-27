@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -8,10 +7,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { UserData } from '@/contexts/AuthContext';
-import { Plus, Trash2, ArrowLeft, LogOut } from 'lucide-react';
+import { Plus, Trash2, ArrowLeft, LogOut, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 
@@ -22,11 +21,19 @@ interface CreateUserForm {
   tipo: 'admin' | 'cliente';
 }
 
+interface EditUserForm {
+  email: string;
+  name: string;
+  tipo: 'admin' | 'cliente';
+}
+
 const ManageUsers = () => {
   const { createUser, userData, currentUser, logout } = useAuth();
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<UserData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -34,6 +41,14 @@ const ManageUsers = () => {
     defaultValues: {
       email: '',
       password: '',
+      name: '',
+      tipo: 'cliente'
+    }
+  });
+
+  const editForm = useForm<EditUserForm>({
+    defaultValues: {
+      email: '',
       name: '',
       tipo: 'cliente'
     }
@@ -113,6 +128,45 @@ const ManageUsers = () => {
         variant: "destructive"
       });
     }
+  };
+
+  const onEditSubmit = async (data: EditUserForm) => {
+    if (!editingUser) return;
+
+    try {
+      const userRef = doc(db, 'users', editingUser.uid);
+      await updateDoc(userRef, {
+        email: data.email,
+        name: data.name,
+        tipo: data.tipo
+      });
+
+      toast({
+        title: "Sucesso",
+        description: "Usuário atualizado com sucesso!"
+      });
+      setIsEditDialogOpen(false);
+      setEditingUser(null);
+      editForm.reset();
+      fetchUsers();
+    } catch (error) {
+      console.error('Erro ao atualizar usuário:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar o usuário",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleEditUser = (user: UserData) => {
+    setEditingUser(user);
+    editForm.reset({
+      email: user.email,
+      name: user.name || '',
+      tipo: user.tipo
+    });
+    setIsEditDialogOpen(true);
   };
 
   const handleDeleteUser = async (userId: string) => {
@@ -308,6 +362,78 @@ const ManageUsers = () => {
           </Dialog>
         </div>
 
+        {/* Edit User Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Editar Usuário</DialogTitle>
+              <DialogDescription>
+                Edite as informações do usuário.
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...editForm}>
+              <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
+                <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                  <strong>UID:</strong> {editingUser?.uid}
+                </div>
+                <FormField
+                  control={editForm.control}
+                  name="name"
+                  rules={{ required: "Nome é obrigatório" }}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nome</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nome do usuário" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="email"
+                  rules={{ 
+                    required: "Email é obrigatório",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Email inválido"
+                    }
+                  }}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="email@exemplo.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="tipo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tipo de Usuário</FormLabel>
+                      <FormControl>
+                        <select className="w-full p-2 border rounded-md" {...field}>
+                          <option value="cliente">Cliente</option>
+                          <option value="admin">Admin</option>
+                        </select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full">
+                  Salvar Alterações
+                </Button>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+
         <Card>
           <CardHeader>
             <CardTitle>Lista de Usuários</CardTitle>
@@ -339,6 +465,7 @@ const ManageUsers = () => {
                   <TableRow>
                     <TableHead>Nome</TableHead>
                     <TableHead>Email</TableHead>
+                    <TableHead>UID</TableHead>
                     <TableHead>Tipo</TableHead>
                     <TableHead>Data de Criação</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
@@ -349,6 +476,7 @@ const ManageUsers = () => {
                     <TableRow key={user.uid}>
                       <TableCell className="font-medium">{user.name || 'N/A'}</TableCell>
                       <TableCell>{user.email}</TableCell>
+                      <TableCell className="font-mono text-xs">{user.uid}</TableCell>
                       <TableCell>
                         <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${
                           user.tipo === 'admin' ? 'bg-blue-100 text-blue-800' :
@@ -359,13 +487,22 @@ const ManageUsers = () => {
                       </TableCell>
                       <TableCell>{formatDate(user.createdAt)}</TableCell>
                       <TableCell className="text-right">
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDeleteUser(user.uid)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditUser(user)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleDeleteUser(user.uid)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
