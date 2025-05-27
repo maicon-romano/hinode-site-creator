@@ -3,7 +3,16 @@ import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+
+interface FieldConfig {
+  key: string;
+  label: string;
+  type: string;
+  required: boolean;
+  placeholder?: string;
+}
 
 interface DynamicFieldsProps {
   template: string;
@@ -16,8 +25,8 @@ export const DynamicFields: React.FC<DynamicFieldsProps> = ({
   variation, 
   form 
 }) => {
-  const getFieldsForTemplate = () => {
-    const baseFields = [
+  const getFieldsForTemplate = (): FieldConfig[] => {
+    const baseFields: FieldConfig[] = [
       { key: 'headline', label: 'Título Principal', type: 'text', required: true },
       { key: 'descricao', label: 'Descrição', type: 'textarea', required: true },
       { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true }
@@ -48,7 +57,7 @@ export const DynamicFields: React.FC<DynamicFieldsProps> = ({
 
     // Campos específicos para Institucional
     if (template === 'institucional') {
-      const institucionalBase = [
+      const institucionalBase: FieldConfig[] = [
         ...baseFields,
         { key: 'missao', label: 'Missão', type: 'textarea', required: false },
         { key: 'visao', label: 'Visão', type: 'textarea', required: false },
@@ -94,8 +103,7 @@ export const DynamicFields: React.FC<DynamicFieldsProps> = ({
               <FormLabel>{field.label}</FormLabel>
               <FormControl>
                 {field.type === 'textarea' ? (
-                  <textarea 
-                    className="w-full p-3 border rounded-md min-h-[120px] resize-y"
+                  <Textarea 
                     placeholder={field.placeholder || `Digite ${field.label.toLowerCase()}...`}
                     {...formField}
                   />
