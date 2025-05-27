@@ -3,12 +3,11 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form } from '@/components/ui/form';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { ClientSelector } from './ClientSelector';
-import { TemplateSelector } from './TemplateSelector';
-import { DynamicSiteEditor } from './DynamicSiteEditor';
+import { ModelSelector } from './ModelSelector';
+import { FlexibleSiteEditor } from './FlexibleSiteEditor';
 
 interface SiteBuilderProps {
   initialData?: any;
@@ -24,39 +23,33 @@ export const SiteBuilder: React.FC<SiteBuilderProps> = ({
   const [step, setStep] = useState(1);
   const [selectedClient, setSelectedClient] = useState(initialData?.clientId || '');
   const [clientName, setClientName] = useState(initialData?.clientName || '');
-  const [siteType, setSiteType] = useState<'landing' | 'institucional'>(
-    initialData?.templateId?.startsWith('landing') ? 'landing' : 'institucional'
-  );
-  const [selectedTemplate, setSelectedTemplate] = useState(initialData?.templateId || '');
+  const [selectedModel, setSelectedModel] = useState(initialData?.modelId || '');
 
-  // Create form context at the top level to provide to all steps
   const form = useForm({
     defaultValues: {
       clientId: selectedClient,
       clientName: clientName,
-      templateId: selectedTemplate,
+      modelId: selectedModel,
       ...initialData
     }
   });
 
   const steps = [
     { number: 1, title: 'Cliente', description: 'Selecione o cliente' },
-    { number: 2, title: 'Tipo', description: 'Escolha o tipo de site' },
-    { number: 3, title: 'Template', description: 'Selecione o design' },
-    { number: 4, title: 'Conteúdo', description: 'Configure o site' }
+    { number: 2, title: 'Modelo', description: 'Escolha o modelo do site' },
+    { number: 3, title: 'Conteúdo', description: 'Configure o site' }
   ];
 
   const canProceedToStep = (stepNumber: number): boolean => {
     switch (stepNumber) {
       case 2: return !!selectedClient;
-      case 3: return !!selectedClient && !!siteType;
-      case 4: return !!selectedClient && !!siteType && !!selectedTemplate;
+      case 3: return !!selectedClient && !!selectedModel;
       default: return true;
     }
   };
 
   const handleNext = () => {
-    if (step < 4 && canProceedToStep(step + 1)) {
+    if (step < 3 && canProceedToStep(step + 1)) {
       setStep(step + 1);
     }
   };
@@ -65,11 +58,6 @@ export const SiteBuilder: React.FC<SiteBuilderProps> = ({
     if (step > 1) {
       setStep(step - 1);
     }
-  };
-
-  const handleSiteTypeChange = (type: 'landing' | 'institucional') => {
-    setSiteType(type);
-    setSelectedTemplate(''); // Reset template when type changes
   };
 
   return (
@@ -120,63 +108,15 @@ export const SiteBuilder: React.FC<SiteBuilderProps> = ({
             )}
 
             {step === 2 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Que tipo de site você quer criar?</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card 
-                    className={`cursor-pointer transition-all hover:shadow-md ${
-                      siteType === 'landing' ? 'ring-2 ring-primary' : ''
-                    }`}
-                    onClick={() => handleSiteTypeChange('landing')}
-                  >
-                    <CardContent className="p-6 text-center">
-                      <h4 className="font-medium mb-2">Landing Page</h4>
-                      <p className="text-sm text-gray-600 mb-4">
-                        Página focada em conversão, ideal para campanhas e produtos específicos
-                      </p>
-                      <Button 
-                        variant={siteType === 'landing' ? "default" : "outline"}
-                        size="sm"
-                      >
-                        {siteType === 'landing' ? 'Selecionado' : 'Selecionar'}
-                      </Button>
-                    </CardContent>
-                  </Card>
-
-                  <Card 
-                    className={`cursor-pointer transition-all hover:shadow-md ${
-                      siteType === 'institucional' ? 'ring-2 ring-primary' : ''
-                    }`}
-                    onClick={() => handleSiteTypeChange('institucional')}
-                  >
-                    <CardContent className="p-6 text-center">
-                      <h4 className="font-medium mb-2">Site Institucional</h4>
-                      <p className="text-sm text-gray-600 mb-4">
-                        Site completo da empresa com informações detalhadas e seções corporativas
-                      </p>
-                      <Button 
-                        variant={siteType === 'institucional' ? "default" : "outline"}
-                        size="sm"
-                      >
-                        {siteType === 'institucional' ? 'Selecionado' : 'Selecionar'}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            )}
-
-            {step === 3 && siteType && (
-              <TemplateSelector
-                selectedType={siteType}
-                selectedTemplate={selectedTemplate}
-                onTemplateSelect={setSelectedTemplate}
+              <ModelSelector
+                selectedModel={selectedModel}
+                onModelSelect={setSelectedModel}
               />
             )}
 
-            {step === 4 && selectedTemplate && (
-              <DynamicSiteEditor
-                templateId={selectedTemplate}
+            {step === 3 && selectedModel && (
+              <FlexibleSiteEditor
+                modelId={selectedModel}
                 clientId={selectedClient}
                 clientName={clientName}
                 initialData={initialData}
@@ -188,7 +128,7 @@ export const SiteBuilder: React.FC<SiteBuilderProps> = ({
         </Card>
 
         {/* Navigation */}
-        {step < 4 && (
+        {step < 3 && (
           <div className="flex justify-between">
             <Button
               variant="outline"
