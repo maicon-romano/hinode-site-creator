@@ -1,13 +1,12 @@
-
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import React, { useState, useEffect } from 'react';
+import { useFormContext } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Eye, EyeOff, Trash2, GripVertical } from 'lucide-react';
@@ -43,17 +42,27 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     texto: initialData?.cores?.texto || '#333333'
   });
 
-  const form = useForm({
-    defaultValues: {
-      clientId,
-      clientName,
-      templateId,
-      nomeDoSite: initialData?.nomeDoSite || '',
-      logoPath: initialData?.logoPath || '',
-      cores: colors,
-      ...initialData
+  // Use the form context from the parent SiteBuilder
+  const form = useFormContext();
+
+  // Update form values when props change
+  useEffect(() => {
+    form.setValue('clientId', clientId);
+    form.setValue('clientName', clientName);
+    form.setValue('templateId', templateId);
+    form.setValue('nomeDoSite', initialData?.nomeDoSite || '');
+    form.setValue('logoPath', initialData?.logoPath || '');
+    form.setValue('cores', colors);
+    
+    // Set initial values for all sections
+    if (initialData) {
+      Object.keys(initialData).forEach(key => {
+        if (key !== 'clientId' && key !== 'clientName' && key !== 'templateId' && key !== 'nomeDoSite' && key !== 'logoPath' && key !== 'cores') {
+          form.setValue(key, initialData[key]);
+        }
+      });
     }
-  });
+  }, [clientId, clientName, templateId, initialData, colors, form]);
 
   if (!templateSchema) {
     return (
@@ -272,108 +281,106 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        {/* Informações Básicas */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              Informações Básicas
-              <Badge variant="secondary">{templateSchema.name}</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <FormField
-              control={form.control}
-              name="nomeDoSite"
-              rules={{ required: "Nome do site é obrigatório" }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nome do Site</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Meu Site Incrível" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+      {/* Informações Básicas */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            Informações Básicas
+            <Badge variant="secondary">{templateSchema.name}</Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <FormField
+            control={form.control}
+            name="nomeDoSite"
+            rules={{ required: "Nome do site é obrigatório" }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nome do Site</FormLabel>
+                <FormControl>
+                  <Input placeholder="Meu Site Incrível" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <LogoUpload
-              clientId={clientId}
-              currentLogo={form.watch('logoPath')}
-              onLogoChange={(logoPath) => form.setValue('logoPath', logoPath)}
-            />
-          </CardContent>
-        </Card>
+          <LogoUpload
+            clientId={clientId}
+            currentLogo={form.watch('logoPath')}
+            onLogoChange={(logoPath) => form.setValue('logoPath', logoPath)}
+          />
+        </CardContent>
+      </Card>
 
-        {/* Cores do Site */}
-        <ColorSelector
-          colors={colors}
-          onColorChange={handleColorChange}
-        />
+      {/* Cores do Site */}
+      <ColorSelector
+        colors={colors}
+        onColorChange={handleColorChange}
+      />
 
-        {/* Seções do Template */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Conteúdo do Site</h3>
-          <p className="text-sm text-gray-600">
-            Configure cada seção do seu site. Use os controles para ativar/desativar ou remover seções.
-          </p>
+      {/* Seções do Template */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">Conteúdo do Site</h3>
+        <p className="text-sm text-gray-600">
+          Configure cada seção do seu site. Use os controles para ativar/desativar ou remover seções.
+        </p>
 
-          {templateSchema.sections.map((section: SectionSchema) => {
-            const isActive = activeSections.has(section.key);
-            
-            return (
-              <Card key={section.key} className={!isActive ? 'opacity-60' : ''}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
-                      <div>
-                        <CardTitle className="text-base">{section.label}</CardTitle>
-                        {section.description && (
-                          <p className="text-sm text-gray-600 mt-1">{section.description}</p>
-                        )}
-                      </div>
+        {templateSchema.sections.map((section: SectionSchema) => {
+          const isActive = activeSections.has(section.key);
+          
+          return (
+            <Card key={section.key} className={!isActive ? 'opacity-60' : ''}>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
+                    <div>
+                      <CardTitle className="text-base">{section.label}</CardTitle>
+                      {section.description && (
+                        <p className="text-sm text-gray-600 mt-1">{section.description}</p>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2">
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => toggleSection(section.key)}
+                    >
+                      {isActive ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                    {section.removable && (
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
                         onClick={() => toggleSection(section.key)}
                       >
-                        {isActive ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        <Trash2 className="h-4 w-4" />
                       </Button>
-                      {section.removable && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => toggleSection(section.key)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
+                    )}
                   </div>
-                </CardHeader>
-                
-                {isActive && (
-                  <CardContent className="space-y-4">
-                    {section.fields.map((field: FieldSchema) => renderField(field, section.key))}
-                  </CardContent>
-                )}
-              </Card>
-            );
-          })}
-        </div>
+                </div>
+              </CardHeader>
+              
+              {isActive && (
+                <CardContent className="space-y-4">
+                  {section.fields.map((field: FieldSchema) => renderField(field, section.key))}
+                </CardContent>
+              )}
+            </Card>
+          );
+        })}
+      </div>
 
-        <Separator />
+      <Separator />
 
-        <Button type="submit" className="w-full" size="lg">
-          {isEditing ? 'Atualizar Site' : 'Criar Site'}
-        </Button>
-      </form>
-    </Form>
+      <Button type="submit" className="w-full" size="lg">
+        {isEditing ? 'Atualizar Site' : 'Criar Site'}
+      </Button>
+    </form>
   );
 };
