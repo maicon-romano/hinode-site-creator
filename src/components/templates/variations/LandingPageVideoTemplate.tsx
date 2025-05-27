@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -49,6 +50,31 @@ export const LandingPageVideoTemplate: React.FC<LandingPageVideoTemplateProps> =
     }
   };
 
+  // Função para converter URL do YouTube para embed
+  const getEmbedUrl = (url: string) => {
+    if (!url) return '';
+    
+    // Se já é uma URL de embed, retorna como está
+    if (url.includes('youtube.com/embed/')) {
+      return url;
+    }
+    
+    // Extrai o ID do vídeo de diferentes formatos de URL do YouTube
+    let videoId = '';
+    
+    if (url.includes('youtube.com/watch?v=')) {
+      videoId = url.split('v=')[1]?.split('&')[0];
+    } else if (url.includes('youtu.be/')) {
+      videoId = url.split('youtu.be/')[1]?.split('?')[0];
+    } else if (url.includes('youtube.com/embed/')) {
+      return url;
+    }
+    
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : '';
+  };
+
+  const embedUrl = getEmbedUrl(siteData.videoUrl || '');
+
   return (
     <div className="min-h-screen" style={styles}>
       <WhatsAppButton whatsapp={siteData.whatsapp} isPreview={isPreview} color={cores.destaque} />
@@ -69,14 +95,15 @@ export const LandingPageVideoTemplate: React.FC<LandingPageVideoTemplateProps> =
             </h1>
             
             {/* Video Section */}
-            {secoes.video && siteData.videoUrl && (
+            {secoes.video && embedUrl && (
               <div className="mb-8">
                 <div className="max-w-4xl mx-auto">
                   <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl bg-black">
                     <iframe
-                      src={siteData.videoUrl}
+                      src={embedUrl}
                       className="w-full h-full"
                       frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                       title="Vídeo Demonstrativo"
                     />
@@ -100,7 +127,7 @@ export const LandingPageVideoTemplate: React.FC<LandingPageVideoTemplateProps> =
                 Começar Agora
               </Button>
               
-              {secoes.video && siteData.videoUrl && (
+              {secoes.video && embedUrl && (
                 <Button 
                   variant="outline" 
                   size="lg"

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import { ClientSelector } from './ClientSelector';
 import { ColorSelector } from './ColorSelector';
 import { LogoUpload } from './LogoUpload';
 import { TemplatePreview } from './TemplatePreview';
+import { DynamicFields } from './DynamicFields';
 
 interface SiteFormData {
   clientId: string;
@@ -34,6 +36,8 @@ interface SiteFormData {
     sobre: boolean;
     contato: boolean;
   };
+  // Campos dinâmicos
+  [key: string]: any;
 }
 
 interface SiteFormProps {
@@ -76,7 +80,9 @@ export const SiteForm: React.FC<SiteFormProps> = ({
         sobre: initialData?.secoes?.sobre ?? true,
         contato: initialData?.secoes?.contato ?? true,
         ...initialData?.secoes
-      }
+      },
+      // Inicializar campos dinâmicos se existirem
+      ...initialData
     }
   });
 
@@ -90,6 +96,7 @@ export const SiteForm: React.FC<SiteFormProps> = ({
   };
 
   const selectedTemplate = form.watch('template');
+  const selectedVariation = form.watch('variation');
 
   const getVariationOptions = (template: string) => {
     if (template === 'landing') {
@@ -206,70 +213,12 @@ export const SiteForm: React.FC<SiteFormProps> = ({
           onTogglePreview={() => setShowPreview(!showPreview)}
         />
 
-        <FormField
-          control={form.control}
-          name="headline"
-          rules={{ required: "Headline é obrigatório" }}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Headline Principal</FormLabel>
-              <FormControl>
-                <Input placeholder="Transforme sua vida com nossos produtos" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+        {/* Campos dinâmicos baseados no template e variação */}
+        <DynamicFields 
+          template={selectedTemplate}
+          variation={selectedVariation}
+          form={form}
         />
-
-        <FormField
-          control={form.control}
-          name="descricao"
-          rules={{ required: "Descrição é obrigatória" }}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Descrição</FormLabel>
-              <FormControl>
-                <textarea 
-                  className="w-full p-3 border rounded-md min-h-[120px] resize-y"
-                  placeholder="Descreva o negócio e seus benefícios..."
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="videoUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>URL do Vídeo (YouTube)</FormLabel>
-                <FormControl>
-                  <Input placeholder="https://youtube.com/embed/..." {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="whatsapp"
-            rules={{ required: "WhatsApp é obrigatório" }}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>WhatsApp</FormLabel>
-                <FormControl>
-                  <Input placeholder="5511999999999" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
 
         <LogoUpload
           clientId={form.watch('clientId')}
