@@ -1,17 +1,13 @@
 
-import express from 'express';
-import path from 'path';
+// This file is for frontend configuration only
+// Static file serving is handled by Vite dev server or production server
 
-export const configureStaticRoutes = (app: express.Application) => {
-  // Servir arquivos estáticos da pasta sites
-  app.use('/sites', express.static(path.join(process.cwd(), 'public', 'sites')));
-  
-  // Garantir que a pasta sites existe
-  const sitesPath = path.join(process.cwd(), 'public', 'sites');
-  const fs = require('fs');
-  if (!fs.existsSync(sitesPath)) {
-    fs.mkdirSync(sitesPath, { recursive: true });
-  }
-  
-  console.log('Configuração de rotas estáticas aplicada - pasta /sites disponível');
+export const ensureSitesDirectory = () => {
+  console.log('Sites directory will be served by the web server at /sites path');
+  // In development: Vite serves public folder automatically
+  // In production: Web server (nginx/apache) should serve public/sites at /sites
+};
+
+export const getPublicImagePath = (clientId: string, fileName: string): string => {
+  return `/sites/${clientId}/${fileName}`;
 };
