@@ -1,10 +1,21 @@
 import React from 'react';
-import { SiteSection } from '@/data/siteModels';
-import { ContactForm } from './ContactForm';
-import { Star, Users, Award, ArrowRight } from 'lucide-react';
+import { LandingPageTemplate } from './LandingPageTemplate';
+import { LandingPageVideoTemplate } from './variations/LandingPageVideoTemplate';
+import { LandingPageMinimalTemplate } from './variations/LandingPageMinimalTemplate';
+import { LandingPageModernTemplate } from './variations/LandingPageModernTemplate';
+import { InstitucionalTemplate } from './InstitucionalTemplate';
+import { InstitucionalBannerTemplate } from './variations/InstitucionalBannerTemplate';
+import { InstitucionalCorporateTemplate } from './variations/InstitucionalCorporateTemplate';
+import { InstitucionalCreativeTemplate } from './variations/InstitucionalCreativeTemplate';
+import { HinodeLandingTemplate } from './variations/HinodeLandingTemplate';
+
+interface SiteSection {
+  type: string;
+  conteudo: any;
+}
 
 interface SectionRendererProps {
-  section: SiteSection;
+  section: any;
   siteData: any;
   isPreview?: boolean;
 }
@@ -14,6 +25,32 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
   siteData,
   isPreview = false
 }) => {
+  // Check if this is a full template render based on templateId
+  if (siteData.templateId) {
+    switch (siteData.templateId) {
+      case 'hinode-01':
+        return <HinodeLandingTemplate siteData={siteData} isPreview={isPreview} />;
+      case 'landing-01':
+        return <LandingPageTemplate siteData={siteData} isPreview={isPreview} />;
+      case 'landing-02':
+        return <LandingPageVideoTemplate siteData={siteData} isPreview={isPreview} />;
+      case 'landing-03':
+        return <LandingPageMinimalTemplate siteData={siteData} isPreview={isPreview} />;
+      case 'landing-04':
+        return <LandingPageModernTemplate siteData={siteData} isPreview={isPreview} />;
+      case 'institucional-01':
+        return <InstitucionalTemplate siteData={siteData} isPreview={isPreview} />;
+      case 'institucional-02':
+        return <InstitucionalBannerTemplate siteData={siteData} isPreview={isPreview} />;
+      case 'institucional-03':
+        return <InstitucionalCorporateTemplate siteData={siteData} isPreview={isPreview} />;
+      case 'institucional-04':
+        return <InstitucionalCreativeTemplate siteData={siteData} isPreview={isPreview} />;
+      default:
+        return <LandingPageTemplate siteData={siteData} isPreview={isPreview} />;
+    }
+  }
+
   const { type, conteudo } = section;
 
   const renderCards = (cards: any[], className: string = "grid grid-cols-1 md:grid-cols-3 gap-6") => {

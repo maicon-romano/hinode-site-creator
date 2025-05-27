@@ -1,4 +1,3 @@
-
 export interface FieldSchema {
   key: string;
   label: string;
@@ -27,14 +26,69 @@ export interface TemplateSchema {
 }
 
 export const templateSchemas: TemplateSchema[] = [
+  // Hinode Template - Novo template moderno
+  {
+    id: 'hinode-01',
+    name: 'Hinode Landing Page',
+    type: 'landing',
+    description: 'Template moderno com navegação, vídeo em destaque e design premium',
+    thumbnail: '/templates/hinode-01.jpg',
+    sections: [
+      {
+        key: 'hero',
+        label: 'Seção Principal (Hero)',
+        fields: [
+          { key: 'titulo', label: 'Título Principal', type: 'text', required: true, placeholder: 'Transforme sua vida hoje!' },
+          { key: 'subtitulo', label: 'Descrição', type: 'textarea', placeholder: 'Descubra como nossa solução pode revolucionar seus resultados' },
+          { key: 'videoUrl', label: 'URL do Vídeo (YouTube)', type: 'url', placeholder: 'https://youtube.com/watch?v=...' },
+          { key: 'logoPath', label: 'Logo da Empresa', type: 'image' }
+        ]
+      },
+      {
+        key: 'biografia',
+        label: 'Sobre Mim/Biografia',
+        removable: true,
+        fields: [
+          { key: 'texto', label: 'Biografia/Apresentação', type: 'textarea', placeholder: 'Conte sua história e experiência...' }
+        ]
+      },
+      {
+        key: 'produtos',
+        label: 'Produtos/Serviços',
+        removable: true,
+        fields: [
+          { key: 'lista', label: 'Lista de Produtos (Nome: Descrição: Preço; separados por nova linha)', type: 'textarea', placeholder: 'Produto Premium: Nossa solução completa: R$ 197\nProduto Básico: Ideal para começar: R$ 97' }
+        ]
+      },
+      {
+        key: 'depoimentos',
+        label: 'Depoimentos',
+        removable: true,
+        fields: [
+          { key: 'titulo', label: 'Título da Seção', type: 'text', placeholder: 'O que nossos clientes dizem' },
+          { key: 'ativo', label: 'Exibir Depoimentos', type: 'boolean' }
+        ]
+      },
+      {
+        key: 'contato',
+        label: 'Contato',
+        fields: [
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Vamos Conversar?' },
+          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true, placeholder: '5511999999999' },
+          { key: 'email', label: 'E-mail', type: 'text', placeholder: 'contato@empresa.com' }
+        ]
+      }
+    ]
+  },
   // Landing Page Templates
   {
     id: 'landing-01',
-    name: 'Landing Clássica',
+    name: 'Landing Clássica Premium',
     type: 'landing',
-    description: 'Template padrão com hero, benefícios e CTA',
+    description: 'Template premium com design moderno, benefícios e CTA otimizado',
     thumbnail: '/templates/landing-01.jpg',
     sections: [
+      // ... keep existing code (alertaTopo section)
       {
         key: 'alertaTopo',
         label: 'Alerta no Topo',
@@ -52,7 +106,7 @@ export const templateSchemas: TemplateSchema[] = [
         fields: [
           { key: 'titulo', label: 'Título Principal', type: 'text', required: true, placeholder: 'Transforme sua vida hoje!' },
           { key: 'subtitulo', label: 'Subtítulo', type: 'text', placeholder: 'Descubra como nosso produto pode ajudar você' },
-          { key: 'botaoTexto', label: 'Texto do Botão', type: 'text', placeholder: 'Fale Conosco' },
+          { key: 'botaoTexto', label: 'Texto do Botão', type: 'text', placeholder: 'Começar Agora' },
           { key: 'botaoLink', label: 'Link do Botão', type: 'url', placeholder: 'https://wa.me/5511999999999' },
           { key: 'imagemHero', label: 'Imagem Principal', type: 'image' },
           { key: 'posicao', label: 'Posição do Texto', type: 'select', options: [
@@ -62,13 +116,14 @@ export const templateSchemas: TemplateSchema[] = [
           ]}
         ]
       },
+      // ... keep existing code (other sections with same structure)
       {
         key: 'beneficios',
         label: 'Benefícios',
         removable: true,
         fields: [
-          { key: 'titulo', label: 'Título da Seção', type: 'text', placeholder: 'Por que escolher nosso produto?' },
-          { key: 'lista', label: 'Lista de Benefícios (um por linha)', type: 'textarea', placeholder: 'Qualidade garantida\nEntrega rápida\nSuporte 24h' }
+          { key: 'titulo', label: 'Título da Seção', type: 'text', placeholder: 'Por que escolher nossa solução?' },
+          { key: 'lista', label: 'Lista de Benefícios (um por linha)', type: 'textarea', placeholder: 'Resultados garantidos\nQualidade premium\nSuporte dedicado' }
         ]
       },
       {
@@ -76,7 +131,7 @@ export const templateSchemas: TemplateSchema[] = [
         label: 'Sobre Nós',
         removable: true,
         fields: [
-          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Sobre Nossa Empresa' },
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Nossa História' },
           { key: 'texto', label: 'Descrição', type: 'textarea', placeholder: 'Nossa história e missão...' },
           { key: 'imagem', label: 'Imagem da Seção', type: 'image' }
         ]
@@ -94,7 +149,7 @@ export const templateSchemas: TemplateSchema[] = [
         key: 'contato',
         label: 'Contato',
         fields: [
-          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Entre em Contato' },
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Fale Conosco Agora' },
           { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true, placeholder: '5511999999999' },
           { key: 'telefone', label: 'Telefone', type: 'text', placeholder: '(11) 99999-9999' },
           { key: 'email', label: 'E-mail', type: 'text', placeholder: 'contato@empresa.com' },
@@ -105,9 +160,9 @@ export const templateSchemas: TemplateSchema[] = [
   },
   {
     id: 'landing-02',
-    name: 'Landing com Vídeo',
+    name: 'Landing com Vídeo Premium',
     type: 'landing',
-    description: 'Template focado em vídeo promocional',
+    description: 'Template premium focado em vídeo promocional com design moderno',
     thumbnail: '/templates/landing-02.jpg',
     sections: [
       {
@@ -163,9 +218,9 @@ export const templateSchemas: TemplateSchema[] = [
   },
   {
     id: 'landing-03',
-    name: 'Landing Minimalista',
+    name: 'Landing Minimalista Premium',
     type: 'landing',
-    description: 'Design limpo e focado na conversão',
+    description: 'Design limpo e premium focado na conversão',
     thumbnail: '/templates/landing-03.jpg',
     sections: [
       {
@@ -200,9 +255,9 @@ export const templateSchemas: TemplateSchema[] = [
   },
   {
     id: 'landing-04',
-    name: 'Landing Promocional',
+    name: 'Landing Promocional Premium',
     type: 'landing',
-    description: 'Template ideal para promoções e ofertas',
+    description: 'Template premium ideal para promoções e ofertas especiais',
     thumbnail: '/templates/landing-04.jpg',
     sections: [
       {
@@ -238,9 +293,9 @@ export const templateSchemas: TemplateSchema[] = [
   // Institucional Templates
   {
     id: 'institucional-01',
-    name: 'Institucional Clássico',
+    name: 'Institucional Clássico Premium',
     type: 'institucional',
-    description: 'Template corporativo tradicional',
+    description: 'Template corporativo premium com design moderno',
     thumbnail: '/templates/institucional-01.jpg',
     sections: [
       {
@@ -297,9 +352,9 @@ export const templateSchemas: TemplateSchema[] = [
   },
   {
     id: 'institucional-02',
-    name: 'Institucional Moderno',
+    name: 'Institucional Moderno Premium',
     type: 'institucional',
-    description: 'Template com design contemporâneo',
+    description: 'Template com design contemporâneo e recursos avançados',
     thumbnail: '/templates/institucional-02.jpg',
     sections: [
       {
@@ -356,9 +411,9 @@ export const templateSchemas: TemplateSchema[] = [
   },
   {
     id: 'institucional-03',
-    name: 'Institucional Criativo',
+    name: 'Institucional Criativo Premium',
     type: 'institucional',
-    description: 'Design diferenciado para empresas inovadoras',
+    description: 'Design diferenciado premium para empresas inovadoras',
     thumbnail: '/templates/institucional-03.jpg',
     sections: [
       {
@@ -400,9 +455,9 @@ export const templateSchemas: TemplateSchema[] = [
   },
   {
     id: 'institucional-04',
-    name: 'Institucional Profissional',
+    name: 'Institucional Profissional Premium',
     type: 'institucional',
-    description: 'Template sóbrio para empresas tradicionais',
+    description: 'Template premium sóbrio para empresas tradicionais',
     thumbnail: '/templates/institucional-04.jpg',
     sections: [
       {
