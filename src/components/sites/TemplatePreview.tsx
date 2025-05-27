@@ -16,97 +16,191 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
   showPreview,
   onTogglePreview
 }) => {
-  // Dados padrão mais completos para preview
-  const previewData = {
-    // Garantir que o templateId/modelId seja passado corretamente
-    templateId: siteData.templateId || siteData.modelId || 'landing-01',
-    modelId: siteData.modelId || siteData.templateId || 'landing-01',
-    nomeDoSite: siteData.nomeDoSite || 'Exemplo Site',
-    logoPath: siteData.logoPath || '',
-    cores: {
-      principal: siteData.cores?.principal || '#ff6b35',
-      fundo: siteData.cores?.fundo || '#ffffff',
-      destaque: siteData.cores?.destaque || '#0066cc',
-      texto: siteData.cores?.texto || '#333333',
-    },
-    activeSections: siteData.activeSections || ['hero', 'beneficios', 'sobre', 'contato'],
-    // Hero com dados de exemplo
-    hero: {
-      titulo: siteData.hero?.titulo || 'Transforme Sua Presença Digital',
-      subtitulo: siteData.hero?.subtitulo || 'Crie sites profissionais com nossa plataforma inovadora',
-      botaoTexto: siteData.hero?.botaoTexto || 'Fale Conosco',
-      botaoLink: siteData.hero?.botaoLink || 'https://wa.me/5511999999999',
-      imagemHero: siteData.hero?.imagemHero || '',
-      posicao: siteData.hero?.posicao || 'center',
-      videoUrl: siteData.hero?.videoUrl || ''
-    },
-    // Benefícios com dados de exemplo
-    beneficios: {
-      titulo: siteData.beneficios?.titulo || 'Por que escolher nossos serviços?',
-      lista: siteData.beneficios?.lista || 'Design Profissional\nSuper Rápido\nSuporte 24/7\nPreço Justo'
-    },
-    // Sobre com dados de exemplo
-    sobre: {
-      titulo: siteData.sobre?.titulo || 'Sobre Nossa Empresa',
-      texto: siteData.sobre?.texto || 'Somos especialistas em criar experiências digitais excepcionais. Nossa equipe combina criatividade e tecnologia para entregar resultados que superam expectativas.',
-      imagem: siteData.sobre?.imagem || ''
-    },
-    // Contato com dados de exemplo
-    contato: {
-      titulo: siteData.contato?.titulo || 'Entre em Contato',
-      whatsapp: siteData.contato?.whatsapp || '5511999999999',
-      telefone: siteData.contato?.telefone || '(11) 99999-9999',
-      email: siteData.contato?.email || 'contato@exemplo.com',
-      endereco: siteData.contato?.endereco || 'São Paulo, SP'
-    },
-    // Dados específicos para Hinode
-    'hero-hinode': {
-      titulo: siteData['hero-hinode']?.titulo || 'Bem-vindo à Hinode',
-      subtitulo: siteData['hero-hinode']?.subtitulo || 'Transforme sua vida com nossos produtos',
-      texto: siteData['hero-hinode']?.texto || 'Descubra o poder da natureza em cada produto Hinode',
-      botaoTexto: siteData['hero-hinode']?.botaoTexto || 'Saiba Mais',
-      botaoLink: siteData['hero-hinode']?.botaoLink || 'https://wa.me/5511999999999',
-      video: siteData['hero-hinode']?.video || '',
-      imagem: siteData['hero-hinode']?.imagem || ''
-    },
-    'sobre-hinode': {
-      titulo: siteData['sobre-hinode']?.titulo || 'Sobre a Hinode',
-      subtitulo: siteData['sobre-hinode']?.subtitulo || 'Qualidade e inovação',
-      texto: siteData['sobre-hinode']?.texto || 'A Hinode é uma empresa brasileira que há mais de 10 anos transforma vidas através de produtos de alta qualidade e oportunidade de negócio.'
-    },
-    'produtos-destaque': {
-      titulo: siteData['produtos-destaque']?.titulo || 'Produtos em Destaque',
-      subtitulo: siteData['produtos-destaque']?.subtitulo || 'Conheça nossa linha premium',
-      descricao: siteData['produtos-destaque']?.descricao || 'Produtos desenvolvidos com a mais alta tecnologia'
-    },
-    // Serviços para templates institucionais
-    servicos: {
-      titulo: siteData.servicos?.titulo || 'Nossos Serviços',
-      lista: siteData.servicos?.lista || 'Desenvolvimento Web\nDesign Digital\nConsultoria\nSuporte Técnico',
-      descricao: siteData.servicos?.descricao || 'Oferecemos soluções completas para transformar sua presença digital.'
-    },
-    // Dados específicos para outros templates
-    recursos: {
-      titulo: 'Recursos Incríveis',
-      lista: 'Interface Intuitiva\nTecnologia Avançada\nSegurança Garantida'
-    },
-    cta: {
-      titulo: 'Pronto para começar?',
-      texto: 'Junte-se a milhares de clientes satisfeitos',
-      botaoTexto: 'Começar Agora',
-      botaoLink: 'https://wa.me/5511999999999'
-    },
-    caracteristicas: {
-      titulo: 'Principais Características',
-      lista: 'Responsivo\nOtimizado\nModerno'
-    },
-    depoimentos: {
-      titulo: 'O que nossos clientes dizem',
-      lista: 'João Silva: Excelente serviço!\nMaria Santos: Superou minhas expectativas!\nPedro Costa: Muito profissional!'
-    },
-    ...siteData
+  // Criar dados específicos baseados no templateId/modelId selecionado
+  const createPreviewData = (templateId: string) => {
+    const baseData = {
+      templateId,
+      modelId: templateId,
+      nomeDoSite: siteData.nomeDoSite || 'Preview Site',
+      logoPath: siteData.logoPath || '',
+      cores: {
+        principal: siteData.cores?.principal || '#0066cc',
+        fundo: siteData.cores?.fundo || '#ffffff',
+        destaque: siteData.cores?.destaque || '#ff6b35',
+        texto: siteData.cores?.texto || '#333333',
+      },
+      whatsapp: '5511999999999',
+      ...siteData
+    };
+
+    // Configurar dados específicos para cada template
+    switch (templateId) {
+      case 'landing-premium':
+        return {
+          ...baseData,
+          hero: {
+            titulo: 'Transforme Seus Sonhos em Realidade Premium',
+            subtitulo: 'Experiência digital de luxo com tecnologia de ponta',
+            botaoTexto: 'Começar Agora',
+            videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+            imagemHero: '',
+          },
+          beneficios: {
+            titulo: 'Benefícios Exclusivos',
+            lista: 'Design Premium\nTecnologia Avançada\nSuporte VIP\nResultados Garantidos'
+          },
+          contato: {
+            titulo: 'Contato Premium',
+            whatsapp: '5511999999999'
+          }
+        };
+
+      case 'landing-conversion':
+        return {
+          ...baseData,
+          hero: {
+            titulo: 'Maximize Suas Conversões Agora',
+            subtitulo: 'Landing page otimizada para resultados excepcionais',
+            botaoTexto: 'Converter Agora',
+            imagemHero: '',
+          },
+          beneficios: {
+            titulo: 'Por Que Converter Conosco?',
+            lista: 'Alta Conversão\nOtimização A/B\nAnalytics Avançado\nSupporte 24/7'
+          }
+        };
+
+      case 'institucional-corporate':
+        return {
+          ...baseData,
+          hero: {
+            titulo: 'Sua Empresa do Futuro',
+            subtitulo: 'Soluções corporativas de excelência',
+            botaoTexto: 'Conhecer Mais',
+            imagemHero: '',
+          },
+          sobre: {
+            titulo: 'Sobre Nossa Empresa',
+            texto: 'Líder em soluções empresariais inovadoras',
+          },
+          servicos: {
+            titulo: 'Nossos Serviços',
+            lista: 'Consultoria Empresarial\nSoluções Digitais\nSupporte Técnico\nTreinamentos'
+          }
+        };
+
+      case 'institucional-premium':
+        return {
+          ...baseData,
+          hero: {
+            titulo: 'Excelência Institucional',
+            subtitulo: 'Tradição e inovação em perfeita harmonia',
+            botaoTexto: 'Descobrir Mais',
+            imagemHero: '',
+          },
+          sobre: {
+            titulo: 'Nossa História',
+            texto: 'Décadas de experiência e compromisso com a qualidade',
+          }
+        };
+
+      case 'portfolio-creative':
+        return {
+          ...baseData,
+          'apresentacao-pessoal': {
+            titulo: 'Criatividade em Ação',
+            subtitulo: 'Designer & Desenvolvedor Criativo',
+            texto: 'Transformo ideias em experiências digitais únicas',
+            botaoTexto: 'Ver Portfolio',
+            imagem: '',
+          },
+          projetos: {
+            titulo: 'Projetos Criativos',
+            cards: [
+              { id: 1, titulo: 'App Mobile', texto: 'Design inovador', ordem: 1 },
+              { id: 2, titulo: 'Website', texto: 'UX/UI moderno', ordem: 2 },
+              { id: 3, titulo: 'Branding', texto: 'Identidade visual', ordem: 3 }
+            ]
+          }
+        };
+
+      case 'portfolio-developer':
+        return {
+          ...baseData,
+          'apresentacao-pessoal': {
+            titulo: 'Desenvolvedor Full Stack',
+            subtitulo: 'Código Limpo & Soluções Eficientes',
+            texto: 'Especialista em criar aplicações web modernas e escaláveis',
+            botaoTexto: 'Ver Projetos',
+            imagem: '',
+          },
+          habilidades: {
+            titulo: 'Tecnologias',
+            lista: 'React & TypeScript\nNode.js & Express\nPython & Django\nAWS & Docker'
+          }
+        };
+
+      case 'hinode-premium':
+        return {
+          ...baseData,
+          'hero-hinode': {
+            titulo: 'Seja um Representante Hinode Premium',
+            subtitulo: 'Transforme sua vida com perfumes de luxo',
+            texto: 'Junte-se à família Hinode e construa seu próprio negócio',
+            botaoTexto: 'Quero ser Representante',
+            video: '',
+            imagem: '',
+          },
+          'sobre-hinode': {
+            titulo: 'Hinode Premium',
+            subtitulo: 'Excelência em Perfumaria',
+            texto: 'A Hinode é líder em cosméticos e perfumaria no Brasil, oferecendo produtos de alta qualidade e oportunidade de negócio única.'
+          },
+          'produtos-destaque': {
+            titulo: 'Perfumes Premium',
+            subtitulo: 'Fragrâncias exclusivas',
+            descricao: 'Linha completa de perfumes importados e nacionais'
+          }
+        };
+
+      case 'hinode-landing':
+        return {
+          ...baseData,
+          'hero-hinode': {
+            titulo: 'Descubra o Mundo Hinode',
+            subtitulo: 'Perfumes e cosméticos de qualidade internacional',
+            texto: 'Produtos que encantam e oportunidade que transforma vidas',
+            botaoTexto: 'Conhecer Produtos',
+            video: '',
+            imagem: '',
+          },
+          'produtos-destaque': {
+            titulo: 'Produtos em Destaque',
+            lista: 'Perfumes Importados\nCosméticos Premium\nCuidados Pessoais\nProdutos Naturais'
+          }
+        };
+
+      default:
+        return {
+          ...baseData,
+          hero: {
+            titulo: 'Bem-vindo ao ' + (baseData.nomeDoSite || 'Nosso Site'),
+            subtitulo: 'Template padrão com design moderno',
+            botaoTexto: 'Saiba Mais',
+            imagemHero: '',
+          },
+          sobre: {
+            titulo: 'Sobre Nós',
+            texto: 'Conheça mais sobre nossos serviços e história',
+          }
+        };
+    }
   };
 
+  const templateId = siteData.templateId || siteData.modelId || 'landing-01';
+  const previewData = createPreviewData(templateId);
+
+  console.log('TemplatePreview - Template selecionado:', templateId);
   console.log('TemplatePreview - Dados do preview:', previewData);
 
   return (
@@ -137,9 +231,9 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
         <Card className="overflow-hidden">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-gray-600 flex items-center justify-between">
-              <span>Preview - {previewData.templateId || previewData.modelId}</span>
+              <span>Preview - {templateId}</span>
               <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                Visualização
+                {templateId}
               </span>
             </CardTitle>
           </CardHeader>
@@ -160,7 +254,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
               <Eye className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p className="text-sm">Clique em "Mostrar Preview" para visualizar seu site</p>
               <p className="text-xs mt-2 text-gray-400">
-                Template: {previewData.templateId || previewData.modelId}
+                Template: {templateId}
               </p>
             </div>
           </CardContent>

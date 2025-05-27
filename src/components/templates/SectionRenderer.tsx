@@ -34,7 +34,7 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
   const templateId = siteData.templateId || siteData.modelId;
   
   if (templateId) {
-    console.log('Renderizando template:', templateId, siteData);
+    console.log('SectionRenderer - Renderizando template:', templateId, siteData);
     
     switch (templateId) {
       // Landing Page Templates
@@ -57,6 +57,8 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
       
       // Institutional Templates
       case 'institucional-corporate':
+        return <InstitucionalCorporateTemplate siteData={siteData} isPreview={isPreview} />;
+      case 'institucional-premium':
         return <InstitucionalCorporateTemplate siteData={siteData} isPreview={isPreview} />;
       case 'institucional-01':
       case 'institucional-basico':
