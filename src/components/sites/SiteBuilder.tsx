@@ -7,7 +7,7 @@ import { Form } from '@/components/ui/form';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { ClientSelector } from './ClientSelector';
 import { ModelSelector } from './ModelSelector';
-import { FlexibleSiteEditor } from './FlexibleSiteEditor';
+import { DynamicSiteEditor } from './DynamicSiteEditor';
 
 interface SiteBuilderProps {
   initialData?: any;
@@ -115,8 +115,8 @@ export const SiteBuilder: React.FC<SiteBuilderProps> = ({
             )}
 
             {step === 3 && selectedModel && (
-              <FlexibleSiteEditor
-                modelId={selectedModel}
+              <DynamicSiteEditor
+                templateId={selectedModel}
                 clientId={selectedClient}
                 clientName={clientName}
                 initialData={initialData}
