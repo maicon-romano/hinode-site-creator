@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowRight, Award, Users, Star } from 'lucide-react';
 import { LandingPageTemplate } from './LandingPageTemplate';
 import { LandingPageVideoTemplate } from './variations/LandingPageVideoTemplate';
 import { LandingPageMinimalTemplate } from './variations/LandingPageMinimalTemplate';
@@ -8,6 +9,7 @@ import { InstitucionalBannerTemplate } from './variations/InstitucionalBannerTem
 import { InstitucionalCorporateTemplate } from './variations/InstitucionalCorporateTemplate';
 import { InstitucionalCreativeTemplate } from './variations/InstitucionalCreativeTemplate';
 import { HinodeLandingTemplate } from './variations/HinodeLandingTemplate';
+import { ContactForm } from './ContactForm';
 
 interface SiteSection {
   type: string;
