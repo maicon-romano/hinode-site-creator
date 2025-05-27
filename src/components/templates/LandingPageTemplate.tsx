@@ -19,7 +19,7 @@ interface SiteData {
     destaque: string;
     texto: string;
   };
-  secoes: {
+  secoes?: {
     video: boolean;
     formulario: boolean;
     depoimentos: boolean;
@@ -37,7 +37,16 @@ export const LandingPageTemplate: React.FC<LandingPageTemplateProps> = ({
   siteData, 
   isPreview = false 
 }) => {
-  const { cores, secoes } = siteData;
+  // Provide default values for secoes if it's undefined
+  const secoes = siteData.secoes || {
+    video: true,
+    formulario: true,
+    depoimentos: true,
+    sobre: true,
+    contato: true
+  };
+  
+  const { cores } = siteData;
   
   const styles = {
     backgroundColor: cores.fundo,
