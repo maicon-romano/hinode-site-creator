@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,7 +10,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Eye, EyeOff, Trash2, GripVertical } from 'lucide-react';
-import { getSiteModelById, SiteModel } from '@/data/siteModels';
+import { getSiteModel, SiteModel } from '@/data/siteModels';
 import { ColorSelector } from './ColorSelector';
 import { LogoUpload } from './LogoUpload';
 import { TemplatePreview } from './TemplatePreview';
@@ -33,7 +32,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
   onSubmit,
   isEditing = false
 }) => {
-  const siteModel = getSiteModelById(templateId);
+  const siteModel = getSiteModel(templateId);
   const [activeSections, setActiveSections] = useState<Set<string>>(
     new Set(siteModel?.secoesPadrao.map(s => s.type) || [])
   );
