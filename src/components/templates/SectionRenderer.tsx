@@ -27,28 +27,42 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
   siteData,
   isPreview = false
 }) => {
-  // Check if this is a full template render based on templateId
-  if (siteData.templateId) {
-    switch (siteData.templateId) {
+  // Check if this is a full template render based on templateId or modelId
+  const templateId = siteData.templateId || siteData.modelId;
+  
+  if (templateId) {
+    console.log('Renderizando template:', templateId, siteData);
+    
+    switch (templateId) {
       case 'hinode-01':
+      case 'hinode-landing':
         return <HinodeLandingTemplate siteData={siteData} isPreview={isPreview} />;
       case 'landing-01':
+      case 'landing-basico':
         return <LandingPageTemplate siteData={siteData} isPreview={isPreview} />;
       case 'landing-02':
+      case 'landing-video':
         return <LandingPageVideoTemplate siteData={siteData} isPreview={isPreview} />;
       case 'landing-03':
+      case 'landing-minimal':
         return <LandingPageMinimalTemplate siteData={siteData} isPreview={isPreview} />;
       case 'landing-04':
+      case 'landing-modern':
         return <LandingPageModernTemplate siteData={siteData} isPreview={isPreview} />;
       case 'institucional-01':
+      case 'institucional-basico':
         return <InstitucionalTemplate siteData={siteData} isPreview={isPreview} />;
       case 'institucional-02':
+      case 'institucional-banner':
         return <InstitucionalBannerTemplate siteData={siteData} isPreview={isPreview} />;
       case 'institucional-03':
+      case 'institucional-corporate':
         return <InstitucionalCorporateTemplate siteData={siteData} isPreview={isPreview} />;
       case 'institucional-04':
+      case 'institucional-creative':
         return <InstitucionalCreativeTemplate siteData={siteData} isPreview={isPreview} />;
       default:
+        console.log('Template não encontrado, usando template padrão para:', templateId);
         return <LandingPageTemplate siteData={siteData} isPreview={isPreview} />;
     }
   }

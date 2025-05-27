@@ -5,7 +5,8 @@ import { ArrowUp } from 'lucide-react';
 import { SectionRenderer } from './SectionRenderer';
 
 interface SiteData {
-  templateId: string;
+  templateId?: string;
+  modelId?: string;
   nomeDoSite: string;
   logoPath?: string;
   cores: {
@@ -53,6 +54,44 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
            siteData['hero-hinode']?.whatsapp ||
            siteData.hero?.whatsapp;
   };
+
+  // Check if we should render as a complete template
+  const templateId = siteData.templateId || siteData.modelId;
+  
+  if (templateId) {
+    console.log('DynamicSiteRenderer - Renderizando template completo:', templateId);
+    // Pass the entire siteData as a section to trigger template rendering
+    return (
+      <div className="min-h-screen" style={styles}>
+        <SectionRenderer
+          section={{ type: 'template', templateId }}
+          siteData={siteData}
+          isPreview={isPreview}
+        />
+
+        {/* WhatsApp Button - apenas se não for preview e tiver whatsapp */}
+        {!isPreview && getWhatsAppNumber() && (
+          <WhatsAppButton 
+            whatsapp={getWhatsAppNumber()!}
+            isPreview={isPreview}
+            color="#25D366"
+          />
+        )}
+
+        {/* Back to Top Button - apenas se não for preview */}
+        {!isPreview && (
+          <button
+            onClick={scrollToTop}
+            className="fixed bottom-6 left-6 z-50 w-12 h-12 rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 flex items-center justify-center text-white"
+            style={{ backgroundColor: siteData.cores.principal }}
+            title="Voltar ao topo"
+          >
+            <ArrowUp className="h-5 w-5" />
+          </button>
+        )}
+      </div>
+    );
+  }
 
   // Use layout if available, otherwise fallback to sections based on activeSections or sectionsOrder
   const sectionsToRender = siteData.layout || 

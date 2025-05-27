@@ -18,7 +18,9 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
 }) => {
   // Dados padrão mais completos para preview
   const previewData = {
-    templateId: siteData.templateId || 'landing-01',
+    // Garantir que o templateId/modelId seja passado corretamente
+    templateId: siteData.templateId || siteData.modelId || 'landing-01',
+    modelId: siteData.modelId || siteData.templateId || 'landing-01',
     nomeDoSite: siteData.nomeDoSite || 'Exemplo Site',
     logoPath: siteData.logoPath || '',
     cores: {
@@ -57,6 +59,26 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
       email: siteData.contato?.email || 'contato@exemplo.com',
       endereco: siteData.contato?.endereco || 'São Paulo, SP'
     },
+    // Dados específicos para Hinode
+    'hero-hinode': {
+      titulo: siteData['hero-hinode']?.titulo || 'Bem-vindo à Hinode',
+      subtitulo: siteData['hero-hinode']?.subtitulo || 'Transforme sua vida com nossos produtos',
+      texto: siteData['hero-hinode']?.texto || 'Descubra o poder da natureza em cada produto Hinode',
+      botaoTexto: siteData['hero-hinode']?.botaoTexto || 'Saiba Mais',
+      botaoLink: siteData['hero-hinode']?.botaoLink || 'https://wa.me/5511999999999',
+      video: siteData['hero-hinode']?.video || '',
+      imagem: siteData['hero-hinode']?.imagem || ''
+    },
+    'sobre-hinode': {
+      titulo: siteData['sobre-hinode']?.titulo || 'Sobre a Hinode',
+      subtitulo: siteData['sobre-hinode']?.subtitulo || 'Qualidade e inovação',
+      texto: siteData['sobre-hinode']?.texto || 'A Hinode é uma empresa brasileira que há mais de 10 anos transforma vidas através de produtos de alta qualidade e oportunidade de negócio.'
+    },
+    'produtos-destaque': {
+      titulo: siteData['produtos-destaque']?.titulo || 'Produtos em Destaque',
+      subtitulo: siteData['produtos-destaque']?.subtitulo || 'Conheça nossa linha premium',
+      descricao: siteData['produtos-destaque']?.descricao || 'Produtos desenvolvidos com a mais alta tecnologia'
+    },
     // Serviços para templates institucionais
     servicos: {
       titulo: siteData.servicos?.titulo || 'Nossos Serviços',
@@ -84,6 +106,8 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
     },
     ...siteData
   };
+
+  console.log('TemplatePreview - Dados do preview:', previewData);
 
   return (
     <div className="space-y-4">
@@ -113,7 +137,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
         <Card className="overflow-hidden">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-gray-600 flex items-center justify-between">
-              <span>Preview - {previewData.templateId}</span>
+              <span>Preview - {previewData.templateId || previewData.modelId}</span>
               <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
                 Visualização
               </span>
@@ -136,7 +160,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
               <Eye className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p className="text-sm">Clique em "Mostrar Preview" para visualizar seu site</p>
               <p className="text-xs mt-2 text-gray-400">
-                Template: {previewData.templateId}
+                Template: {previewData.templateId || previewData.modelId}
               </p>
             </div>
           </CardContent>
