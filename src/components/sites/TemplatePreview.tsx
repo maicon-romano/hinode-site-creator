@@ -24,6 +24,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
     videoUrl: siteData.videoUrl || '',
     whatsapp: siteData.whatsapp || '5511999999999',
     template: siteData.template || 'landing',
+    variation: siteData.variation || 'default',
     logoPath: siteData.logoPath || '',
     cores: {
       principal: siteData.cores?.principal || '#ff6b35',
@@ -38,6 +39,25 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
       sobre: siteData.secoes?.sobre ?? true,
       contato: siteData.secoes?.contato ?? true,
     }
+  };
+
+  const getVariationLabel = (template: string, variation: string) => {
+    if (template === 'landing') {
+      switch (variation) {
+        case 'video': return 'Com Vídeo';
+        case 'minimal': return 'Minimalista';
+        case 'modern': return 'Moderno';
+        default: return 'Padrão';
+      }
+    } else if (template === 'institucional') {
+      switch (variation) {
+        case 'banner': return 'Com Banner';
+        case 'corporate': return 'Corporativo';
+        case 'creative': return 'Criativo';
+        default: return 'Padrão';
+      }
+    }
+    return 'Padrão';
   };
 
   return (
@@ -58,7 +78,8 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
         <Card className="max-h-[600px] overflow-y-auto">
           <CardHeader>
             <CardTitle className="text-sm text-gray-600">
-              Preview - {previewData.template === 'landing' ? 'Landing Page' : 'Institucional'}
+              Preview - {previewData.template === 'landing' ? 'Landing Page' : 'Institucional'} 
+              ({getVariationLabel(previewData.template, previewData.variation)})
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
