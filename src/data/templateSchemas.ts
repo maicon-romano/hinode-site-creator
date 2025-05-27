@@ -161,6 +161,80 @@ export const templateSchemas: TemplateSchema[] = [
       }
     ]
   },
+  {
+    id: 'landing-03',
+    name: 'Landing Minimalista',
+    type: 'landing',
+    description: 'Design limpo e focado na conversão',
+    thumbnail: '/templates/landing-03.jpg',
+    sections: [
+      {
+        key: 'hero',
+        label: 'Seção Principal',
+        fields: [
+          { key: 'titulo', label: 'Título Principal', type: 'text', required: true },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text' },
+          { key: 'botaoTexto', label: 'Texto do Botão', type: 'text' },
+          { key: 'botaoLink', label: 'Link do Botão', type: 'url' },
+          { key: 'imagemHero', label: 'Imagem Principal', type: 'image' }
+        ]
+      },
+      {
+        key: 'caracteristicas',
+        label: 'Características',
+        fields: [
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Principais Características' },
+          { key: 'lista', label: 'Lista de Características', type: 'textarea' }
+        ]
+      },
+      {
+        key: 'contato',
+        label: 'Contato',
+        fields: [
+          { key: 'titulo', label: 'Título', type: 'text' },
+          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true },
+          { key: 'email', label: 'E-mail', type: 'text' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'landing-04',
+    name: 'Landing Promocional',
+    type: 'landing',
+    description: 'Template ideal para promoções e ofertas',
+    thumbnail: '/templates/landing-04.jpg',
+    sections: [
+      {
+        key: 'oferta',
+        label: 'Oferta Especial',
+        fields: [
+          { key: 'titulo', label: 'Título da Oferta', type: 'text', required: true },
+          { key: 'desconto', label: 'Percentual de Desconto', type: 'text' },
+          { key: 'prazo', label: 'Prazo da Oferta', type: 'text' },
+          { key: 'botaoTexto', label: 'Texto do Botão', type: 'text' },
+          { key: 'botaoLink', label: 'Link do Botão', type: 'url' }
+        ]
+      },
+      {
+        key: 'produto',
+        label: 'Sobre o Produto',
+        fields: [
+          { key: 'titulo', label: 'Nome do Produto', type: 'text' },
+          { key: 'descricao', label: 'Descrição', type: 'textarea' },
+          { key: 'imagem', label: 'Imagem do Produto', type: 'image' }
+        ]
+      },
+      {
+        key: 'contato',
+        label: 'Contato',
+        fields: [
+          { key: 'titulo', label: 'Título', type: 'text' },
+          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true }
+        ]
+      }
+    ]
+  },
   // Institucional Templates
   {
     id: 'institucional-01',
@@ -276,6 +350,95 @@ export const templateSchemas: TemplateSchema[] = [
           { key: 'email', label: 'E-mail', type: 'text' },
           { key: 'linkedin', label: 'LinkedIn', type: 'url' },
           { key: 'instagram', label: 'Instagram', type: 'url' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'institucional-03',
+    name: 'Institucional Criativo',
+    type: 'institucional',
+    description: 'Design diferenciado para empresas inovadoras',
+    thumbnail: '/templates/institucional-03.jpg',
+    sections: [
+      {
+        key: 'hero',
+        label: 'Seção Principal',
+        fields: [
+          { key: 'titulo', label: 'Título Principal', type: 'text', required: true },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text' },
+          { key: 'imagemHero', label: 'Imagem Principal', type: 'image' }
+        ]
+      },
+      {
+        key: 'inovacao',
+        label: 'Inovação',
+        fields: [
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Nossa Inovação' },
+          { key: 'descricao', label: 'Descrição', type: 'textarea' }
+        ]
+      },
+      {
+        key: 'projetos',
+        label: 'Projetos Especiais',
+        removable: true,
+        fields: [
+          { key: 'titulo', label: 'Título', type: 'text' },
+          { key: 'lista', label: 'Lista de Projetos', type: 'textarea' }
+        ]
+      },
+      {
+        key: 'contato',
+        label: 'Contato',
+        fields: [
+          { key: 'titulo', label: 'Título', type: 'text' },
+          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true },
+          { key: 'email', label: 'E-mail', type: 'text' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'institucional-04',
+    name: 'Institucional Profissional',
+    type: 'institucional',
+    description: 'Template sóbrio para empresas tradicionais',
+    thumbnail: '/templates/institucional-04.jpg',
+    sections: [
+      {
+        key: 'hero',
+        label: 'Apresentação',
+        fields: [
+          { key: 'titulo', label: 'Nome da Empresa', type: 'text', required: true },
+          { key: 'area', label: 'Área de Atuação', type: 'text' },
+          { key: 'experiencia', label: 'Tempo de Experiência', type: 'text' }
+        ]
+      },
+      {
+        key: 'competencias',
+        label: 'Competências',
+        fields: [
+          { key: 'titulo', label: 'Título', type: 'text', placeholder: 'Nossas Competências' },
+          { key: 'lista', label: 'Lista de Competências', type: 'textarea' }
+        ]
+      },
+      {
+        key: 'certificacoes',
+        label: 'Certificações',
+        removable: true,
+        fields: [
+          { key: 'titulo', label: 'Título', type: 'text' },
+          { key: 'lista', label: 'Lista de Certificações', type: 'textarea' }
+        ]
+      },
+      {
+        key: 'contato',
+        label: 'Contato',
+        fields: [
+          { key: 'titulo', label: 'Título', type: 'text' },
+          { key: 'whatsapp', label: 'WhatsApp', type: 'text', required: true },
+          { key: 'endereco', label: 'Endereço', type: 'text' },
+          { key: 'telefone', label: 'Telefone', type: 'text' }
         ]
       }
     ]
