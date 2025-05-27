@@ -1,42 +1,42 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Plus, Edit, Trash2, ArrowLeft, Eye, LogOut } from 'lucide-react';
+import { Plus, Edit, Trash2, ArrowLeft, Eye, LogOut, Download, Copy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
+import { SiteForm } from '@/components/sites/SiteForm';
 
 interface SiteData {
   id?: string;
   clientId: string;
   clientName: string;
-  siteName: string;
+  nomeDoSite: string;
   headline: string;
-  description: string;
+  descricao: string;
   videoUrl: string;
-  whatsappNumber: string;
-  logoUrl: string;
-  themeColor: string;
+  whatsapp: string;
+  template: string;
+  logoPath: string;
+  cores: {
+    principal: string;
+    fundo: string;
+    destaque: string;
+    texto: string;
+  };
+  secoes: {
+    video: boolean;
+    formulario: boolean;
+    depoimentos: boolean;
+    sobre: boolean;
+    contato: boolean;
+  };
   createdAt: Date;
-}
-
-interface SiteForm {
-  clientId: string;
-  clientName: string;
-  siteName: string;
-  headline: string;
-  description: string;
-  videoUrl: string;
-  whatsappNumber: string;
-  logoUrl: string;
-  themeColor: string;
 }
 
 const ManageSites = () => {
@@ -46,24 +46,10 @@ const ManageSites = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSite, setEditingSite] = useState<SiteData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const form = useForm<SiteForm>({
-    defaultValues: {
-      clientId: '',
-      clientName: '',
-      siteName: '',
-      headline: '',
-      description: '',
-      videoUrl: '',
-      whatsappNumber: '',
-      logoUrl: '',
-      themeColor: '#ff6b35'
-    }
-  });
-
   const fetchSites = async () => {
-    // Só carrega sites se estiver autenticado e for admin
     if (!currentUser || userData?.tipo !== 'admin') {
       console.log('User not authenticated or not admin, skipping sites fetch');
       setLoading(false);
@@ -110,11 +96,9 @@ const ManageSites = () => {
   };
 
   useEffect(() => {
-    // Aguarda a autenticação completa antes de tentar carregar sites
     if (currentUser && userData) {
       fetchSites();
     } else if (currentUser && !userData) {
-      // Usuário autenticado mas userData ainda não carregou
       setLoading(true);
     } else {
       setLoading(false);
@@ -130,10 +114,9 @@ const ManageSites = () => {
     }
   };
 
-  const onSubmit = async (data: SiteForm) => {
+  const onSubmit = async (data: any) => {
     try {
       if (editingSite) {
-        // Atualizar site existente
         await updateDoc(doc(db, 'sites', editingSite.id!), {
           ...data,
           updatedAt: new Date()
@@ -143,7 +126,6 @@ const ManageSites = () => {
           description: "Site atualizado com sucesso!"
         });
       } else {
-        // Criar novo site
         await addDoc(collection(db, 'sites'), {
           ...data,
           createdAt: new Date()
@@ -156,7 +138,6 @@ const ManageSites = () => {
       
       setIsDialogOpen(false);
       setEditingSite(null);
-      form.reset();
       fetchSites();
     } catch (error) {
       console.error('Erro ao salvar site:', error);
@@ -170,17 +151,6 @@ const ManageSites = () => {
 
   const handleEditSite = (site: SiteData) => {
     setEditingSite(site);
-    form.reset({
-      clientId: site.clientId,
-      clientName: site.clientName,
-      siteName: site.siteName,
-      headline: site.headline,
-      description: site.description,
-      videoUrl: site.videoUrl,
-      whatsappNumber: site.whatsappNumber,
-      logoUrl: site.logoUrl,
-      themeColor: site.themeColor
-    });
     setIsDialogOpen(true);
   };
 
@@ -204,9 +174,46 @@ const ManageSites = () => {
     }
   };
 
+  const handleDownloadSite = async (site: SiteData) => {
+    setDownloading(site.id!);
+    try {
+      // Simular processo de build e download
+      console.log(`Iniciando build do site ${site.clientId}...`);
+      
+      // Em um ambiente real, isso faria uma chamada para API
+      await new Promise(resolve => setTimeout(resolve, 3000)); // Simular build
+      
+      toast({
+        title: "Site buildado com sucesso!",
+        description: `O site ${site.nomeDoSite} foi empacotado e está pronto para download.`
+      });
+      
+      // Simular download
+      console.log(`Download do arquivo /dist/${site.clientId}.zip iniciado`);
+      
+    } catch (error) {
+      console.error('Erro ao fazer build do site:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível fazer o build do site",
+        variant: "destructive"
+      });
+    } finally {
+      setDownloading(null);
+    }
+  };
+
+  const handleCopyUrl = (clientId: string) => {
+    const url = `${window.location.origin}/cliente/${clientId}`;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: "URL copiada!",
+      description: "A URL do site foi copiada para a área de transferência."
+    });
+  };
+
   const openCreateDialog = () => {
     setEditingSite(null);
-    form.reset();
     setIsDialogOpen(true);
   };
 
@@ -253,171 +260,31 @@ const ManageSites = () => {
             </Button>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Gerenciar Sites</h1>
-              <p className="text-gray-600">Criar, editar e excluir sites dos clientes</p>
-              <p className="text-sm text-gray-500">UID: {currentUser?.uid}</p>
+              <p className="text-gray-600">Criar, editar e gerenciar sites dos clientes</p>
             </div>
           </div>
           
-          <Button onClick={openCreateDialog}>
+          <Button onClick={openCreateDialog} size="lg">
             <Plus className="h-4 w-4 mr-2" />
             Novo Site
           </Button>
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingSite ? 'Editar Site' : 'Criar Novo Site'}
               </DialogTitle>
               <DialogDescription>
-                {editingSite ? 'Edite as informações do site.' : 'Preencha os dados para criar um novo site.'}
+                {editingSite ? 'Edite as configurações do site.' : 'Configure um novo site para o cliente.'}
               </DialogDescription>
             </DialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="clientId"
-                    rules={{ required: "ID do cliente é obrigatório" }}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>ID do Cliente</FormLabel>
-                        <FormControl>
-                          <Input placeholder="cliente123" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="clientName"
-                    rules={{ required: "Nome do cliente é obrigatório" }}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Nome do Cliente</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Nome do Cliente" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="siteName"
-                  rules={{ required: "Nome do site é obrigatório" }}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nome do Site</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Site do Cliente" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="headline"
-                  rules={{ required: "Headline é obrigatório" }}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Headline Principal</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Transforme sua vida com Hinode" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Descrição</FormLabel>
-                      <FormControl>
-                        <textarea 
-                          className="w-full p-2 border rounded-md min-h-[100px]" 
-                          placeholder="Descrição do negócio..."
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="videoUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>URL do Vídeo</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://youtube.com/embed/..." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="whatsappNumber"
-                    rules={{ required: "WhatsApp é obrigatório" }}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>WhatsApp</FormLabel>
-                        <FormControl>
-                          <Input placeholder="5511999999999" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="themeColor"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Cor do Tema</FormLabel>
-                        <FormControl>
-                          <Input type="color" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="logoUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>URL do Logo</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://exemplo.com/logo.png" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <Button type="submit" className="w-full">
-                  {editingSite ? 'Atualizar Site' : 'Criar Site'}
-                </Button>
-              </form>
-            </Form>
+            <SiteForm
+              initialData={editingSite || undefined}
+              onSubmit={onSubmit}
+              isEditing={!!editingSite}
+            />
           </DialogContent>
         </Dialog>
 
@@ -450,9 +317,10 @@ const ManageSites = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Logo</TableHead>
                     <TableHead>Nome do Site</TableHead>
                     <TableHead>Cliente</TableHead>
-                    <TableHead>ID do Cliente</TableHead>
+                    <TableHead>Template</TableHead>
                     <TableHead>WhatsApp</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
@@ -460,30 +328,67 @@ const ManageSites = () => {
                 <TableBody>
                   {sites.map((site) => (
                     <TableRow key={site.id}>
-                      <TableCell className="font-medium">{site.siteName}</TableCell>
+                      <TableCell>
+                        {site.logoPath ? (
+                          <img 
+                            src={site.logoPath} 
+                            alt="Logo" 
+                            className="w-10 h-10 object-contain rounded border"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 bg-gray-200 rounded border flex items-center justify-center text-xs text-gray-500">
+                            Logo
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell className="font-medium">{site.nomeDoSite}</TableCell>
                       <TableCell>{site.clientName}</TableCell>
-                      <TableCell>{site.clientId}</TableCell>
-                      <TableCell>{site.whatsappNumber}</TableCell>
+                      <TableCell className="capitalize">{site.template}</TableCell>
+                      <TableCell>{site.whatsapp}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex gap-2 justify-end">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => navigate(`/cliente/${site.clientId}`)}
+                            title="Visualizar site"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
+                            onClick={() => handleCopyUrl(site.clientId)}
+                            title="Copiar URL"
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() => handleEditSite(site)}
+                            title="Editar site"
                           >
                             <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDownloadSite(site)}
+                            disabled={downloading === site.id}
+                            title="Baixar site buildado"
+                          >
+                            {downloading === site.id ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                            ) : (
+                              <Download className="h-4 w-4" />
+                            )}
                           </Button>
                           <Button
                             variant="destructive"
                             size="sm"
                             onClick={() => handleDeleteSite(site.id!)}
+                            title="Excluir site"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -491,6 +396,13 @@ const ManageSites = () => {
                       </TableCell>
                     </TableRow>
                   ))}
+                  {sites.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                        Nenhum site cadastrado ainda. Clique em "Novo Site" para começar.
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             )}
