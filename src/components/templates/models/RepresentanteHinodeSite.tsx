@@ -311,7 +311,7 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
       {/* Formulário com Textura */}
       <section className="py-20 px-6 bg-gradient-to-br from-rose-600 via-pink-600 to-amber-600 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="white" opacity="0.1"/><circle cx="80" cy="40" r="1" fill="white" opacity="0.1"/><circle cx="40" cy="80" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>')] opacity-30"></div>
+        <div className="absolute inset-0 opacity-30"></div>
         
         <div className="container mx-auto max-w-4xl relative z-10">
           <div className="text-center mb-12">
