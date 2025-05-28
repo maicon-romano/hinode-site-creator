@@ -14,7 +14,7 @@ interface ColorSelectorProps {
       fim: string;
     };
   };
-  onColorChange: (colorType: string, color: string) => void;
+  onColorChange: (colorType: string, color: string | { inicio: string; fim: string }) => void;
 }
 
 export const ColorSelector: React.FC<ColorSelectorProps> = ({ colors, onColorChange }) => {

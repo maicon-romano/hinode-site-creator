@@ -50,19 +50,20 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
         fim: '#00ffcc'
       }
     },
-    ...siteData,
-    cores: {
-      principal: '#0066cc',
-      fundo: '#ffffff',
-      destaque: '#ff6b35',
-      texto: '#333333',
-      degradeHero: {
-        inicio: '#0067c7',
-        fim: '#00ffcc'
-      },
-      ...siteData.cores
-    }
+    ...siteData
   };
+
+  // Merge cores properly, ensuring degradeHero is handled correctly
+  if (siteData.cores) {
+    safeSiteData.cores = {
+      ...safeSiteData.cores,
+      ...siteData.cores,
+      degradeHero: {
+        ...safeSiteData.cores.degradeHero,
+        ...(siteData.cores.degradeHero || {})
+      }
+    };
+  }
 
   // Check if this is a full template render based on templateId or modelId
   const templateId = safeSiteData.templateId || safeSiteData.modelId;
