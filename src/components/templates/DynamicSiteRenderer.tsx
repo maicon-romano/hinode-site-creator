@@ -51,22 +51,25 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
     }
   };
 
-  const cores = {
-    ...defaultCores,
-    ...siteData.cores,
+  // Merge cores properly without duplication
+  const coresFinais = {
+    principal: siteData.cores?.principal || defaultCores.principal,
+    fundo: siteData.cores?.fundo || defaultCores.fundo,
+    destaque: siteData.cores?.destaque || defaultCores.destaque,
+    texto: siteData.cores?.texto || defaultCores.texto,
     degradeHero: {
-      ...defaultCores.degradeHero,
-      ...(siteData.cores?.degradeHero || {})
+      inicio: siteData.cores?.degradeHero?.inicio || defaultCores.degradeHero.inicio,
+      fim: siteData.cores?.degradeHero?.fim || defaultCores.degradeHero.fim
     }
   };
 
   const styles = {
-    '--color-primary': cores.principal,
-    '--color-background': cores.fundo,
-    '--color-accent': cores.destaque,
-    '--color-text': cores.texto,
-    '--gradient-start': cores.degradeHero.inicio,
-    '--gradient-end': cores.degradeHero.fim,
+    '--color-primary': coresFinais.principal,
+    '--color-background': coresFinais.fundo,
+    '--color-accent': coresFinais.destaque,
+    '--color-text': coresFinais.texto,
+    '--gradient-start': coresFinais.degradeHero.inicio,
+    '--gradient-end': coresFinais.degradeHero.fim,
   } as React.CSSProperties;
 
   // Get whatsapp number from various possible locations
@@ -89,7 +92,7 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
       <div className="min-h-screen w-full" style={styles}>
         <SectionRenderer
           section={{ type: 'template', templateId }}
-          siteData={{ ...siteData, cores }}
+          siteData={{ ...siteData, cores: coresFinais }}
           isPreview={isPreview}
         />
 
@@ -121,7 +124,7 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
           <SectionRenderer
             key={`${section.type}-${index}`}
             section={section}
-            siteData={{ ...siteData, cores }}
+            siteData={{ ...siteData, cores: coresFinais }}
             isPreview={isPreview}
           />
         ))}

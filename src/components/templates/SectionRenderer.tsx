@@ -53,14 +53,19 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
     ...siteData
   };
 
-  // Merge cores properly, ensuring degradeHero is handled correctly
+  // Merge cores properly, ensuring degradeHero is handled correctly - SEM DUPLICAÇÃO
   if (siteData.cores) {
+    const coresOriginais = safeSiteData.cores;
+    const coresNovas = siteData.cores;
+    
     safeSiteData.cores = {
-      ...safeSiteData.cores,
-      ...siteData.cores,
+      principal: coresNovas.principal || coresOriginais.principal,
+      fundo: coresNovas.fundo || coresOriginais.fundo,
+      destaque: coresNovas.destaque || coresOriginais.destaque,
+      texto: coresNovas.texto || coresOriginais.texto,
       degradeHero: {
-        ...safeSiteData.cores.degradeHero,
-        ...(siteData.cores.degradeHero || {})
+        inicio: coresNovas.degradeHero?.inicio || coresOriginais.degradeHero.inicio,
+        fim: coresNovas.degradeHero?.fim || coresOriginais.degradeHero.fim
       }
     };
   }
@@ -486,6 +491,25 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
                       </p>
                     ))}
                   </div>
+                )}
+
+                {safeConteudo.experiencia && (
+                  <div className="mt-6 p-4 bg-white rounded-lg shadow-sm">
+                    <p className="text-sm text-gray-600">Experiência</p>
+                    <p className="font-semibold" style={{ color: safeSiteData.cores.principal }}>{safeConteudo.experiencia}</p>
+                  </div>
+                )}
+
+                {safeConteudo.botaoTexto && safeConteudo.botaoLink && (
+                  <a
+                    href={safeConteudo.botaoLink}
+                    className="inline-flex items-center gap-2 px-6 py-3 mt-6 font-semibold rounded-lg transition-all duration-300 hover:scale-105 text-white"
+                    style={{ backgroundColor: safeSiteData.cores.destaque }}
+                    target={safeConteudo.botaoLink.includes('wa.me') ? '_blank' : '_self'}
+                  >
+                    {safeConteudo.botaoTexto}
+                    <ArrowRight className="h-4 w-4" />
+                  </a>
                 )}
               </div>
               
