@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { TemplateRenderer } from '@/components/templates/TemplateRenderer';
+import { DynamicSiteRenderer } from '@/components/templates/DynamicSiteRenderer';
 
 interface SiteData {
   id: string;
@@ -24,6 +24,10 @@ interface SiteData {
     fundo: string;
     destaque: string;
     texto: string;
+    degradeHero?: {
+      inicio: string;
+      fim: string;
+    };
   };
   secoes?: {
     video: boolean;
@@ -118,9 +122,10 @@ const ClientSite = () => {
     );
   }
 
-  console.log('ClientSite - Renderizando site com dados:', siteData);
+  console.log('ClientSite - Renderizando site com dados completos:', siteData);
 
-  return <TemplateRenderer siteData={siteData} />;
+  // Use DynamicSiteRenderer directly with all the data from Firestore
+  return <DynamicSiteRenderer siteData={siteData} isPreview={false} />;
 };
 
 export default ClientSite;

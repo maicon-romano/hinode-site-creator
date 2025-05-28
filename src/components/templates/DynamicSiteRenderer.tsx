@@ -3,6 +3,12 @@ import React from 'react';
 import { WhatsAppButton } from './WhatsAppButton';
 import { SectionRenderer } from './SectionRenderer';
 
+// Import specific model components
+import { RepresentanteHinodeSite } from './models/RepresentanteHinodeSite';
+import { InstitucionalSite } from './models/InstitucionalSite';
+import { LandingVendasSite } from './models/LandingVendasSite';
+import { PortfolioSite } from './models/PortfolioSite';
+
 interface SiteData {
   templateId?: string;
   modelId?: string;
@@ -94,27 +100,94 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
   
   console.log('DynamicSiteRenderer - Template ID final:', templateId);
   console.log('DynamicSiteRenderer - Cores aplicadas:', coresFinais);
+  console.log('DynamicSiteRenderer - Dados completos para template:', siteData);
   
   if (templateId) {
-    // Pass the entire siteData as a section to trigger template rendering
-    return (
-      <div className="min-h-screen w-full" style={styles}>
-        <SectionRenderer
-          section={{ type: 'template', templateId }}
-          siteData={{ ...siteData, cores: coresFinais }}
-          isPreview={isPreview}
-        />
-
-        {/* WhatsApp Button - apenas se não for preview e tiver whatsapp */}
-        {!isPreview && getWhatsAppNumber() && (
-          <WhatsAppButton 
-            whatsapp={getWhatsAppNumber()!}
-            isPreview={isPreview}
-            color="#25D366"
-          />
-        )}
-      </div>
-    );
+    // Use specific model components with complete siteData
+    const completeData = { ...siteData, cores: coresFinais };
+    
+    switch (templateId.toLowerCase()) {
+      case 'representante-hinode':
+        console.log('Renderizando Representante Hinode com dados:', completeData);
+        return (
+          <div className="min-h-screen w-full" style={styles}>
+            <RepresentanteHinodeSite siteData={completeData} isPreview={isPreview} />
+            {!isPreview && getWhatsAppNumber() && (
+              <WhatsAppButton 
+                whatsapp={getWhatsAppNumber()!}
+                isPreview={isPreview}
+                color="#25D366"
+              />
+            )}
+          </div>
+        );
+      
+      case 'site-institucional':
+        console.log('Renderizando Site Institucional com dados:', completeData);
+        return (
+          <div className="min-h-screen w-full" style={styles}>
+            <InstitucionalSite siteData={completeData} isPreview={isPreview} />
+            {!isPreview && getWhatsAppNumber() && (
+              <WhatsAppButton 
+                whatsapp={getWhatsAppNumber()!}
+                isPreview={isPreview}
+                color="#25D366"
+              />
+            )}
+          </div>
+        );
+      
+      case 'landing-vendas':
+      case 'landing-page-vendas':
+      case 'landing-page-vendas-01':
+        console.log('Renderizando Landing de Vendas com dados:', completeData);
+        return (
+          <div className="min-h-screen w-full" style={styles}>
+            <LandingVendasSite siteData={completeData} isPreview={isPreview} />
+            {!isPreview && getWhatsAppNumber() && (
+              <WhatsAppButton 
+                whatsapp={getWhatsAppNumber()!}
+                isPreview={isPreview}
+                color="#25D366"
+              />
+            )}
+          </div>
+        );
+      
+      case 'portfolio-profissional':
+        console.log('Renderizando Portfólio com dados:', completeData);
+        return (
+          <div className="min-h-screen w-full" style={styles}>
+            <PortfolioSite siteData={completeData} isPreview={isPreview} />
+            {!isPreview && getWhatsAppNumber() && (
+              <WhatsAppButton 
+                whatsapp={getWhatsAppNumber()!}
+                isPreview={isPreview}
+                color="#25D366"
+              />
+            )}
+          </div>
+        );
+      
+      default:
+        // For other templates, pass as section to SectionRenderer
+        return (
+          <div className="min-h-screen w-full" style={styles}>
+            <SectionRenderer
+              section={{ type: 'template', templateId }}
+              siteData={completeData}
+              isPreview={isPreview}
+            />
+            {!isPreview && getWhatsAppNumber() && (
+              <WhatsAppButton 
+                whatsapp={getWhatsAppNumber()!}
+                isPreview={isPreview}
+                color="#25D366"
+              />
+            )}
+          </div>
+        );
+    }
   }
 
   // Use layout if available, otherwise fallback to sections based on activeSections or sectionsOrder
