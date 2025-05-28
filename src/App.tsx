@@ -17,55 +17,59 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute allowedTypes={['admin', 'cliente']}>
-                  <Dashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/manage-users" 
-              element={
-                <ProtectedRoute allowedTypes={['admin']}>
-                  <ManageUsers />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/manage-sites" 
-              element={
-                <ProtectedRoute allowedTypes={['admin']}>
-                  <ManageSites />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/system-settings" 
-              element={
-                <ProtectedRoute allowedTypes={['admin']}>
-                  <SystemSettings />
-                </ProtectedRoute>
-              } 
-            />
-            <Route path="/cliente/:id" element={<ClientSite />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          <TooltipProvider>
+            <div className="min-h-screen">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route 
+                  path="/dashboard" 
+                  element={
+                    <ProtectedRoute allowedTypes={['admin', 'cliente']}>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/manage-users" 
+                  element={
+                    <ProtectedRoute allowedTypes={['admin']}>
+                      <ManageUsers />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/manage-sites" 
+                  element={
+                    <ProtectedRoute allowedTypes={['admin']}>
+                      <ManageSites />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/system-settings" 
+                  element={
+                    <ProtectedRoute allowedTypes={['admin']}>
+                      <SystemSettings />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route path="/cliente/:id" element={<ClientSite />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+            <Toaster />
+            <Sonner />
+          </TooltipProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
