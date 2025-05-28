@@ -44,9 +44,24 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
       principal: '#0066cc',
       fundo: '#ffffff',
       destaque: '#ff6b35',
-      texto: '#333333'
+      texto: '#333333',
+      degradeHero: {
+        inicio: '#0067c7',
+        fim: '#00ffcc'
+      }
     },
-    ...siteData
+    ...siteData,
+    cores: {
+      principal: '#0066cc',
+      fundo: '#ffffff',
+      destaque: '#ff6b35',
+      texto: '#333333',
+      degradeHero: {
+        inicio: '#0067c7',
+        fim: '#00ffcc'
+      },
+      ...siteData.cores
+    }
   };
 
   // Check if this is a full template render based on templateId or modelId
@@ -155,6 +170,21 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
   // Ensure conteudo is an object
   const safeConteudo = conteudo || {};
 
+  // Helper para aplicar cores CSS
+  const applyColors = (element: React.ReactElement, additionalStyles?: React.CSSProperties) => {
+    return React.cloneElement(element, {
+      style: {
+        '--color-primary': safeSiteData.cores.principal,
+        '--color-background': safeSiteData.cores.fundo,
+        '--color-accent': safeSiteData.cores.destaque,
+        '--color-text': safeSiteData.cores.texto,
+        '--gradient-start': safeSiteData.cores.degradeHero?.inicio || '#0067c7',
+        '--gradient-end': safeSiteData.cores.degradeHero?.fim || '#00ffcc',
+        ...additionalStyles
+      } as React.CSSProperties
+    });
+  };
+
   const renderCards = (cards: any[], className: string = "grid grid-cols-1 md:grid-cols-3 gap-6") => {
     if (!cards || cards.length === 0) return null;
     
@@ -164,7 +194,10 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
           <div 
             key={card.id} 
             className="bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition-all duration-300 animate-fade-in group"
-            style={{ animationDelay: `${index * 100}ms` }}
+            style={{ 
+              animationDelay: `${index * 100}ms`,
+              borderColor: `${safeSiteData.cores.principal}20`
+            }}
           >
             {card.imagem && (
               <div className="overflow-hidden rounded-lg mb-4">
@@ -175,7 +208,10 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
                 />
               </div>
             )}
-            <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors" style={{ color: safeSiteData.cores.texto }}>
+            <h3 
+              className="font-semibold text-lg mb-2 group-hover:opacity-80 transition-colors" 
+              style={{ color: safeSiteData.cores.texto }}
+            >
               {card.titulo}
             </h3>
             {card.texto && (
@@ -191,16 +227,22 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
     case 'hero':
     case 'hero-hinode':
     case 'apresentacao-pessoal':
-      return (
+      return applyColors(
         <section 
           className={`relative py-16 lg:py-20 px-4 ${isPreview ? 'min-h-[400px]' : 'min-h-screen'} flex items-center overflow-hidden`}
-          style={{ backgroundColor: safeSiteData.cores.fundo, color: safeSiteData.cores.texto }}
+          style={{ 
+            backgroundColor: safeSiteData.cores.fundo, 
+            color: safeSiteData.cores.texto,
+            background: type === 'hero-hinode' && safeSiteData.cores.degradeHero ? 
+              `linear-gradient(135deg, ${safeSiteData.cores.degradeHero.inicio}, ${safeSiteData.cores.degradeHero.fim})` :
+              safeSiteData.cores.fundo
+          }}
         >
           {/* Background decoration for Hinode */}
           {type === 'hero-hinode' && (
             <div className="absolute inset-0 overflow-hidden">
-              <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-yellow-400/20 to-orange-500/20 rounded-full blur-3xl animate-float"></div>
-              <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-blue-400/20 to-purple-500/20 rounded-full blur-3xl animate-float animation-delay-2000"></div>
+              <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-float"></div>
+              <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-float animation-delay-2000"></div>
             </div>
           )}
           
@@ -217,19 +259,31 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
                 
                 <h1 
                   className="text-4xl lg:text-6xl font-bold leading-tight mb-6 animate-fade-in"
-                  style={{ color: safeSiteData.cores.principal }}
+                  style={{ 
+                    color: type === 'hero-hinode' ? 'white' : safeSiteData.cores.principal 
+                  }}
                 >
                   {safeConteudo.titulo || 'Título do Site'}
                 </h1>
                 
                 {safeConteudo.subtitulo && (
-                  <p className="text-xl lg:text-2xl opacity-90 mb-6 animate-fade-in animation-delay-1000">
+                  <p 
+                    className="text-xl lg:text-2xl opacity-90 mb-6 animate-fade-in animation-delay-1000"
+                    style={{ 
+                      color: type === 'hero-hinode' ? 'white' : safeSiteData.cores.texto 
+                    }}
+                  >
                     {safeConteudo.subtitulo}
                   </p>
                 )}
 
                 {safeConteudo.texto && (
-                  <p className="text-lg opacity-80 mb-8 animate-fade-in animation-delay-2000">
+                  <p 
+                    className="text-lg opacity-80 mb-8 animate-fade-in animation-delay-2000"
+                    style={{ 
+                      color: type === 'hero-hinode' ? 'white' : safeSiteData.cores.texto 
+                    }}
+                  >
                     {safeConteudo.texto}
                   </p>
                 )}

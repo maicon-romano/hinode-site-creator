@@ -13,6 +13,10 @@ interface SiteData {
     fundo: string;
     destaque: string;
     texto: string;
+    degradeHero?: {
+      inicio: string;
+      fim: string;
+    };
   };
   layout?: any[];
   sectionsOrder?: string[];
@@ -40,16 +44,29 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
     principal: '#0066cc',
     fundo: '#ffffff',
     destaque: '#ff6b35',
-    texto: '#333333'
+    texto: '#333333',
+    degradeHero: {
+      inicio: '#0067c7',
+      fim: '#00ffcc'
+    }
   };
 
-  const cores = siteData.cores || defaultCores;
+  const cores = {
+    ...defaultCores,
+    ...siteData.cores,
+    degradeHero: {
+      ...defaultCores.degradeHero,
+      ...(siteData.cores?.degradeHero || {})
+    }
+  };
 
   const styles = {
     '--color-primary': cores.principal,
     '--color-background': cores.fundo,
     '--color-accent': cores.destaque,
     '--color-text': cores.texto,
+    '--gradient-start': cores.degradeHero.inicio,
+    '--gradient-end': cores.degradeHero.fim,
   } as React.CSSProperties;
 
   // Get whatsapp number from various possible locations

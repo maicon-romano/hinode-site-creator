@@ -46,35 +46,62 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     principal: initialData?.cores?.principal || '#ff6b35',
     fundo: initialData?.cores?.fundo || '#ffffff',
     destaque: initialData?.cores?.destaque || '#0066cc',
-    texto: initialData?.cores?.texto || '#333333'
+    texto: initialData?.cores?.texto || '#333333',
+    degradeHero: initialData?.cores?.degradeHero || {
+      inicio: '#0067c7',
+      fim: '#00ffcc'
+    }
   });
   const [isInitialized, setIsInitialized] = useState(false);
   const [previewData, setPreviewData] = useState(null);
 
-  // Use the form context from the parent SiteBuilder
   const form = useFormContext();
 
-  // Debounced function to update preview data - mais agressivo
+  // Debounced function para update do preview - mais conservador
   const debouncedUpdatePreview = useCallback(
     debounce((data) => {
+      console.log('Atualizando preview com dados:', data);
       setPreviewData(data);
-    }, 1000), // Aumentei para 1 segundo
+    }, 2000), // 2 segundos
     []
   );
 
-  // Watch only basic fields that affect preview
+  // Watch apenas campos essenciais
   const nomeDoSite = form.watch('nomeDoSite');
   const logoPath = form.watch('logoPath');
 
-  // Update preview data when key fields change - menos frequente
+  // Update preview apenas quando campos importantes mudam
   useEffect(() => {
     if (isInitialized) {
       const currentData = getCurrentSiteData();
       debouncedUpdatePreview(currentData);
     }
-  }, [nomeDoSite, logoPath, colors, activeSections, sectionsOrder]);
+  }, [nomeDoSite, logoPath, activeSections, sectionsOrder]);
 
-  // Initialize form values only once
+  // Função para atualizar cores imediatamente no preview
+  const handleColorChange = useCallback((colorType: string, color: string) => {
+    let newColors = { ...colors };
+    
+    if (colorType === 'degradeHero') {
+      try {
+        const degradeObj = typeof color === 'string' ? JSON.parse(color) : color;
+        newColors.degradeHero = degradeObj;
+      } catch (error) {
+        console.error('Erro ao processar degradê:', error);
+        return;
+      }
+    } else {
+      newColors[colorType] = color;
+    }
+    
+    setColors(newColors);
+    form.setValue(`cores.${colorType}`, colorType === 'degradeHero' ? newColors.degradeHero : color);
+    
+    // Atualizar preview imediatamente para cores
+    const currentData = getCurrentSiteData();
+    setPreviewData({ ...currentData, cores: newColors });
+  }, [form, colors]);
+
   useEffect(() => {
     if (!isInitialized && siteModel) {
       console.log('Inicializando formulário com dados:', { clientId, clientName, templateId, initialData });
@@ -129,19 +156,6 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     }
   }, [templateId, siteModel, isInitialized, form, isEditing]);
 
-  // Memoized color change handler - agora atualiza o preview imediatamente apenas para cores
-  const handleColorChange = useCallback((colorType: string, color: string) => {
-    const newColors = { ...colors, [colorType]: color };
-    setColors(newColors);
-    form.setValue(`cores.${colorType}` as any, color);
-    
-    // Para cores, atualizar preview imediatamente mas debounced
-    setTimeout(() => {
-      const currentData = getCurrentSiteData();
-      setPreviewData({ ...currentData, cores: newColors });
-    }, 200);
-  }, [form, colors]);
-
   // Memoized section toggle handler
   const toggleSection = useCallback((sectionType: string) => {
     setActiveSections(prev => {
@@ -191,7 +205,245 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     );
   }
 
-  // Helper function to get section display name
+  // Mapeamento de campos específicos por modelo
+  const getModelSpecificFields = (modelId: string) => {
+    const commonFields = {
+      hero: ['titulo', 'subtitulo', 'texto', 'video', 'botaoTexto', 'botaoLink', 'whatsapp', 'imagem'],
+      sobre: ['titulo', 'subtitulo', 'texto', 'imagem'],
+      contato: ['titulo', 'subtitulo', 'whatsapp', 'telefone', 'email', 'endereco'],
+      rodape: ['texto']
+    };
+
+    const modelSpecificFields = {
+      'representante-hinode': {
+        'hero-hinode': ['titulo', 'subtitulo', 'texto', 'video', 'botaoTexto', 'botaoLink', 'whatsapp', 'imagem'],
+        'sobre-hinode': ['titulo', 'subtitulo', 'texto', 'imagem'],
+        'biografia-representante': ['nome', 'titulo', 'texto', 'foto', 'experiencia', 'botaoTexto', 'botaoLink'],
+        'produtos-hinode': ['titulo', 'subtitulo', 'descricao', 'produtos'],
+        'contato-hinode': ['titulo', 'subtitulo', 'whatsapp', 'telefone', 'email'],
+        'rodape-hinode': ['texto']
+      },
+      'site-institucional': {
+        'banner-institucional': ['titulo', 'subtitulo', 'imagem'],
+        'sobre': ['titulo', 'subtitulo', 'texto', 'imagem'],
+        'servicos': ['titulo', 'subtitulo', 'lista'],
+        'equipe': ['titulo', 'subtitulo'],
+        'contato': ['titulo', 'subtitulo', 'whatsapp', 'telefone', 'email', 'endereco']
+      },
+      'landing-page-vendas': {
+        'hero': ['titulo', 'subtitulo', 'video', 'botaoTexto', 'botaoLink'],
+        'beneficios': ['titulo', 'subtitulo', 'lista'],
+        'produto': ['titulo', 'texto', 'imagem', 'preco', 'botaoTexto', 'botaoLink'],
+        'depoimentos': ['titulo'],
+        'contato': ['titulo', 'whatsapp']
+      },
+      'portfolio-profissional': {
+        'bio': ['titulo', 'subtitulo', 'texto', 'imagem'],
+        'habilidades': ['titulo', 'lista'],
+        'projetos': ['titulo'],
+        'contato': ['titulo', 'whatsapp', 'email']
+      }
+    };
+
+    return modelSpecificFields[modelId] || commonFields;
+  };
+
+  const renderSectionField = (fieldKey: string, sectionType: string, fieldLabel: string, fieldType: 'text' | 'textarea' | 'url' | 'image' | 'price' = 'text') => {
+    const fieldName = `${sectionType}.${fieldKey}`;
+
+    switch (fieldType) {
+      case 'textarea':
+        return (
+          <FormField
+            key={fieldName}
+            control={form.control}
+            name={fieldName}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{fieldLabel}</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder={`Digite ${fieldLabel.toLowerCase()}`}
+                    className="min-h-[100px]"
+                    {...field}
+                    value={field.value || ''}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        );
+
+      case 'url':
+        return (
+          <FormField
+            key={fieldName}
+            control={form.control}
+            name={fieldName}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{fieldLabel}</FormLabel>
+                <FormControl>
+                  <Input
+                    type="url"
+                    placeholder="https://exemplo.com"
+                    {...field}
+                    value={field.value || ''}
+                    onBlur={(e) => {
+                      const value = e.target.value;
+                      if (value && (value.includes('youtube.com') || value.includes('youtu.be'))) {
+                        const convertedUrl = convertYouTubeToEmbed(value);
+                        field.onChange(convertedUrl);
+                      } else {
+                        field.onBlur();
+                      }
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        );
+
+      case 'image':
+        return (
+          <FormField
+            key={fieldName}
+            control={form.control}
+            name={fieldName}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{fieldLabel}</FormLabel>
+                <FormControl>
+                  <div className="space-y-2">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (event) => {
+                            field.onChange(event.target?.result);
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                    {field.value && (
+                      <img
+                        src={field.value}
+                        alt="Preview"
+                        className="w-32 h-32 object-cover rounded border"
+                      />
+                    )}
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        );
+
+      case 'price':
+        return (
+          <FormField
+            key={fieldName}
+            control={form.control}
+            name={fieldName}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{fieldLabel}</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="R$ 97,00"
+                    {...field}
+                    value={field.value || ''}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        );
+
+      default:
+        return (
+          <FormField
+            key={fieldName}
+            control={form.control}
+            name={fieldName}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{fieldLabel}</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={`Digite ${fieldLabel.toLowerCase()}`}
+                    {...field}
+                    value={field.value || ''}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        );
+    }
+  };
+
+  const renderSectionFields = (sectionType: string) => {
+    const modelFields = getModelSpecificFields(templateId);
+    const fieldsForSection = modelFields[sectionType] || [];
+    
+    const fieldLabels = {
+      titulo: 'Título',
+      subtitulo: 'Subtítulo',
+      texto: 'Texto/Descrição',
+      descricao: 'Descrição',
+      video: 'URL do Vídeo',
+      botaoTexto: 'Texto do Botão',
+      botaoLink: 'Link do Botão',
+      whatsapp: 'WhatsApp',
+      telefone: 'Telefone',
+      email: 'E-mail',
+      endereco: 'Endereço',
+      imagem: 'Imagem',
+      foto: 'Foto',
+      nome: 'Nome',
+      experiencia: 'Anos de Experiência',
+      produtos: 'Lista de Produtos (um por linha)',
+      lista: 'Lista de Itens (um por linha)',
+      preco: 'Preço'
+    };
+
+    const fieldTypes = {
+      texto: 'textarea',
+      descricao: 'textarea',
+      produtos: 'textarea',
+      lista: 'textarea',
+      video: 'url',
+      botaoLink: 'url',
+      imagem: 'image',
+      foto: 'image',
+      preco: 'price'
+    };
+
+    return (
+      <div className="space-y-4">
+        {fieldsForSection.map(fieldKey => 
+          renderSectionField(
+            fieldKey, 
+            sectionType, 
+            fieldLabels[fieldKey] || fieldKey,
+            fieldTypes[fieldKey] || 'text'
+          )
+        )}
+      </div>
+    );
+  };
+
   const getSectionDisplayName = (sectionType: string) => {
     const sectionNames: { [key: string]: string } = {
       'hero': 'Seção Principal',
@@ -344,371 +596,23 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     );
   };
 
-  const renderSectionField = (fieldKey: string, sectionType: string, fieldLabel: string, fieldType: 'text' | 'textarea' | 'url' | 'image' = 'text') => {
-    const fieldName = `${sectionType}.${fieldKey}`;
-
-    switch (fieldType) {
-      case 'textarea':
-        return (
-          <FormField
-            key={fieldName}
-            control={form.control}
-            name={fieldName}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{fieldLabel}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder={`Digite ${fieldLabel.toLowerCase()}`}
-                    className="min-h-[100px]"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        );
-
-      case 'url':
-        return (
-          <FormField
-            key={fieldName}
-            control={form.control}
-            name={fieldName}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{fieldLabel}</FormLabel>
-                <FormControl>
-                  <Input
-                    type="url"
-                    placeholder="https://exemplo.com"
-                    {...field}
-                    onBlur={(e) => {
-                      const value = e.target.value;
-                      if (value && (value.includes('youtube.com') || value.includes('youtu.be'))) {
-                        const convertedUrl = convertYouTubeToEmbed(value);
-                        field.onChange(convertedUrl);
-                      } else {
-                        field.onBlur();
-                      }
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-                {field.value && (field.value.includes('youtube.com') || field.value.includes('youtu.be')) && (
-                  <p className="text-sm text-blue-600 mt-1">
-                    ✓ URL do YouTube será convertida automaticamente para formato de embed
-                  </p>
-                )}
-              </FormItem>
-            )}
-          />
-        );
-
-      case 'image':
-        return (
-          <FormField
-            key={fieldName}
-            control={form.control}
-            name={fieldName}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{fieldLabel}</FormLabel>
-                <FormControl>
-                  <div className="space-y-2">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onload = (event) => {
-                            field.onChange(event.target?.result);
-                          };
-                          reader.readAsDataURL(file);
-                        }
-                      }}
-                    />
-                    {field.value && (
-                      <img
-                        src={field.value}
-                        alt="Preview"
-                        className="w-32 h-32 object-cover rounded border"
-                      />
-                    )}
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        );
-
-      default:
-        return (
-          <FormField
-            key={fieldName}
-            control={form.control}
-            name={fieldName}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{fieldLabel}</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={`Digite ${fieldLabel.toLowerCase()}`}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        );
-    }
-  };
-
-  const renderSectionFields = (sectionType: string) => {
-    switch (sectionType) {
-      case 'hero':
-      case 'hero-hinode':
-        return (
-          <>
-            {renderSectionField('titulo', sectionType, 'Título Principal')}
-            {renderSectionField('subtitulo', sectionType, 'Subtítulo', 'textarea')}
-            {renderSectionField('texto', sectionType, 'Texto Adicional', 'textarea')}
-            {renderSectionField('video', sectionType, 'URL do Vídeo', 'url')}
-            {renderSectionField('botaoTexto', sectionType, 'Texto do Botão')}
-            {renderSectionField('botaoLink', sectionType, 'Link do Botão', 'url')}
-            {renderSectionField('whatsapp', sectionType, 'WhatsApp')}
-            {renderSectionField('imagem', sectionType, 'Imagem Principal', 'image')}
-          </>
-        );
-
-      case 'sobre':
-      case 'sobre-hinode':
-      case 'sobre-negocio':
-      case 'sobre-distribuidor':
-      case 'biografia-representante':
-      case 'bio':
-        return (
-          <>
-            {renderSectionField('titulo', sectionType, 'Título')}
-            {renderSectionField('subtitulo', sectionType, 'Subtítulo')}
-            {renderSectionField('texto', sectionType, 'Descrição', 'textarea')}
-            {renderSectionField('imagem', sectionType, 'Imagem da Seção', 'image')}
-            {sectionType === 'biografia-representante' && (
-              <>
-                {renderSectionField('nome', sectionType, 'Nome do Representante')}
-                {renderSectionField('foto', sectionType, 'Foto do Representante', 'image')}
-                {renderSectionField('experiencia', sectionType, 'Anos de Experiência')}
-              </>
-            )}
-            {(sectionType === 'sobre-negocio' || sectionType === 'biografia-representante') && (
-              renderSectionField('botaoTexto', sectionType, 'Texto do Botão')
-            )}
-          </>
-        );
-
-      case 'produtos-destaque':
-      case 'produtos-hinode':
-        return (
-          <>
-            {renderSectionField('titulo', sectionType, 'Título da Seção')}
-            {renderSectionField('subtitulo', sectionType, 'Subtítulo')}
-            {renderSectionField('descricao', sectionType, 'Descrição', 'textarea')}
-            {renderSectionField('produtos', sectionType, 'Lista de Produtos (um por linha)', 'textarea')}
-            {renderCardEditor(sectionType, 'Produtos (Avançado)')}
-          </>
-        );
-
-      case 'beneficios':
-      case 'servicos':
-      case 'habilidades':
-        return (
-          <>
-            {renderSectionField('titulo', sectionType, 'Título da Seção')}
-            {renderSectionField('subtitulo', sectionType, 'Subtítulo')}
-            {renderSectionField('descricao', sectionType, 'Descrição', 'textarea')}
-            {renderSectionField('lista', sectionType, 'Lista de Itens (um por linha)', 'textarea')}
-          </>
-        );
-
-      case 'como-funciona':
-      case 'etapas-comecar':
-        return (
-          <>
-            {renderSectionField('titulo', sectionType, 'Título da Seção')}
-            {renderSectionField('subtitulo', sectionType, 'Subtítulo')}
-            {renderSectionField('descricao', sectionType, 'Descrição', 'textarea')}
-            {renderSectionField('lista', sectionType, 'Etapas (uma por linha)', 'textarea')}
-          </>
-        );
-
-      case 'depoimentos':
-        return (
-          <>
-            {renderSectionField('titulo', sectionType, 'Título da Seção')}
-            {renderSectionField('subtitulo', sectionType, 'Subtítulo')}
-            {renderSectionField('lista', sectionType, 'Depoimentos (Nome: Texto; separados por nova linha)', 'textarea')}
-          </>
-        );
-
-      case 'contato':
-      case 'contato-hinode':
-        return (
-          <>
-            {renderSectionField('titulo', sectionType, 'Título')}
-            {renderSectionField('subtitulo', sectionType, 'Subtítulo')}
-            {renderSectionField('whatsapp', sectionType, 'WhatsApp')}
-            {renderSectionField('telefone', sectionType, 'Telefone')}
-            {renderSectionField('email', sectionType, 'E-mail')}
-            {renderSectionField('endereco', sectionType, 'Endereço')}
-          </>
-        );
-
-      case 'rodape':
-      case 'rodape-hinode':
-        return (
-          <>
-            {renderSectionField('texto', sectionType, 'Texto do Rodapé', 'textarea')}
-          </>
-        );
-
-      default:
-        return (
-          <>
-            {renderSectionField('titulo', sectionType, 'Título')}
-            {renderSectionField('texto', sectionType, 'Texto', 'textarea')}
-          </>
-        );
-    }
-  };
-
   const handleSubmit = useCallback((data: any) => {
     console.log('DynamicSiteEditor - Dados do formulário:', data);
     console.log('DynamicSiteEditor - Template ID:', templateId);
     
-    // Criar estrutura de dados específica para cada modelo
     const processedData = {
       clientId,
       clientName,
-      templateId, // Garantir que templateId está presente
-      modelId: templateId, // Manter compatibilidade
+      templateId,
+      modelId: templateId,
       nomeDoSite: data.nomeDoSite,
       logoPath: data.logoPath,
       cores: colors,
       activeSections: Array.from(activeSections),
       sectionsOrder,
       whatsapp: data.hero?.whatsapp || data['hero-hinode']?.whatsapp || data.contato?.whatsapp,
+      ...data
     };
-
-    // Mapear dados específicos por modelo
-    if (templateId === 'representante-hinode') {
-      processedData['hero-hinode'] = {
-        titulo: data['hero-hinode']?.titulo || data.titulo || 'Transforme Sua Beleza',
-        subtitulo: data['hero-hinode']?.subtitulo || data.subtitulo || 'Descubra produtos de luxo',
-        video: data['hero-hinode']?.video || data.video,
-        botaoTexto: data['hero-hinode']?.botaoTexto || 'QUERO CONHECER OS PRODUTOS',
-        whatsapp: data['hero-hinode']?.whatsapp || data.whatsapp
-      };
-      
-      processedData['sobre-negocio'] = {
-        titulo: data['sobre-negocio']?.titulo || 'Sobre a Hinode',
-        texto: data['sobre-negocio']?.texto || 'A Hinode é líder em cosméticos...',
-        imagem: data['sobre-negocio']?.imagem,
-        botaoTexto: data['sobre-negocio']?.botaoTexto || 'Conhecer Oportunidade'
-      };
-      
-      processedData['biografia-representante'] = {
-        nome: data['biografia-representante']?.nome || clientName,
-        titulo: data['biografia-representante']?.titulo || 'Consultora de Beleza',
-        texto: data['biografia-representante']?.texto || 'Especialista em produtos Hinode...',
-        foto: data['biografia-representante']?.foto,
-        experiencia: data['biografia-representante']?.experiencia || '5+',
-        botaoTexto: data['biografia-representante']?.botaoTexto || 'Falar Comigo Agora'
-      };
-      
-      processedData['produtos-hinode'] = {
-        titulo: data['produtos-hinode']?.titulo || 'Linha Completa Hinode',
-        subtitulo: data['produtos-hinode']?.subtitulo || 'Produtos premium...',
-        produtos: data['produtos-hinode']?.produtos || 'Perfumes Premium\nMaquiagem Professional\nCuidados com a Pele'
-      };
-      
-      processedData['contato-hinode'] = {
-        titulo: data['contato-hinode']?.titulo || 'Vamos Conversar?',
-        subtitulo: data['contato-hinode']?.subtitulo || 'Entre em contato...',
-        whatsapp: data['contato-hinode']?.whatsapp || data.whatsapp
-      };
-    } else if (templateId === 'site-institucional') {
-      processedData['hero'] = {
-        titulo: data.hero?.titulo || data.titulo || 'Sua Empresa',
-        subtitulo: data.hero?.subtitulo || data.subtitulo || 'Confiança e qualidade',
-        imagem: data.hero?.imagem,
-        botaoTexto: data.hero?.botaoTexto || 'Saiba Mais',
-        botaoLink: data.hero?.botaoLink
-      };
-      
-      processedData['sobre'] = {
-        titulo: data.sobre?.titulo || 'Sobre Nós',
-        texto: data.sobre?.texto || 'Nossa história e valores...',
-        imagem: data.sobre?.imagem
-      };
-      
-      processedData['servicos'] = {
-        titulo: data.servicos?.titulo || 'Nossos Serviços',
-        lista: data.servicos?.lista || 'Serviço 1\nServiço 2\nServiço 3'
-      };
-    } else if (templateId === 'landing-page-vendas') {
-      processedData['hero'] = {
-        titulo: data.hero?.titulo || data.titulo || 'Produto Incrível',
-        subtitulo: data.hero?.subtitulo || data.subtitulo || 'A solução que você procura',
-        video: data.hero?.video || data.video,
-        botaoTexto: data.hero?.botaoTexto || 'COMPRAR AGORA',
-        botaoLink: data.hero?.botaoLink || `https://wa.me/${data.whatsapp}`
-      };
-      
-      processedData['beneficios'] = {
-        titulo: data.beneficios?.titulo || 'Por que escolher?',
-        lista: data.beneficios?.lista || 'Benefício 1\nBenefício 2\nBenefício 3'
-      };
-      
-      processedData['produto'] = {
-        titulo: data.produto?.titulo || 'Nosso Produto',
-        texto: data.produto?.texto || 'Descrição do produto...',
-        imagem: data.produto?.imagem,
-        preco: data.produto?.preco || 'R$ 97,00'
-      };
-    } else if (templateId === 'portfolio-profissional') {
-      processedData['bio'] = {
-        titulo: data.bio?.titulo || clientName,
-        subtitulo: data.bio?.subtitulo || 'Profissional',
-        texto: data.bio?.texto || 'Minha biografia profissional...',
-        imagem: data.bio?.imagem
-      };
-      
-      processedData['habilidades'] = {
-        titulo: data.habilidades?.titulo || 'Minhas Habilidades',
-        lista: data.habilidades?.lista || 'Habilidade 1\nHabilidade 2\nHabilidade 3'
-      };
-      
-      processedData['projetos'] = {
-        titulo: data.projetos?.titulo || 'Meus Projetos',
-        cards: data.projetos?.cards || []
-      };
-    }
-
-    // Adicionar dados genéricos que todos os modelos podem ter
-    if (data.contato && !processedData['contato-hinode']) {
-      processedData['contato'] = {
-        titulo: data.contato?.titulo || 'Entre em Contato',
-        whatsapp: data.contato?.whatsapp || data.whatsapp,
-        telefone: data.contato?.telefone,
-        email: data.contato?.email,
-        endereco: data.contato?.endereco
-      };
-    }
 
     console.log('DynamicSiteEditor - Dados processados:', processedData);
     onSubmit(processedData);
@@ -882,4 +786,51 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
       </div>
     </div>
   );
+};
+
+// Helper functions fora do componente para evitar re-renders
+const getSectionDisplayName = (sectionType: string) => {
+  const sectionNames: { [key: string]: string } = {
+    'hero': 'Seção Principal',
+    'hero-hinode': 'Seção Principal Hinode',
+    'apresentacao-pessoal': 'Apresentação Pessoal',
+    'beneficios': 'Benefícios',
+    'sobre': 'Sobre',
+    'sobre-hinode': 'Sobre Hinode',
+    'sobre-negocio': 'Sobre o Negócio',
+    'sobre-distribuidor': 'Sobre Distribuidor',
+    'biografia-representante': 'Biografia do Representante',
+    'bio': 'Biografia',
+    'servicos': 'Serviços',
+    'habilidades': 'Habilidades',
+    'produtos-destaque': 'Produtos em Destaque',
+    'produtos-hinode': 'Produtos Hinode',
+    'como-funciona': 'Como Funciona',
+    'etapas-comecar': 'Etapas para Começar',
+    'depoimentos': 'Depoimentos',
+    'faq': 'Perguntas Frequentes',
+    'equipe': 'Equipe',
+    'projetos': 'Projetos',
+    'mapa': 'Mapa',
+    'contato': 'Contato',
+    'contato-hinode': 'Contato Hinode',
+    'rodape': 'Rodapé',
+    'rodape-hinode': 'Rodapé Hinode',
+    'banner-institucional': 'Banner Institucional',
+    'produto': 'Produto'
+  };
+  return sectionNames[sectionType] || sectionType;
+};
+
+const toggleSection = (sectionType: string, activeSections: Set<string>, setActiveSections: any, form: any) => {
+  setActiveSections((prev: Set<string>) => {
+    const newSet = new Set(prev);
+    if (newSet.has(sectionType)) {
+      newSet.delete(sectionType);
+    } else {
+      newSet.add(sectionType);
+    }
+    form.setValue('activeSections', Array.from(newSet));
+    return newSet;
+  });
 };

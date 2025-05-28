@@ -21,7 +21,7 @@ export const ColorSelector: React.FC<ColorSelectorProps> = ({ colors, onColorCha
   const handleDegradeChange = (position: 'inicio' | 'fim', color: string) => {
     const currentDegrade = colors.degradeHero || { inicio: '#0067c7', fim: '#00ffcc' };
     const newDegrade = { ...currentDegrade, [position]: color };
-    onColorChange('degradeHero', JSON.stringify(newDegrade));
+    onColorChange('degradeHero', newDegrade);
   };
 
   return (
