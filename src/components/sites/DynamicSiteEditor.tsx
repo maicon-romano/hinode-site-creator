@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,13 +10,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Eye, EyeOff, Trash2, GripVertical, ChevronUp, ChevronDown, Plus, X } from 'lucide-react';
+import { Eye, EyeOff, Trash2, GripVertical, ChevronUp, ChevronDown, Plus, X, ExternalLink } from 'lucide-react';
 import { getSiteModel, SiteModel } from '@/data/siteModels';
 import { ColorSelector } from './ColorSelector';
 import { LogoUpload } from './LogoUpload';
 import { TemplatePreview } from './TemplatePreview';
 import { convertYouTubeToEmbed } from '@/lib/imageUtils';
 import { debounce } from 'lodash';
+import { useToast } from '@/hooks/use-toast';
 
 interface DynamicSiteEditorProps {
   templateId: string;
@@ -34,6 +36,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
   onSubmit,
   isEditing = false
 }) => {
+  const { toast } = useToast();
   const siteModel = getSiteModel(templateId);
   const [activeSections, setActiveSections] = useState<Set<string>>(
     new Set(initialData?.activeSections || siteModel?.secoesPadrao.map(s => s.type) || [])
@@ -54,23 +57,24 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
   });
   const [isInitialized, setIsInitialized] = useState(false);
   const [previewData, setPreviewData] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useFormContext();
 
-  // Debounced function para update do preview - mais conservador
+  // Debounced function para update do preview
   const debouncedUpdatePreview = useCallback(
     debounce((data) => {
       console.log('Atualizando preview com dados:', data);
       setPreviewData(data);
-    }, 2000), // 2 segundos
+    }, 1500),
     []
   );
 
-  // Watch apenas campos essenciais
+  // Watch campos essenciais
   const nomeDoSite = form.watch('nomeDoSite');
   const logoPath = form.watch('logoPath');
 
-  // Update preview apenas quando campos importantes mudam
+  // Update preview quando campos importantes mudam
   useEffect(() => {
     if (isInitialized) {
       const currentData = getCurrentSiteData();
@@ -79,19 +83,13 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
   }, [nomeDoSite, logoPath, activeSections, sectionsOrder]);
 
   // Função para atualizar cores imediatamente no preview
-  const handleColorChange = useCallback((colorType: string, color: string) => {
+  const handleColorChange = useCallback((colorType: string, color: string | { inicio: string; fim: string }) => {
     let newColors = { ...colors };
     
     if (colorType === 'degradeHero') {
-      try {
-        const degradeObj = typeof color === 'string' ? JSON.parse(color) : color;
-        newColors.degradeHero = degradeObj;
-      } catch (error) {
-        console.error('Erro ao processar degradê:', error);
-        return;
-      }
+      newColors.degradeHero = typeof color === 'string' ? JSON.parse(color) : color;
     } else {
-      newColors[colorType] = color;
+      newColors[colorType] = color as string;
     }
     
     setColors(newColors);
@@ -205,68 +203,156 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     );
   }
 
-  // Mapeamento de campos específicos por modelo
+  // Mapeamento completo de campos específicos por modelo
   const getModelSpecificFields = (modelId: string) => {
-    const commonFields = {
-      hero: ['titulo', 'subtitulo', 'texto', 'video', 'botaoTexto', 'botaoLink', 'whatsapp', 'imagem'],
-      sobre: ['titulo', 'subtitulo', 'texto', 'imagem'],
-      contato: ['titulo', 'subtitulo', 'whatsapp', 'telefone', 'email', 'endereco'],
-      rodape: ['texto']
-    };
-
-    const modelSpecificFields = {
+    const fieldMappings = {
       'representante-hinode': {
-        'hero-hinode': ['titulo', 'subtitulo', 'texto', 'video', 'botaoTexto', 'botaoLink', 'whatsapp', 'imagem'],
-        'sobre-hinode': ['titulo', 'subtitulo', 'texto', 'imagem'],
-        'biografia-representante': ['nome', 'titulo', 'texto', 'foto', 'experiencia', 'botaoTexto', 'botaoLink'],
-        'produtos-hinode': ['titulo', 'subtitulo', 'descricao', 'produtos'],
-        'contato-hinode': ['titulo', 'subtitulo', 'whatsapp', 'telefone', 'email'],
-        'rodape-hinode': ['texto']
+        'hero-hinode': [
+          { key: 'titulo', label: 'Título Principal', type: 'text' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text' },
+          { key: 'texto', label: 'Texto Descritivo', type: 'textarea' },
+          { key: 'video', label: 'URL do Vídeo', type: 'url' },
+          { key: 'botaoTexto', label: 'Texto do Botão', type: 'text' },
+          { key: 'botaoLink', label: 'Link do Botão', type: 'url' },
+          { key: 'whatsapp', label: 'WhatsApp', type: 'text' },
+          { key: 'imagem', label: 'Imagem de Fundo', type: 'image' }
+        ],
+        'sobre-hinode': [
+          { key: 'titulo', label: 'Título da Seção', type: 'text' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text' },
+          { key: 'texto', label: 'Texto Sobre a Hinode', type: 'textarea' },
+          { key: 'imagem', label: 'Logo/Imagem Hinode', type: 'image' }
+        ],
+        'biografia-representante': [
+          { key: 'nome', label: 'Nome do Representante', type: 'text' },
+          { key: 'titulo', label: 'Título/Cargo', type: 'text' },
+          { key: 'texto', label: 'Biografia', type: 'textarea' },
+          { key: 'foto', label: 'Foto do Representante', type: 'image' },
+          { key: 'experiencia', label: 'Anos de Experiência', type: 'text' },
+          { key: 'botaoTexto', label: 'Texto do Botão CTA', type: 'text' },
+          { key: 'botaoLink', label: 'Link do Botão', type: 'url' }
+        ],
+        'produtos-hinode': [
+          { key: 'titulo', label: 'Título dos Produtos', type: 'text' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text' },
+          { key: 'descricao', label: 'Descrição', type: 'textarea' },
+          { key: 'produtos', label: 'Lista de Produtos (um por linha)', type: 'textarea' }
+        ],
+        'contato-hinode': [
+          { key: 'titulo', label: 'Título do Contato', type: 'text' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text' },
+          { key: 'whatsapp', label: 'WhatsApp', type: 'text' },
+          { key: 'telefone', label: 'Telefone', type: 'text' },
+          { key: 'email', label: 'E-mail', type: 'email' }
+        ],
+        'rodape-hinode': [
+          { key: 'texto', label: 'Texto do Rodapé', type: 'textarea' }
+        ]
       },
       'site-institucional': {
-        'banner-institucional': ['titulo', 'subtitulo', 'imagem'],
-        'sobre': ['titulo', 'subtitulo', 'texto', 'imagem'],
-        'servicos': ['titulo', 'subtitulo', 'lista'],
-        'equipe': ['titulo', 'subtitulo'],
-        'contato': ['titulo', 'subtitulo', 'whatsapp', 'telefone', 'email', 'endereco']
+        'banner-institucional': [
+          { key: 'titulo', label: 'Título Principal', type: 'text' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text' },
+          { key: 'imagem', label: 'Imagem de Fundo', type: 'image' }
+        ],
+        'sobre': [
+          { key: 'titulo', label: 'Título Sobre Nós', type: 'text' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text' },
+          { key: 'texto', label: 'Texto Sobre a Empresa', type: 'textarea' },
+          { key: 'imagem', label: 'Imagem da Empresa', type: 'image' }
+        ],
+        'servicos': [
+          { key: 'titulo', label: 'Título dos Serviços', type: 'text' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text' },
+          { key: 'lista', label: 'Lista de Serviços (um por linha)', type: 'textarea' }
+        ],
+        'equipe': [
+          { key: 'titulo', label: 'Título da Equipe', type: 'text' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text' }
+        ],
+        'contato': [
+          { key: 'titulo', label: 'Título do Contato', type: 'text' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text' },
+          { key: 'whatsapp', label: 'WhatsApp', type: 'text' },
+          { key: 'telefone', label: 'Telefone', type: 'text' },
+          { key: 'email', label: 'E-mail', type: 'email' },
+          { key: 'endereco', label: 'Endereço', type: 'textarea' }
+        ]
       },
       'landing-page-vendas': {
-        'hero': ['titulo', 'subtitulo', 'video', 'botaoTexto', 'botaoLink'],
-        'beneficios': ['titulo', 'subtitulo', 'lista'],
-        'produto': ['titulo', 'texto', 'imagem', 'preco', 'botaoTexto', 'botaoLink'],
-        'depoimentos': ['titulo'],
-        'contato': ['titulo', 'whatsapp']
+        'hero': [
+          { key: 'titulo', label: 'Título Principal', type: 'text' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text' },
+          { key: 'video', label: 'URL do Vídeo', type: 'url' },
+          { key: 'botaoTexto', label: 'Texto do Botão', type: 'text' },
+          { key: 'botaoLink', label: 'Link do Botão', type: 'url' },
+          { key: 'whatsapp', label: 'WhatsApp', type: 'text' }
+        ],
+        'beneficios': [
+          { key: 'titulo', label: 'Título dos Benefícios', type: 'text' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text' },
+          { key: 'lista', label: 'Lista de Benefícios (um por linha)', type: 'textarea' }
+        ],
+        'produto': [
+          { key: 'titulo', label: 'Nome do Produto', type: 'text' },
+          { key: 'texto', label: 'Descrição do Produto', type: 'textarea' },
+          { key: 'imagem', label: 'Imagem do Produto', type: 'image' },
+          { key: 'preco', label: 'Preço', type: 'price' },
+          { key: 'botaoTexto', label: 'Texto do Botão de Compra', type: 'text' },
+          { key: 'botaoLink', label: 'Link de Compra', type: 'url' }
+        ],
+        'depoimentos': [
+          { key: 'titulo', label: 'Título dos Depoimentos', type: 'text' }
+        ],
+        'contato': [
+          { key: 'titulo', label: 'Título do Contato', type: 'text' },
+          { key: 'whatsapp', label: 'WhatsApp', type: 'text' }
+        ]
       },
       'portfolio-profissional': {
-        'bio': ['titulo', 'subtitulo', 'texto', 'imagem'],
-        'habilidades': ['titulo', 'lista'],
-        'projetos': ['titulo'],
-        'contato': ['titulo', 'whatsapp', 'email']
+        'bio': [
+          { key: 'titulo', label: 'Seu Nome', type: 'text' },
+          { key: 'subtitulo', label: 'Sua Profissão/Título', type: 'text' },
+          { key: 'texto', label: 'Sua Biografia', type: 'textarea' },
+          { key: 'imagem', label: 'Sua Foto', type: 'image' }
+        ],
+        'habilidades': [
+          { key: 'titulo', label: 'Título das Habilidades', type: 'text' },
+          { key: 'lista', label: 'Lista de Habilidades (uma por linha)', type: 'textarea' }
+        ],
+        'projetos': [
+          { key: 'titulo', label: 'Título dos Projetos', type: 'text' }
+        ],
+        'contato': [
+          { key: 'titulo', label: 'Título do Contato', type: 'text' },
+          { key: 'whatsapp', label: 'WhatsApp', type: 'text' },
+          { key: 'email', label: 'E-mail', type: 'email' }
+        ]
       }
     };
 
-    return modelSpecificFields[modelId] || commonFields;
+    return fieldMappings[modelId] || {};
   };
 
-  const renderSectionField = (fieldKey: string, sectionType: string, fieldLabel: string, fieldType: 'text' | 'textarea' | 'url' | 'image' | 'price' = 'text') => {
-    const fieldName = `${sectionType}.${fieldKey}`;
+  const renderSectionField = (field: any, sectionType: string) => {
+    const fieldName = `${sectionType}.${field.key}`;
 
-    switch (fieldType) {
+    switch (field.type) {
       case 'textarea':
         return (
           <FormField
             key={fieldName}
             control={form.control}
             name={fieldName}
-            render={({ field }) => (
+            render={({ field: formField }) => (
               <FormItem>
-                <FormLabel>{fieldLabel}</FormLabel>
+                <FormLabel>{field.label}</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder={`Digite ${fieldLabel.toLowerCase()}`}
+                    placeholder={`Digite ${field.label.toLowerCase()}`}
                     className="min-h-[100px]"
-                    {...field}
-                    value={field.value || ''}
+                    {...formField}
+                    value={formField.value || ''}
                   />
                 </FormControl>
                 <FormMessage />
@@ -281,24 +367,47 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
             key={fieldName}
             control={form.control}
             name={fieldName}
-            render={({ field }) => (
+            render={({ field: formField }) => (
               <FormItem>
-                <FormLabel>{fieldLabel}</FormLabel>
+                <FormLabel>{field.label}</FormLabel>
                 <FormControl>
                   <Input
                     type="url"
                     placeholder="https://exemplo.com"
-                    {...field}
-                    value={field.value || ''}
+                    {...formField}
+                    value={formField.value || ''}
                     onBlur={(e) => {
                       const value = e.target.value;
                       if (value && (value.includes('youtube.com') || value.includes('youtu.be'))) {
                         const convertedUrl = convertYouTubeToEmbed(value);
-                        field.onChange(convertedUrl);
+                        formField.onChange(convertedUrl);
                       } else {
-                        field.onBlur();
+                        formField.onBlur();
                       }
                     }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        );
+
+      case 'email':
+        return (
+          <FormField
+            key={fieldName}
+            control={form.control}
+            name={fieldName}
+            render={({ field: formField }) => (
+              <FormItem>
+                <FormLabel>{field.label}</FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    placeholder="exemplo@email.com"
+                    {...formField}
+                    value={formField.value || ''}
                   />
                 </FormControl>
                 <FormMessage />
@@ -313,9 +422,9 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
             key={fieldName}
             control={form.control}
             name={fieldName}
-            render={({ field }) => (
+            render={({ field: formField }) => (
               <FormItem>
-                <FormLabel>{fieldLabel}</FormLabel>
+                <FormLabel>{field.label}</FormLabel>
                 <FormControl>
                   <div className="space-y-2">
                     <Input
@@ -326,15 +435,15 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
                         if (file) {
                           const reader = new FileReader();
                           reader.onload = (event) => {
-                            field.onChange(event.target?.result);
+                            formField.onChange(event.target?.result);
                           };
                           reader.readAsDataURL(file);
                         }
                       }}
                     />
-                    {field.value && (
+                    {formField.value && (
                       <img
-                        src={field.value}
+                        src={formField.value}
                         alt="Preview"
                         className="w-32 h-32 object-cover rounded border"
                       />
@@ -353,14 +462,14 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
             key={fieldName}
             control={form.control}
             name={fieldName}
-            render={({ field }) => (
+            render={({ field: formField }) => (
               <FormItem>
-                <FormLabel>{fieldLabel}</FormLabel>
+                <FormLabel>{field.label}</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="R$ 97,00"
-                    {...field}
-                    value={field.value || ''}
+                    {...formField}
+                    value={formField.value || ''}
                   />
                 </FormControl>
                 <FormMessage />
@@ -375,14 +484,14 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
             key={fieldName}
             control={form.control}
             name={fieldName}
-            render={({ field }) => (
+            render={({ field: formField }) => (
               <FormItem>
-                <FormLabel>{fieldLabel}</FormLabel>
+                <FormLabel>{field.label}</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder={`Digite ${fieldLabel.toLowerCase()}`}
-                    {...field}
-                    value={field.value || ''}
+                    placeholder={`Digite ${field.label.toLowerCase()}`}
+                    {...formField}
+                    value={formField.value || ''}
                   />
                 </FormControl>
                 <FormMessage />
@@ -397,49 +506,18 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     const modelFields = getModelSpecificFields(templateId);
     const fieldsForSection = modelFields[sectionType] || [];
     
-    const fieldLabels = {
-      titulo: 'Título',
-      subtitulo: 'Subtítulo',
-      texto: 'Texto/Descrição',
-      descricao: 'Descrição',
-      video: 'URL do Vídeo',
-      botaoTexto: 'Texto do Botão',
-      botaoLink: 'Link do Botão',
-      whatsapp: 'WhatsApp',
-      telefone: 'Telefone',
-      email: 'E-mail',
-      endereco: 'Endereço',
-      imagem: 'Imagem',
-      foto: 'Foto',
-      nome: 'Nome',
-      experiencia: 'Anos de Experiência',
-      produtos: 'Lista de Produtos (um por linha)',
-      lista: 'Lista de Itens (um por linha)',
-      preco: 'Preço'
-    };
-
-    const fieldTypes = {
-      texto: 'textarea',
-      descricao: 'textarea',
-      produtos: 'textarea',
-      lista: 'textarea',
-      video: 'url',
-      botaoLink: 'url',
-      imagem: 'image',
-      foto: 'image',
-      preco: 'price'
-    };
+    if (fieldsForSection.length === 0) {
+      return (
+        <div className="text-center py-4 text-gray-500">
+          <p>Nenhum campo específico definido para esta seção.</p>
+          <p className="text-sm">Modelo: {templateId}, Seção: {sectionType}</p>
+        </div>
+      );
+    }
 
     return (
       <div className="space-y-4">
-        {fieldsForSection.map(fieldKey => 
-          renderSectionField(
-            fieldKey, 
-            sectionType, 
-            fieldLabels[fieldKey] || fieldKey,
-            fieldTypes[fieldKey] || 'text'
-          )
-        )}
+        {fieldsForSection.map(field => renderSectionField(field, sectionType))}
       </div>
     );
   };
@@ -477,146 +555,47 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     return sectionNames[sectionType] || sectionType;
   };
 
-  // Helper function to manage cards (for produtos, etc)
-  const addCard = (sectionType: string) => {
-    const currentCards = form.getValues(`${sectionType}.cards`) || [];
-    const newCard = {
-      id: Date.now().toString(),
-      titulo: '',
-      texto: '',
-      imagem: '',
-      ordem: currentCards.length + 1
-    };
-    form.setValue(`${sectionType}.cards`, [...currentCards, newCard]);
-  };
-
-  const removeCard = (sectionType: string, cardId: string) => {
-    const currentCards = form.getValues(`${sectionType}.cards`) || [];
-    const updatedCards = currentCards.filter((card: any) => card.id !== cardId);
-    form.setValue(`${sectionType}.cards`, updatedCards);
-  };
-
-  const renderCardEditor = (sectionType: string, fieldLabel: string) => {
-    const cards = form.watch(`${sectionType}.cards`) || [];
+  const handleSubmit = useCallback(async (data: any) => {
+    console.log('DynamicSiteEditor - Iniciando submissão...', data);
+    setIsSubmitting(true);
     
-    return (
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <FormLabel>{fieldLabel}</FormLabel>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => addCard(sectionType)}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Adicionar Item
-          </Button>
-        </div>
-        
-        {cards.map((card: any, index: number) => (
-          <Card key={card.id} className="p-4">
-            <div className="flex justify-between items-start mb-4">
-              <h4 className="font-medium">Item {index + 1}</h4>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => removeCard(sectionType, card.id)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            
-            <div className="grid grid-cols-1 gap-4">
-              <FormField
-                control={form.control}
-                name={`${sectionType}.cards.${index}.titulo`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Título</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Título do item" {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name={`${sectionType}.cards.${index}.texto`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Descrição</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Descrição do item" {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name={`${sectionType}.cards.${index}.imagem`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Imagem</FormLabel>
-                    <FormControl>
-                      <div className="space-y-2">
-                        <Input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              const reader = new FileReader();
-                              reader.onload = (event) => {
-                                field.onChange(event.target?.result);
-                              };
-                              reader.readAsDataURL(file);
-                            }
-                          }}
-                        />
-                        {field.value && (
-                          <img
-                            src={field.value}
-                            alt="Preview"
-                            className="w-32 h-32 object-cover rounded border"
-                          />
-                        )}
-                      </div>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
-          </Card>
-        ))}
-      </div>
-    );
-  };
+    try {
+      const processedData = {
+        clientId,
+        clientName,
+        templateId,
+        modelId: templateId,
+        nomeDoSite: data.nomeDoSite,
+        logoPath: data.logoPath,
+        cores: colors,
+        activeSections: Array.from(activeSections),
+        sectionsOrder,
+        whatsapp: data.hero?.whatsapp || data['hero-hinode']?.whatsapp || data.contato?.whatsapp,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        ...data
+      };
 
-  const handleSubmit = useCallback((data: any) => {
-    console.log('DynamicSiteEditor - Dados do formulário:', data);
-    console.log('DynamicSiteEditor - Template ID:', templateId);
-    
-    const processedData = {
-      clientId,
-      clientName,
-      templateId,
-      modelId: templateId,
-      nomeDoSite: data.nomeDoSite,
-      logoPath: data.logoPath,
-      cores: colors,
-      activeSections: Array.from(activeSections),
-      sectionsOrder,
-      whatsapp: data.hero?.whatsapp || data['hero-hinode']?.whatsapp || data.contato?.whatsapp,
-      ...data
-    };
-
-    console.log('DynamicSiteEditor - Dados processados:', processedData);
-    onSubmit(processedData);
-  }, [templateId, clientId, clientName, colors, activeSections, sectionsOrder, onSubmit]);
+      console.log('DynamicSiteEditor - Dados processados para submissão:', processedData);
+      
+      await onSubmit(processedData);
+      
+      toast({
+        title: "Sucesso!",
+        description: `Site ${isEditing ? 'atualizado' : 'criado'} com sucesso.`,
+      });
+      
+    } catch (error) {
+      console.error('Erro na submissão:', error);
+      toast({
+        title: "Erro",
+        description: `Erro ao ${isEditing ? 'atualizar' : 'criar'} o site. Tente novamente.`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [templateId, clientId, clientName, colors, activeSections, sectionsOrder, onSubmit, isEditing, toast]);
 
   const getCurrentSiteData = useCallback(() => {
     const formData = form.getValues();
@@ -636,17 +615,23 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
       logoPath: formData.logoPath,
       cores: colors,
       layout,
-      whatsapp: formData.hero?.whatsapp || formData.contato?.whatsapp || '5511999999999',
+      whatsapp: formData.hero?.whatsapp || formData['hero-hinode']?.whatsapp || formData.contato?.whatsapp || '5511999999999',
       sectionsOrder,
       activeSections: Array.from(activeSections),
       ...formData
     };
   }, [form, sectionsOrder, siteModel, activeSections, templateId, colors]);
 
+  const openFullPreview = () => {
+    const currentData = getCurrentSiteData();
+    const previewUrl = `/preview/${clientId}?data=${encodeURIComponent(JSON.stringify(currentData))}`;
+    window.open(previewUrl, '_blank');
+  };
+
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
       {/* Formulário */}
-      <div className="space-y-6 max-h-[80vh] overflow-y-auto">
+      <div className="space-y-6 max-h-[85vh] overflow-y-auto">
         {/* Informações Básicas */}
         <Card>
           <CardHeader>
@@ -766,71 +751,54 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
 
         <Separator />
 
-        <Button 
-          type="button" 
-          onClick={form.handleSubmit(handleSubmit)} 
-          className="w-full" 
-          size="lg"
-        >
-          {isEditing ? 'Atualizar Site' : 'Criar Site'}
-        </Button>
+        <div className="flex gap-3">
+          <Button 
+            type="button" 
+            onClick={form.handleSubmit(handleSubmit)} 
+            className="flex-1" 
+            size="lg"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Salvando...' : (isEditing ? 'Atualizar Site' : 'Criar Site')}
+          </Button>
+          
+          <Button 
+            type="button" 
+            variant="outline"
+            onClick={openFullPreview}
+            size="lg"
+            title="Abrir preview em tela cheia"
+          >
+            <ExternalLink className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {/* Preview */}
       <div className="xl:sticky xl:top-6 xl:self-start">
-        <TemplatePreview
-          siteData={previewData || getCurrentSiteData()}
-          showPreview={showPreview}
-          onTogglePreview={() => setShowPreview(!showPreview)}
-        />
+        <div className="bg-white border rounded-lg overflow-hidden">
+          <div className="p-3 bg-gray-50 border-b flex items-center justify-between">
+            <h4 className="font-medium">Preview do Site</h4>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowPreview(!showPreview)}
+            >
+              {showPreview ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </Button>
+          </div>
+          
+          {showPreview && (
+            <div className="h-[75vh] overflow-y-auto bg-gray-100">
+              <TemplatePreview
+                siteData={previewData || getCurrentSiteData()}
+                showPreview={true}
+                onTogglePreview={() => setShowPreview(!showPreview)}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
-};
-
-// Helper functions fora do componente para evitar re-renders
-const getSectionDisplayName = (sectionType: string) => {
-  const sectionNames: { [key: string]: string } = {
-    'hero': 'Seção Principal',
-    'hero-hinode': 'Seção Principal Hinode',
-    'apresentacao-pessoal': 'Apresentação Pessoal',
-    'beneficios': 'Benefícios',
-    'sobre': 'Sobre',
-    'sobre-hinode': 'Sobre Hinode',
-    'sobre-negocio': 'Sobre o Negócio',
-    'sobre-distribuidor': 'Sobre Distribuidor',
-    'biografia-representante': 'Biografia do Representante',
-    'bio': 'Biografia',
-    'servicos': 'Serviços',
-    'habilidades': 'Habilidades',
-    'produtos-destaque': 'Produtos em Destaque',
-    'produtos-hinode': 'Produtos Hinode',
-    'como-funciona': 'Como Funciona',
-    'etapas-comecar': 'Etapas para Começar',
-    'depoimentos': 'Depoimentos',
-    'faq': 'Perguntas Frequentes',
-    'equipe': 'Equipe',
-    'projetos': 'Projetos',
-    'mapa': 'Mapa',
-    'contato': 'Contato',
-    'contato-hinode': 'Contato Hinode',
-    'rodape': 'Rodapé',
-    'rodape-hinode': 'Rodapé Hinode',
-    'banner-institucional': 'Banner Institucional',
-    'produto': 'Produto'
-  };
-  return sectionNames[sectionType] || sectionType;
-};
-
-const toggleSection = (sectionType: string, activeSections: Set<string>, setActiveSections: any, form: any) => {
-  setActiveSections((prev: Set<string>) => {
-    const newSet = new Set(prev);
-    if (newSet.has(sectionType)) {
-      newSet.delete(sectionType);
-    } else {
-      newSet.add(sectionType);
-    }
-    form.setValue('activeSections', Array.from(newSet));
-    return newSet;
-  });
 };

@@ -197,7 +197,8 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
             className="bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition-all duration-300 animate-fade-in group"
             style={{ 
               animationDelay: `${index * 100}ms`,
-              borderColor: `${safeSiteData.cores.principal}20`
+              borderColor: `${safeSiteData.cores.principal}20`,
+              backgroundColor: 'white'
             }}
           >
             {card.imagem && (
@@ -228,12 +229,12 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
     case 'hero':
     case 'hero-hinode':
     case 'apresentacao-pessoal':
-      return applyColors(
+      return (
         <section 
-          className={`relative py-16 lg:py-20 px-4 ${isPreview ? 'min-h-[400px]' : 'min-h-screen'} flex items-center overflow-hidden`}
+          className={`relative py-16 lg:py-20 px-4 ${isPreview ? 'min-h-[400px]' : 'min-h-screen'} flex items-center overflow-hidden w-full`}
           style={{ 
-            backgroundColor: safeSiteData.cores.fundo, 
-            color: safeSiteData.cores.texto,
+            backgroundColor: type === 'hero-hinode' ? 'transparent' : safeSiteData.cores.fundo, 
+            color: type === 'hero-hinode' ? 'white' : safeSiteData.cores.texto,
             background: type === 'hero-hinode' && safeSiteData.cores.degradeHero ? 
               `linear-gradient(135deg, ${safeSiteData.cores.degradeHero.inicio}, ${safeSiteData.cores.degradeHero.fim})` :
               safeSiteData.cores.fundo
@@ -338,7 +339,7 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
 
     case 'sobre-hinode':
       return (
-        <section className="py-20 px-4 relative overflow-hidden" style={{ backgroundColor: `${safeSiteData.cores.principal}05` }}>
+        <section className="py-20 px-4 relative overflow-hidden w-full" style={{ backgroundColor: `${safeSiteData.cores.principal}05` }}>
           <div className="absolute inset-0">
             <div className="absolute top-20 right-20 w-32 h-32 bg-gradient-to-br from-yellow-400/10 to-orange-500/10 rounded-full blur-xl"></div>
             <div className="absolute bottom-20 left-20 w-32 h-32 bg-gradient-to-tr from-blue-400/10 to-purple-500/10 rounded-full blur-xl"></div>
@@ -411,7 +412,7 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
 
     case 'produtos-destaque':
       return (
-        <section className="py-20 px-4" style={{ backgroundColor: safeSiteData.cores.fundo }}>
+        <section className="py-20 px-4 w-full" style={{ backgroundColor: safeSiteData.cores.fundo }}>
           <div className="container mx-auto max-w-6xl">
             <div className="text-center mb-16">
               {safeConteudo.titulo && (

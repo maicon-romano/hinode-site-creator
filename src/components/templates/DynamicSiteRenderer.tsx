@@ -86,7 +86,7 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
   if (templateId) {
     // Pass the entire siteData as a section to trigger template rendering
     return (
-      <div className="min-h-screen" style={styles}>
+      <div className="min-h-screen w-full" style={styles}>
         <SectionRenderer
           section={{ type: 'template', templateId }}
           siteData={{ ...siteData, cores }}
@@ -114,7 +114,7 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
     }));
 
   return (
-    <div className="min-h-screen" style={styles}>
+    <div className="min-h-screen w-full" style={styles}>
       {sectionsToRender
         .filter(section => section.enabled)
         .map((section, index) => (
