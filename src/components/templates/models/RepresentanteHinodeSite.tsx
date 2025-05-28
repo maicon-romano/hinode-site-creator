@@ -14,6 +14,11 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
   siteData,
   isPreview = false
 }) => {
+  console.log('RepresentanteHinodeSite - Dados recebidos:', siteData);
+  console.log('RepresentanteHinodeSite - Hero Hinode:', siteData['hero-hinode']);
+  console.log('RepresentanteHinodeSite - Sobre Negócio:', siteData['sobre-negocio']);
+  console.log('RepresentanteHinodeSite - Biografia:', siteData['biografia-representante']);
+
   const handleWhatsAppClick = () => {
     if (!isPreview && siteData.whatsapp) {
       window.open(`https://wa.me/${siteData.whatsapp}`, '_blank');

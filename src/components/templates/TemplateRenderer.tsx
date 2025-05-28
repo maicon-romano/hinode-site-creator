@@ -4,13 +4,14 @@ import { DynamicSiteRenderer } from './DynamicSiteRenderer';
 
 interface SiteData {
   templateId?: string;
+  modelId?: string;
   template?: string;
   variation?: string;
   nomeDoSite: string;
-  headline: string;
-  descricao: string;
+  headline?: string;
+  descricao?: string;
   videoUrl?: string;
-  whatsapp: string;
+  whatsapp?: string;
   logoPath?: string;
   cores: {
     principal: string;
@@ -37,23 +38,38 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
   siteData, 
   isPreview = false 
 }) => {
-  // Convert old format to new format if needed
+  console.log('TemplateRenderer - Site data recebido:', siteData);
+
+  // Priorizar templateId sobre modelId, depois template
+  const templateId = siteData.templateId || siteData.modelId || `${siteData.template}-01`;
+  
+  console.log('TemplateRenderer - Template ID determinado:', templateId);
+
+  // Para modelos novos, usar diretamente o DynamicSiteRenderer
+  if (['representante-hinode', 'site-institucional', 'landing-page-vendas', 'portfolio-profissional'].includes(templateId)) {
+    console.log('TemplateRenderer - Usando modelo novo:', templateId);
+    return <DynamicSiteRenderer siteData={{ ...siteData, templateId }} isPreview={isPreview} />;
+  }
+
+  // Para modelos antigos, converter formato se necessário
   const convertedData = {
     ...siteData,
-    templateId: siteData.templateId || `${siteData.template}-01`,
+    templateId,
     activeSections: siteData.activeSections || Object.keys(siteData.secoes || {}).filter(key => siteData.secoes?.[key]),
-    hero: {
+    hero: siteData.hero || {
       titulo: siteData.headline,
       subtitulo: siteData.descricao,
       videoUrl: siteData.videoUrl,
       botaoTexto: 'Fale Conosco',
       botaoLink: `https://wa.me/${siteData.whatsapp}`
     },
-    contato: {
+    contato: siteData.contato || {
       titulo: 'Entre em Contato',
       whatsapp: siteData.whatsapp
     }
   };
+
+  console.log('TemplateRenderer - Dados convertidos:', convertedData);
 
   return <DynamicSiteRenderer siteData={convertedData} isPreview={isPreview} />;
 };

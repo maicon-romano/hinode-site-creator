@@ -34,6 +34,8 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
   siteData,
   isPreview = false
 }) => {
+  console.log('DynamicSiteRenderer - Site data recebido:', siteData);
+
   const scrollToTop = () => {
     if (!isPreview) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -52,14 +54,16 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
     return siteData.whatsapp || 
            siteData.contato?.whatsapp || 
            siteData['hero-hinode']?.whatsapp ||
+           siteData['contato-hinode']?.whatsapp ||
            siteData.hero?.whatsapp;
   };
 
   // Check if we should render as a complete template
   const templateId = siteData.templateId || siteData.modelId;
   
+  console.log('DynamicSiteRenderer - Template ID final:', templateId);
+  
   if (templateId) {
-    console.log('DynamicSiteRenderer - Renderizando template completo:', templateId);
     // Pass the entire siteData as a section to trigger template rendering
     return (
       <div className="min-h-screen" style={styles}>

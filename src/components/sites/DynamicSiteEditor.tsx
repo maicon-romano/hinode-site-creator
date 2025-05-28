@@ -506,23 +506,131 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
   };
 
   const handleSubmit = (data: any) => {
-    const layout = sectionsOrder.map(sectionType => {
-      const secao = siteModel.secoesPadrao.find(s => s.type === sectionType);
-      return {
-        ...secao,
-        enabled: activeSections.has(sectionType),
-        conteudo: data[sectionType] || {}
-      };
-    });
-
-    onSubmit({
-      ...data,
+    console.log('DynamicSiteEditor - Dados do formulário:', data);
+    console.log('DynamicSiteEditor - Template ID:', templateId);
+    
+    // Criar estrutura de dados específica para cada modelo
+    const processedData = {
+      clientId,
+      clientName,
+      templateId, // Garantir que templateId está presente
+      modelId: templateId, // Manter compatibilidade
+      nomeDoSite: data.nomeDoSite,
+      logoPath: data.logoPath,
       cores: colors,
-      layout,
-      modelId: templateId,
+      activeSections: Array.from(activeSections),
       sectionsOrder,
-      activeSections: Array.from(activeSections)
-    });
+      whatsapp: data.hero?.whatsapp || data['hero-hinode']?.whatsapp || data.contato?.whatsapp,
+    };
+
+    // Mapear dados específicos por modelo
+    if (templateId === 'representante-hinode') {
+      processedData['hero-hinode'] = {
+        titulo: data['hero-hinode']?.titulo || data.titulo || 'Transforme Sua Beleza',
+        subtitulo: data['hero-hinode']?.subtitulo || data.subtitulo || 'Descubra produtos de luxo',
+        video: data['hero-hinode']?.video || data.video,
+        botaoTexto: data['hero-hinode']?.botaoTexto || 'QUERO CONHECER OS PRODUTOS',
+        whatsapp: data['hero-hinode']?.whatsapp || data.whatsapp
+      };
+      
+      processedData['sobre-negocio'] = {
+        titulo: data['sobre-negocio']?.titulo || 'Sobre a Hinode',
+        texto: data['sobre-negocio']?.texto || 'A Hinode é líder em cosméticos...',
+        imagem: data['sobre-negocio']?.imagem,
+        botaoTexto: data['sobre-negocio']?.botaoTexto || 'Conhecer Oportunidade'
+      };
+      
+      processedData['biografia-representante'] = {
+        nome: data['biografia-representante']?.nome || clientName,
+        titulo: data['biografia-representante']?.titulo || 'Consultora de Beleza',
+        texto: data['biografia-representante']?.texto || 'Especialista em produtos Hinode...',
+        foto: data['biografia-representante']?.foto,
+        experiencia: data['biografia-representante']?.experiencia || '5+',
+        botaoTexto: data['biografia-representante']?.botaoTexto || 'Falar Comigo Agora'
+      };
+      
+      processedData['produtos-hinode'] = {
+        titulo: data['produtos-hinode']?.titulo || 'Linha Completa Hinode',
+        subtitulo: data['produtos-hinode']?.subtitulo || 'Produtos premium...',
+        produtos: data['produtos-hinode']?.produtos || 'Perfumes Premium\nMaquiagem Professional\nCuidados com a Pele'
+      };
+      
+      processedData['contato-hinode'] = {
+        titulo: data['contato-hinode']?.titulo || 'Vamos Conversar?',
+        subtitulo: data['contato-hinode']?.subtitulo || 'Entre em contato...',
+        whatsapp: data['contato-hinode']?.whatsapp || data.whatsapp
+      };
+    } else if (templateId === 'site-institucional') {
+      processedData['hero'] = {
+        titulo: data.hero?.titulo || data.titulo || 'Sua Empresa',
+        subtitulo: data.hero?.subtitulo || data.subtitulo || 'Confiança e qualidade',
+        imagem: data.hero?.imagem,
+        botaoTexto: data.hero?.botaoTexto || 'Saiba Mais',
+        botaoLink: data.hero?.botaoLink
+      };
+      
+      processedData['sobre'] = {
+        titulo: data.sobre?.titulo || 'Sobre Nós',
+        texto: data.sobre?.texto || 'Nossa história e valores...',
+        imagem: data.sobre?.imagem
+      };
+      
+      processedData['servicos'] = {
+        titulo: data.servicos?.titulo || 'Nossos Serviços',
+        lista: data.servicos?.lista || 'Serviço 1\nServiço 2\nServiço 3'
+      };
+    } else if (templateId === 'landing-page-vendas') {
+      processedData['hero'] = {
+        titulo: data.hero?.titulo || data.titulo || 'Produto Incrível',
+        subtitulo: data.hero?.subtitulo || data.subtitulo || 'A solução que você procura',
+        video: data.hero?.video || data.video,
+        botaoTexto: data.hero?.botaoTexto || 'COMPRAR AGORA',
+        botaoLink: data.hero?.botaoLink || `https://wa.me/${data.whatsapp}`
+      };
+      
+      processedData['beneficios'] = {
+        titulo: data.beneficios?.titulo || 'Por que escolher?',
+        lista: data.beneficios?.lista || 'Benefício 1\nBenefício 2\nBenefício 3'
+      };
+      
+      processedData['produto'] = {
+        titulo: data.produto?.titulo || 'Nosso Produto',
+        texto: data.produto?.texto || 'Descrição do produto...',
+        imagem: data.produto?.imagem,
+        preco: data.produto?.preco || 'R$ 97,00'
+      };
+    } else if (templateId === 'portfolio-profissional') {
+      processedData['bio'] = {
+        titulo: data.bio?.titulo || clientName,
+        subtitulo: data.bio?.subtitulo || 'Profissional',
+        texto: data.bio?.texto || 'Minha biografia profissional...',
+        imagem: data.bio?.imagem
+      };
+      
+      processedData['habilidades'] = {
+        titulo: data.habilidades?.titulo || 'Minhas Habilidades',
+        lista: data.habilidades?.lista || 'Habilidade 1\nHabilidade 2\nHabilidade 3'
+      };
+      
+      processedData['projetos'] = {
+        titulo: data.projetos?.titulo || 'Meus Projetos',
+        cards: data.projetos?.cards || []
+      };
+    }
+
+    // Adicionar dados genéricos que todos os modelos podem ter
+    if (data.contato && !processedData['contato-hinode']) {
+      processedData['contato'] = {
+        titulo: data.contato?.titulo || 'Entre em Contato',
+        whatsapp: data.contato?.whatsapp || data.whatsapp,
+        telefone: data.contato?.telefone,
+        email: data.contato?.email,
+        endereco: data.contato?.endereco
+      };
+    }
+
+    console.log('DynamicSiteEditor - Dados processados:', processedData);
+    onSubmit(processedData);
   };
 
   const getCurrentSiteData = () => {

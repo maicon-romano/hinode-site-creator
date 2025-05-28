@@ -9,27 +9,32 @@ interface SiteData {
   id: string;
   clientId: string;
   clientName: string;
+  templateId?: string;
+  modelId?: string;
   nomeDoSite: string;
-  headline: string;
-  descricao: string;
-  videoUrl: string;
-  whatsapp: string;
-  template: string;
+  headline?: string;
+  descricao?: string;
+  videoUrl?: string;
+  whatsapp?: string;
+  template?: string;
   variation?: string;
-  logoPath: string;
+  logoPath?: string;
   cores: {
     principal: string;
     fundo: string;
     destaque: string;
     texto: string;
   };
-  secoes: {
+  secoes?: {
     video: boolean;
     formulario: boolean;
     depoimentos: boolean;
     sobre: boolean;
     contato: boolean;
   };
+  activeSections?: string[];
+  sectionsOrder?: string[];
+  [key: string]: any;
 }
 
 const ClientSite = () => {
@@ -47,14 +52,18 @@ const ClientSite = () => {
       }
 
       try {
+        console.log('ClientSite - Carregando site para ID:', id);
+        
         // First try to get site by document ID
         const siteDoc = await getDoc(doc(db, 'sites', id));
         
         if (siteDoc.exists()) {
           const data = { id: siteDoc.id, ...siteDoc.data() } as SiteData;
+          console.log('ClientSite - Site encontrado por document ID:', data);
           setSiteData(data);
         } else {
           // If not found by document ID, try to find by clientId
+          console.log('ClientSite - Buscando por clientId:', id);
           const sitesQuery = query(
             collection(db, 'sites'),
             where('clientId', '==', id)
@@ -64,13 +73,15 @@ const ClientSite = () => {
           if (!sitesSnapshot.empty) {
             const siteDoc = sitesSnapshot.docs[0];
             const data = { id: siteDoc.id, ...siteDoc.data() } as SiteData;
+            console.log('ClientSite - Site encontrado por clientId:', data);
             setSiteData(data);
           } else {
+            console.log('ClientSite - Site não encontrado');
             setError('Site não encontrado');
           }
         }
       } catch (error) {
-        console.error('Erro ao carregar dados do site:', error);
+        console.error('ClientSite - Erro ao carregar dados do site:', error);
         setError('Erro ao carregar o site');
       } finally {
         setLoading(false);
@@ -106,6 +117,8 @@ const ClientSite = () => {
       </div>
     );
   }
+
+  console.log('ClientSite - Renderizando site com dados:', siteData);
 
   return <TemplateRenderer siteData={siteData} />;
 };
