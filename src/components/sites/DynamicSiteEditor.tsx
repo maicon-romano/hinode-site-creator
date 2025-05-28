@@ -190,7 +190,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     form.setValue(`${sectionType}.cards`, updatedCards);
   };
 
-  // ... keep existing code (renderCardEditor, renderSectionField, renderSectionFields functions)
+  // ... keep existing code (renderCardEditor function)
 
   const renderCardEditor = (sectionType: string, fieldLabel: string) => {
     const cards = form.watch(`${sectionType}.cards`) || [];
@@ -339,7 +339,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
                         const convertedUrl = convertYouTubeToEmbed(value);
                         field.onChange(convertedUrl);
                       } else {
-                        field.onBlur(e);
+                        field.onBlur();
                       }
                     }}
                   />
@@ -417,6 +417,8 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
         );
     }
   };
+
+  // ... keep existing code (renderSectionFields function and all other remaining methods)
 
   const renderSectionFields = (sectionType: string) => {
     switch (sectionType) {
