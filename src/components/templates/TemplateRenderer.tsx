@@ -26,6 +26,18 @@ interface SiteData {
     sobre: boolean;
     contato: boolean;
   };
+  activeSections?: string[];
+  hero?: {
+    titulo?: string;
+    subtitulo?: string;
+    videoUrl?: string;
+    botaoTexto?: string;
+    botaoLink?: string;
+  };
+  contato?: {
+    titulo?: string;
+    whatsapp?: string;
+  };
   [key: string]: any;
 }
 
