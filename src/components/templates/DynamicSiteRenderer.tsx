@@ -36,6 +36,16 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
 }) => {
   console.log('DynamicSiteRenderer - Site data recebido:', siteData);
 
+  // Add default values for cores to prevent undefined errors
+  const defaultCores = {
+    principal: '#0066cc',
+    fundo: '#ffffff',
+    destaque: '#ff6b35',
+    texto: '#333333'
+  };
+
+  const cores = siteData.cores || defaultCores;
+
   const scrollToTop = () => {
     if (!isPreview) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -43,10 +53,10 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
   };
 
   const styles = {
-    '--color-primary': siteData.cores.principal,
-    '--color-background': siteData.cores.fundo,
-    '--color-accent': siteData.cores.destaque,
-    '--color-text': siteData.cores.texto,
+    '--color-primary': cores.principal,
+    '--color-background': cores.fundo,
+    '--color-accent': cores.destaque,
+    '--color-text': cores.texto,
   } as React.CSSProperties;
 
   // Get whatsapp number from various possible locations
@@ -69,7 +79,7 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
       <div className="min-h-screen" style={styles}>
         <SectionRenderer
           section={{ type: 'template', templateId }}
-          siteData={siteData}
+          siteData={{ ...siteData, cores }}
           isPreview={isPreview}
         />
 
@@ -87,7 +97,7 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
           <button
             onClick={scrollToTop}
             className="fixed bottom-6 left-6 z-50 w-12 h-12 rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 flex items-center justify-center text-white"
-            style={{ backgroundColor: siteData.cores.principal }}
+            style={{ backgroundColor: cores.principal }}
             title="Voltar ao topo"
           >
             <ArrowUp className="h-5 w-5" />
@@ -113,7 +123,7 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
           <SectionRenderer
             key={`${section.type}-${index}`}
             section={section}
-            siteData={siteData}
+            siteData={{ ...siteData, cores }}
             isPreview={isPreview}
           />
         ))}
@@ -132,7 +142,7 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
         <button
           onClick={scrollToTop}
           className="fixed bottom-6 left-6 z-50 w-12 h-12 rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 flex items-center justify-center text-white"
-          style={{ backgroundColor: siteData.cores.principal }}
+          style={{ backgroundColor: cores.principal }}
           title="Voltar ao topo"
         >
           <ArrowUp className="h-5 w-5" />
