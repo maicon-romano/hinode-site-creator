@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { WhatsAppButton } from './WhatsAppButton';
-import { ArrowUp } from 'lucide-react';
 import { SectionRenderer } from './SectionRenderer';
 
 interface SiteData {
@@ -46,12 +45,6 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
 
   const cores = siteData.cores || defaultCores;
 
-  const scrollToTop = () => {
-    if (!isPreview) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-
   const styles = {
     '--color-primary': cores.principal,
     '--color-background': cores.fundo,
@@ -91,18 +84,6 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
             color="#25D366"
           />
         )}
-
-        {/* Back to Top Button - apenas se não for preview */}
-        {!isPreview && (
-          <button
-            onClick={scrollToTop}
-            className="fixed bottom-6 left-6 z-50 w-12 h-12 rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 flex items-center justify-center text-white"
-            style={{ backgroundColor: cores.principal }}
-            title="Voltar ao topo"
-          >
-            <ArrowUp className="h-5 w-5" />
-          </button>
-        )}
       </div>
     );
   }
@@ -135,18 +116,6 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
           isPreview={isPreview}
           color="#25D366"
         />
-      )}
-
-      {/* Back to Top Button - apenas se não for preview */}
-      {!isPreview && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-6 left-6 z-50 w-12 h-12 rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 flex items-center justify-center text-white"
-          style={{ backgroundColor: cores.principal }}
-          title="Voltar ao topo"
-        >
-          <ArrowUp className="h-5 w-5" />
-        </button>
       )}
     </div>
   );

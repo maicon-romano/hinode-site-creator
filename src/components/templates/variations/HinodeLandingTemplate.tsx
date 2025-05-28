@@ -6,10 +6,10 @@ import { Phone, Play, ChevronRight, Star, Users, Award, MessageCircle, ArrowUp, 
 
 interface SiteData {
   nomeDoSite: string;
-  headline: string;
-  descricao: string;
+  headline?: string;
+  descricao?: string;
   videoUrl?: string;
-  whatsapp: string;
+  whatsapp?: string;
   logoPath?: string;
   cores: {
     principal: string;
@@ -17,12 +17,36 @@ interface SiteData {
     destaque: string;
     texto: string;
   };
-  secoes: {
-    video: boolean;
-    formulario: boolean;
-    depoimentos: boolean;
-    sobre: boolean;
-    contato: boolean;
+  'hero-hinode'?: {
+    titulo?: string;
+    subtitulo?: string;
+    video?: string;
+    botaoTexto?: string;
+    whatsapp?: string;
+  };
+  'sobre-negocio'?: {
+    titulo?: string;
+    texto?: string;
+    imagem?: string;
+    botaoTexto?: string;
+  };
+  'biografia-representante'?: {
+    nome?: string;
+    titulo?: string;
+    texto?: string;
+    foto?: string;
+    experiencia?: string;
+    botaoTexto?: string;
+  };
+  'produtos-hinode'?: {
+    titulo?: string;
+    subtitulo?: string;
+    produtos?: string;
+  };
+  'contato-hinode'?: {
+    titulo?: string;
+    subtitulo?: string;
+    whatsapp?: string;
   };
   [key: string]: any;
 }
@@ -45,9 +69,19 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
+  // Extrair dados das seções com fallbacks
+  const heroData = siteData['hero-hinode'] || {};
+  const sobreData = siteData['sobre-negocio'] || {};
+  const biografiaData = siteData['biografia-representante'] || {};
+  const produtosData = siteData['produtos-hinode'] || {};
+  const contatoData = siteData['contato-hinode'] || {};
+
   const handleWhatsAppClick = () => {
     if (!isPreview) {
-      window.open(`https://wa.me/${siteData.whatsapp}`, '_blank');
+      const whatsapp = heroData.whatsapp || contatoData.whatsapp || siteData.whatsapp;
+      if (whatsapp) {
+        window.open(`https://wa.me/${whatsapp}`, '_blank');
+      }
     }
   };
 
@@ -66,8 +100,16 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
     }
   };
 
+  // Aplicar cores CSS variables
+  const styleVars = {
+    '--color-primary': siteData.cores.principal,
+    '--color-background': siteData.cores.fundo,
+    '--color-accent': siteData.cores.destaque,
+    '--color-text': siteData.cores.texto,
+  } as React.CSSProperties;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden" style={styleVars}>
       {/* Animated Background Elements */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-yellow-400/10 to-orange-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -96,9 +138,12 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
                   key={item}
                   onClick={() => scrollToSection(item)}
                   className={`relative font-medium transition-all duration-300 hover:scale-105 ${
-                    activeSection === item ? 'text-transparent bg-gradient-to-r bg-clip-text' : 'text-gray-700 hover:text-gray-900'
+                    activeSection === item ? 'text-transparent bg-gradient-to-r bg-clip-text' : 'hover:text-gray-900'
                   }`}
-                  style={activeSection === item ? { backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` } : {}}
+                  style={{
+                    color: activeSection === item ? 'transparent' : siteData.cores.texto,
+                    backgroundImage: activeSection === item ? `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` : 'none'
+                  }}
                 >
                   {item.charAt(0).toUpperCase() + item.slice(1)}
                   {activeSection === item && (
@@ -126,10 +171,10 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
                 <button
                   key={item}
                   onClick={() => scrollToSection(item)}
-                  className="block w-full text-left py-3 px-4 text-gray-700 hover:text-white hover:bg-gradient-to-r rounded-xl transition-all duration-300 transform hover:scale-105"
+                  className="block w-full text-left py-3 px-4 hover:text-white hover:bg-gradient-to-r rounded-xl transition-all duration-300 transform hover:scale-105"
                   style={{ 
                     backgroundImage: activeSection === item ? `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` : 'none',
-                    color: activeSection === item ? 'white' : undefined
+                    color: activeSection === item ? 'white' : siteData.cores.texto
                   }}
                 >
                   {item.charAt(0).toUpperCase() + item.slice(1)}
@@ -147,26 +192,26 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
             <div className="inline-block mb-6">
               <span className="px-6 py-3 bg-gradient-to-r text-white text-sm font-semibold rounded-full shadow-lg animate-pulse"
                     style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}>
-                ✨ Transforme sua vida com Hinode
+                ✨ {heroData.subtitulo || 'Transforme sua vida com Hinode'}
               </span>
             </div>
             
             <h1 className="text-5xl md:text-7xl font-black mb-8 leading-tight">
               <span className="bg-gradient-to-r bg-clip-text text-transparent"
                     style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}>
-                {siteData.headline}
+                {heroData.titulo || siteData.headline || 'Transforme Sua Beleza'}
               </span>
             </h1>
 
             {/* Video Section */}
-            {siteData.videoUrl && (
+            {(heroData.video || siteData.videoUrl) && (
               <div className="mb-12 animate-scale-in" style={{ animationDelay: '0.3s' }}>
                 <div className="relative max-w-4xl mx-auto group">
                   <div className="absolute inset-0 bg-gradient-to-r rounded-3xl blur-xl opacity-30 group-hover:opacity-50 transition-opacity duration-500"
                        style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}></div>
                   <div className="relative aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border-4 border-white/20">
                     <iframe
-                      src={siteData.videoUrl.replace('watch?v=', 'embed/')}
+                      src={(heroData.video || siteData.videoUrl)?.replace('watch?v=', 'embed/')}
                       className="w-full h-full"
                       allowFullScreen
                       title="Vídeo Hinode"
@@ -176,8 +221,9 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
               </div>
             )}
 
-            <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed animate-fade-in" style={{ animationDelay: '0.6s' }}>
-              {siteData.descricao}
+            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed animate-fade-in" 
+               style={{ color: siteData.cores.texto, animationDelay: '0.6s' }}>
+              {siteData.descricao || 'Descubra produtos de luxo que transformam sua rotina de beleza e bem-estar'}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center animate-fade-in" style={{ animationDelay: '0.9s' }}>
@@ -189,11 +235,11 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
                 <Phone className="h-6 w-6 mr-3 group-hover:rotate-12 transition-transform duration-300" />
-                Começar Jornada
+                {heroData.botaoTexto || 'QUERO CONHECER OS PRODUTOS'}
                 <ChevronRight className="h-6 w-6 ml-3 group-hover:translate-x-1 transition-transform duration-300" />
               </Button>
               
-              {siteData.videoUrl && (
+              {(heroData.video || siteData.videoUrl) && (
                 <Button 
                   variant="outline" 
                   size="lg"
@@ -226,10 +272,10 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
             <div className="text-center mb-20">
               <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r bg-clip-text text-transparent"
                   style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}>
-                Sobre a Hinode
+                {sobreData.titulo || 'Sobre a Hinode'}
               </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Descubra a empresa que está transformando vidas através de produtos inovadores e oportunidades únicas
+              <p className="text-xl max-w-3xl mx-auto" style={{ color: siteData.cores.texto }}>
+                {sobreData.texto || 'Descubra a empresa que está transformando vidas através de produtos inovadores e oportunidades únicas'}
               </p>
             </div>
 
@@ -239,7 +285,7 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
                   <div className="absolute inset-0 bg-gradient-to-r rounded-3xl blur-2xl opacity-20"
                        style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}></div>
                   <img 
-                    src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&h=400&fit=crop" 
+                    src={sobreData.imagem || "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&h=400&fit=crop"} 
                     alt="Hinode" 
                     className="relative w-full rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-500"
                   />
@@ -255,7 +301,7 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
                   <h3 className="text-3xl font-bold mb-4" style={{ color: siteData.cores.principal }}>
                     Mais de 10 anos transformando vidas
                   </h3>
-                  <p className="text-lg text-gray-600 leading-relaxed">
+                  <p className="text-lg leading-relaxed" style={{ color: siteData.cores.texto }}>
                     A Hinode é uma empresa brasileira líder em cosméticos e produtos de bem-estar, 
                     comprometida em proporcionar qualidade de vida e oportunidades de crescimento pessoal e profissional.
                   </p>
@@ -265,17 +311,17 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
                   <div className="text-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
                     <Users className="h-10 w-10 mx-auto mb-3" style={{ color: siteData.cores.destaque }} />
                     <div className="text-2xl font-bold" style={{ color: siteData.cores.principal }}>1M+</div>
-                    <div className="text-sm text-gray-600">Clientes</div>
+                    <div className="text-sm" style={{ color: siteData.cores.texto }}>Clientes</div>
                   </div>
                   <div className="text-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
                     <Star className="h-10 w-10 mx-auto mb-3" style={{ color: siteData.cores.destaque }} />
                     <div className="text-2xl font-bold" style={{ color: siteData.cores.principal }}>10+</div>
-                    <div className="text-sm text-gray-600">Anos</div>
+                    <div className="text-sm" style={{ color: siteData.cores.texto }}>Anos</div>
                   </div>
                   <div className="text-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
                     <Award className="h-10 w-10 mx-auto mb-3" style={{ color: siteData.cores.destaque }} />
                     <div className="text-2xl font-bold" style={{ color: siteData.cores.principal }}>100%</div>
-                    <div className="text-sm text-gray-600">Nacional</div>
+                    <div className="text-sm" style={{ color: siteData.cores.texto }}>Nacional</div>
                   </div>
                 </div>
 
@@ -284,7 +330,7 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
                   className="group text-white text-lg px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
                   style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}
                 >
-                  Conhecer Mais
+                  {sobreData.botaoTexto || 'Conhecer Mais'}
                   <ChevronRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                 </Button>
               </div>
@@ -299,55 +345,61 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r bg-clip-text text-transparent"
                 style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}>
-              Produtos em Destaque
+              {produtosData.titulo || 'Produtos em Destaque'}
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Conheça nossa linha premium de produtos que combinam inovação, qualidade e resultados excepcionais
+            <p className="text-xl max-w-3xl mx-auto" style={{ color: siteData.cores.texto }}>
+              {produtosData.subtitulo || 'Conheça nossa linha premium de produtos que combinam inovação, qualidade e resultados excepcionais'}
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {[
-              { title: "Cosméticos Premium", desc: "Cuidados faciais e corporais com tecnologia avançada", image: "photo-1596462502278-27bfdc403348" },
-              { title: "Suplementos", desc: "Nutrição inteligente para seu bem-estar", image: "photo-1556909114-f6e7ad7d3136" },
-              { title: "Perfumaria", desc: "Fragrâncias exclusivas que marcam presença", image: "photo-1541643600914-78b084683601" }
-            ].map((product, i) => (
-              <Card key={i} className="group border-0 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-500 overflow-hidden">
-                <div className="relative overflow-hidden">
-                  <img 
-                    src={`https://images.unsplash.com/${product.image}?w=400&h=250&fit=crop`}
-                    alt={product.title}
-                    className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
-                <CardContent className="p-8">
-                  <h3 className="text-xl font-bold mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text transition-all duration-300"
-                      style={{ 
-                        color: siteData.cores.principal,
-                        backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})`
-                      }}>
-                    {product.title}
-                  </h3>
-                  <p className="text-gray-600 mb-6">{product.desc}</p>
-                  <Button 
-                    variant="outline" 
-                    onClick={handleWhatsAppClick}
-                    className="w-full group border-2 hover:bg-gradient-to-r hover:text-white hover:border-transparent transition-all duration-300"
-                    style={{ borderColor: siteData.cores.principal, color: siteData.cores.principal }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundImage = `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})`;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundImage = 'none';
-                    }}
-                  >
-                    Saiba Mais
-                    <ChevronRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+            {(produtosData.produtos || 'Cosméticos Premium\nSuplementos\nPerfumaria').split('\n').map((produto, i) => {
+              const defaultProducts = [
+                { title: "Cosméticos Premium", desc: "Cuidados faciais e corporais com tecnologia avançada", image: "photo-1596462502278-27bfdc403348" },
+                { title: "Suplementos", desc: "Nutrição inteligente para seu bem-estar", image: "photo-1556909114-f6e7ad7d3136" },
+                { title: "Perfumaria", desc: "Fragrâncias exclusivas que marcam presença", image: "photo-1541643600914-78b084683601" }
+              ];
+              
+              const productData = defaultProducts[i] || { title: produto, desc: "Produto de qualidade premium", image: "photo-1596462502278-27bfdc403348" };
+              
+              return (
+                <Card key={i} className="group border-0 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-500 overflow-hidden">
+                  <div className="relative overflow-hidden">
+                    <img 
+                      src={`https://images.unsplash.com/${productData.image}?w=400&h=250&fit=crop`}
+                      alt={productData.title}
+                      className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </div>
+                  <CardContent className="p-8">
+                    <h3 className="text-xl font-bold mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text transition-all duration-300"
+                        style={{ 
+                          color: siteData.cores.principal,
+                          backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})`
+                        }}>
+                      {produto.trim() || productData.title}
+                    </h3>
+                    <p className="mb-6" style={{ color: siteData.cores.texto }}>{productData.desc}</p>
+                    <Button 
+                      variant="outline" 
+                      onClick={handleWhatsAppClick}
+                      className="w-full group border-2 hover:bg-gradient-to-r hover:text-white hover:border-transparent transition-all duration-300"
+                      style={{ borderColor: siteData.cores.principal, color: siteData.cores.principal }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundImage = `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})`;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundImage = 'none';
+                      }}
+                    >
+                      Saiba Mais
+                      <ChevronRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -360,7 +412,7 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
                 style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}>
               Depoimentos
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl max-w-3xl mx-auto" style={{ color: siteData.cores.texto }}>
               Veja o que nossos parceiros e clientes falam sobre a experiência Hinode
             </p>
           </div>
@@ -376,7 +428,7 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
                       <Star key={star} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                     ))}
                   </div>
-                  <p className="text-gray-600 mb-6 leading-relaxed">
+                  <p className="mb-6 leading-relaxed" style={{ color: siteData.cores.texto }}>
                     "A Hinode transformou minha vida! Os produtos são excepcionais e a oportunidade de negócio é incrível. Recomendo de coração!"
                   </p>
                   <div className="flex items-center">
@@ -386,7 +438,7 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
                     </div>
                     <div>
                       <p className="font-semibold" style={{ color: siteData.cores.principal }}>Cliente {i}</p>
-                      <p className="text-sm text-gray-500">Parceiro Hinode</p>
+                      <p className="text-sm" style={{ color: siteData.cores.texto }}>Parceiro Hinode</p>
                     </div>
                   </div>
                 </CardContent>
@@ -401,10 +453,10 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r bg-clip-text text-transparent"
               style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}>
-            Pronto para Começar?
+            {contatoData.titulo || 'Pronto para Começar?'}
           </h2>
-          <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
-            Entre em contato conosco e descubra como a Hinode pode transformar sua vida pessoal e profissional
+          <p className="text-xl mb-12 max-w-3xl mx-auto" style={{ color: siteData.cores.texto }}>
+            {contatoData.subtitulo || 'Entre em contato conosco e descubra como a Hinode pode transformar sua vida pessoal e profissional'}
           </p>
           
           <div className="relative inline-block">

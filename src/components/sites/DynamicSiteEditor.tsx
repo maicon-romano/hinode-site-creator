@@ -54,25 +54,25 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
   // Use the form context from the parent SiteBuilder
   const form = useFormContext();
 
-  // Debounced function to update preview data
+  // Debounced function to update preview data - mais agressivo
   const debouncedUpdatePreview = useCallback(
     debounce((data) => {
       setPreviewData(data);
-    }, 300),
+    }, 1000), // Aumentei para 1 segundo
     []
   );
 
-  // Watch only specific fields that affect preview
+  // Watch only basic fields that affect preview
   const nomeDoSite = form.watch('nomeDoSite');
   const logoPath = form.watch('logoPath');
 
-  // Update preview data when key fields change
+  // Update preview data when key fields change - menos frequente
   useEffect(() => {
     if (isInitialized) {
       const currentData = getCurrentSiteData();
       debouncedUpdatePreview(currentData);
     }
-  }, [nomeDoSite, logoPath, colors, activeSections, sectionsOrder, isInitialized]);
+  }, [nomeDoSite, logoPath, colors, activeSections, sectionsOrder]);
 
   // Initialize form values only once
   useEffect(() => {
@@ -129,11 +129,18 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     }
   }, [templateId, siteModel, isInitialized, form, isEditing]);
 
-  // Memoized color change handler
+  // Memoized color change handler - agora atualiza o preview imediatamente apenas para cores
   const handleColorChange = useCallback((colorType: string, color: string) => {
-    setColors(prev => ({ ...prev, [colorType]: color }));
+    const newColors = { ...colors, [colorType]: color };
+    setColors(newColors);
     form.setValue(`cores.${colorType}` as any, color);
-  }, [form]);
+    
+    // Para cores, atualizar preview imediatamente mas debounced
+    setTimeout(() => {
+      const currentData = getCurrentSiteData();
+      setPreviewData({ ...currentData, cores: newColors });
+    }, 200);
+  }, [form, colors]);
 
   // Memoized section toggle handler
   const toggleSection = useCallback((sectionType: string) => {
@@ -193,11 +200,14 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
       'beneficios': 'Benefícios',
       'sobre': 'Sobre',
       'sobre-hinode': 'Sobre Hinode',
+      'sobre-negocio': 'Sobre o Negócio',
       'sobre-distribuidor': 'Sobre Distribuidor',
+      'biografia-representante': 'Biografia do Representante',
       'bio': 'Biografia',
       'servicos': 'Serviços',
       'habilidades': 'Habilidades',
       'produtos-destaque': 'Produtos em Destaque',
+      'produtos-hinode': 'Produtos Hinode',
       'como-funciona': 'Como Funciona',
       'etapas-comecar': 'Etapas para Começar',
       'depoimentos': 'Depoimentos',
@@ -206,6 +216,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
       'projetos': 'Projetos',
       'mapa': 'Mapa',
       'contato': 'Contato',
+      'contato-hinode': 'Contato Hinode',
       'rodape': 'Rodapé',
       'rodape-hinode': 'Rodapé Hinode',
       'banner-institucional': 'Banner Institucional',
@@ -232,8 +243,6 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     const updatedCards = currentCards.filter((card: any) => card.id !== cardId);
     form.setValue(`${sectionType}.cards`, updatedCards);
   };
-
-  // ... keep existing code (renderCardEditor function)
 
   const renderCardEditor = (sectionType: string, fieldLabel: string) => {
     const cards = form.watch(`${sectionType}.cards`) || [];
@@ -334,8 +343,6 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
       </div>
     );
   };
-
-  // ... keep existing code (renderSectionField and renderSectionFields functions and all other remaining methods)
 
   const renderSectionField = (fieldKey: string, sectionType: string, fieldLabel: string, fieldType: 'text' | 'textarea' | 'url' | 'image' = 'text') => {
     const fieldName = `${sectionType}.${fieldKey}`;
@@ -481,7 +488,9 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
 
       case 'sobre':
       case 'sobre-hinode':
+      case 'sobre-negocio':
       case 'sobre-distribuidor':
+      case 'biografia-representante':
       case 'bio':
         return (
           <>
@@ -489,17 +498,28 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
             {renderSectionField('subtitulo', sectionType, 'Subtítulo')}
             {renderSectionField('texto', sectionType, 'Descrição', 'textarea')}
             {renderSectionField('imagem', sectionType, 'Imagem da Seção', 'image')}
+            {sectionType === 'biografia-representante' && (
+              <>
+                {renderSectionField('nome', sectionType, 'Nome do Representante')}
+                {renderSectionField('foto', sectionType, 'Foto do Representante', 'image')}
+                {renderSectionField('experiencia', sectionType, 'Anos de Experiência')}
+              </>
+            )}
+            {(sectionType === 'sobre-negocio' || sectionType === 'biografia-representante') && (
+              renderSectionField('botaoTexto', sectionType, 'Texto do Botão')
+            )}
           </>
         );
 
       case 'produtos-destaque':
+      case 'produtos-hinode':
         return (
           <>
             {renderSectionField('titulo', sectionType, 'Título da Seção')}
             {renderSectionField('subtitulo', sectionType, 'Subtítulo')}
             {renderSectionField('descricao', sectionType, 'Descrição', 'textarea')}
-            {renderCardEditor(sectionType, 'Produtos')}
-            {renderSectionField('lista', sectionType, 'Lista de Produtos (fallback - um por linha)', 'textarea')}
+            {renderSectionField('produtos', sectionType, 'Lista de Produtos (um por linha)', 'textarea')}
+            {renderCardEditor(sectionType, 'Produtos (Avançado)')}
           </>
         );
 
@@ -536,6 +556,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
         );
 
       case 'contato':
+      case 'contato-hinode':
         return (
           <>
             {renderSectionField('titulo', sectionType, 'Título')}
