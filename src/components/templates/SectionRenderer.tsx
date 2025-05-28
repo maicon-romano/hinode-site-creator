@@ -9,6 +9,7 @@ import { InstitucionalTemplate } from './InstitucionalTemplate';
 import { InstitucionalBannerTemplate } from './variations/InstitucionalBannerTemplate';
 import { InstitucionalCorporateTemplate } from './variations/InstitucionalCorporateTemplate';
 import { InstitucionalCreativeTemplate } from './variations/InstitucionalCreativeTemplate';
+import { InstitucionalModernTemplate } from './variations/InstitucionalModernTemplate';
 import { PortfolioCreativeTemplate } from './variations/PortfolioCreativeTemplate';
 import { HinodeLandingTemplate } from './variations/HinodeLandingTemplate';
 import { HinodePremiumTemplate } from './variations/HinodePremiumTemplate';
@@ -33,61 +34,79 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
   // Check if this is a full template render based on templateId or modelId
   const templateId = siteData.templateId || siteData.modelId;
   
+  console.log('SectionRenderer - Template ID detectado:', templateId);
+  console.log('SectionRenderer - Site data recebido:', siteData);
+  
   if (templateId) {
-    console.log('SectionRenderer - Renderizando template:', templateId, siteData);
-    
+    // Ensure we're rendering the correct template based on the ID
     switch (templateId) {
       // Landing Page Templates
       case 'landing-premium':
+        console.log('Renderizando Landing Premium');
         return <LandingPremiumTemplate siteData={siteData} isPreview={isPreview} />;
       case 'landing-conversion':
+        console.log('Renderizando Landing Conversion');
         return <LandingPremiumTemplate siteData={siteData} isPreview={isPreview} />;
       case 'landing-01':
       case 'landing-basico':
+        console.log('Renderizando Landing Básico');
         return <LandingPageTemplate siteData={siteData} isPreview={isPreview} />;
       case 'landing-02':
       case 'landing-video':
+        console.log('Renderizando Landing Video');
         return <LandingPageVideoTemplate siteData={siteData} isPreview={isPreview} />;
       case 'landing-03':
       case 'landing-minimal':
+        console.log('Renderizando Landing Minimal');
         return <LandingPageMinimalTemplate siteData={siteData} isPreview={isPreview} />;
       case 'landing-04':
       case 'landing-modern':
+        console.log('Renderizando Landing Modern');
         return <LandingPageModernTemplate siteData={siteData} isPreview={isPreview} />;
       
-      // Institutional Templates
+      // Institutional Templates - CADA UM COMPLETAMENTE DIFERENTE
       case 'institucional-corporate':
-        return <InstitucionalCorporateTemplate siteData={siteData} isPreview={isPreview} />;
+        console.log('Renderizando Institucional Corporate - Template Moderno');
+        return <InstitucionalModernTemplate siteData={siteData} isPreview={isPreview} />;
       case 'institucional-premium':
-        return <InstitucionalCorporateTemplate siteData={siteData} isPreview={isPreview} />;
+        console.log('Renderizando Institucional Premium (Banner)');
+        return <InstitucionalBannerTemplate siteData={siteData} isPreview={isPreview} />;
       case 'institucional-01':
       case 'institucional-basico':
+        console.log('Renderizando Institucional Básico');
         return <InstitucionalTemplate siteData={siteData} isPreview={isPreview} />;
       case 'institucional-02':
       case 'institucional-banner':
+        console.log('Renderizando Institucional Banner');
         return <InstitucionalBannerTemplate siteData={siteData} isPreview={isPreview} />;
       case 'institucional-03':
       case 'institucional-corporate-old':
+        console.log('Renderizando Institucional Corporate Legacy');
         return <InstitucionalCorporateTemplate siteData={siteData} isPreview={isPreview} />;
       case 'institucional-04':
       case 'institucional-creative':
+        console.log('Renderizando Institucional Creative');
         return <InstitucionalCreativeTemplate siteData={siteData} isPreview={isPreview} />;
       
       // Portfolio Templates
       case 'portfolio-creative':
+        console.log('Renderizando Portfolio Creative');
         return <PortfolioCreativeTemplate siteData={siteData} isPreview={isPreview} />;
       case 'portfolio-developer':
+        console.log('Renderizando Portfolio Developer');
         return <PortfolioCreativeTemplate siteData={siteData} isPreview={isPreview} />;
       
-      // Hinode Templates
+      // Hinode Templates - TOTALMENTE ÚNICOS E ESPECÍFICOS
       case 'hinode-premium':
+        console.log('Renderizando Hinode Premium - Template Específico para Hinode');
         return <HinodePremiumTemplate siteData={siteData} isPreview={isPreview} />;
       case 'hinode-01':
       case 'hinode-landing':
+        console.log('Renderizando Hinode Landing - Template Específico para Hinode');
         return <HinodeLandingTemplate siteData={siteData} isPreview={isPreview} />;
       
       default:
-        console.log('Template não encontrado, usando template padrão para:', templateId);
+        console.warn('Template não encontrado, usando template padrão para:', templateId);
         return <LandingPageTemplate siteData={siteData} isPreview={isPreview} />;
     }
   }

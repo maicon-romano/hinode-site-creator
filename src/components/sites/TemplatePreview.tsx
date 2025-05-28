@@ -17,7 +17,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
   onTogglePreview
 }) => {
   const createPreviewData = (templateId: string) => {
-    console.log('Criando preview data para template:', templateId);
+    console.log('Criando preview data ESPECÍFICO para template:', templateId);
     
     const baseData = {
       templateId,
@@ -34,8 +34,80 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
       ...siteData
     };
 
-    // Dados específicos para cada template
+    // DADOS COMPLETAMENTE ESPECÍFICOS PARA CADA TEMPLATE
     switch (templateId) {
+      case 'institucional-corporate':
+        return {
+          ...baseData,
+          hero: {
+            titulo: baseData.nomeDoSite || 'Empresa Corporativa Ltda',
+            slogan: 'Excelência em Soluções Corporativas',
+            anos: '15',
+            imagemCorporativa: '',
+          },
+          sobre: {
+            historia: 'Fundada em 2009, nossa empresa tem se destacado como líder em soluções corporativas inovadoras.',
+            missao: 'Fornecer soluções de alta qualidade que superem as expectativas dos nossos clientes.',
+            visao: 'Ser reconhecida como líder em inovação e qualidade no mercado corporativo.'
+          },
+          servicos: {
+            titulo: 'Nossos Serviços Corporativos',
+            lista: 'Consultoria Estratégica\nDesenvolvimento de Software\nMarketing Digital\nTreinamento Corporativo'
+          },
+          numeros: {
+            clientes: '500+',
+            projetos: '1200+',
+            satisfacao: '98%'
+          },
+          contato: {
+            endereco: 'Av. Paulista, 1000 - São Paulo',
+            telefone: '(11) 3000-0000',
+            email: 'contato@empresa.com.br',
+            whatsapp: '5511999999999'
+          }
+        };
+
+      case 'hinode-premium':
+        return {
+          ...baseData,
+          'hero-hinode': {
+            titulo: 'Seja um Representante Hinode Premium',
+            subtitulo: 'Transforme sua vida com perfumes de luxo',
+            video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+            botaoTexto: 'Quero ser Representante',
+            imagem: '',
+          },
+          'sobre-negocio': {
+            titulo: 'Sobre a Hinode',
+            texto: 'A Hinode é líder em cosméticos e perfumaria no Brasil, oferecendo produtos de alta qualidade e oportunidade de negócio única.',
+            botaoTexto: 'Conhecer Mais',
+            imagem: ''
+          },
+          'biografia-representante': {
+            nome: 'Ana Beatriz Silva',
+            titulo: 'Consultora de Beleza Hinode',
+            texto: 'Sou consultora Hinode há 5 anos e amo poder transformar a vida das pessoas através da beleza e da oportunidade de negócio.',
+            experiencia: '5 anos',
+            botaoTexto: 'Falar Comigo',
+            foto: ''
+          },
+          'produtos-hinode': {
+            titulo: 'Nossos Produtos Hinode',
+            subtitulo: 'Linha completa de beleza e cuidados',
+            produtos: 'Perfumes Importados - Fragrâncias exclusivas e marcantes\nMaquiagem Premium - Beleza que dura o dia todo\nCuidados com a Pele - Produtos naturais e eficazes'
+          },
+          'contato-hinode': {
+            titulo: 'Entre em Contato',
+            subtitulo: 'Tire suas dúvidas ou faça seu pedido',
+            whatsapp: '5511999999999',
+            mostrarFormulario: true
+          },
+          'rodape-hinode': {
+            texto: 'Consultora Hinode - Transformando vidas através da beleza',
+            ano: '2024'
+          }
+        };
+
       case 'landing-premium':
         return {
           ...baseData,
@@ -238,7 +310,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
   const previewData = createPreviewData(templateId);
 
   console.log('TemplatePreview - Template selecionado:', templateId);
-  console.log('TemplatePreview - Dados do preview:', previewData);
+  console.log('TemplatePreview - Dados ESPECÍFICOS do preview:', previewData);
 
   return (
     <div className="space-y-4">
@@ -268,7 +340,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
         <Card className="overflow-hidden">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-gray-600 flex items-center justify-between">
-              <span>Preview - {templateId}</span>
+              <span>Preview Específico - {templateId}</span>
               <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
                 {templateId}
               </span>
@@ -295,7 +367,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
               <Eye className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p className="text-sm">Clique em "Mostrar Preview" para visualizar seu site</p>
               <p className="text-xs mt-2 text-gray-400">
-                Template: {templateId}
+                Template específico: {templateId}
               </p>
             </div>
           </CardContent>
