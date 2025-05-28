@@ -15,6 +15,12 @@ import { HinodeLandingTemplate } from './variations/HinodeLandingTemplate';
 import { HinodePremiumTemplate } from './variations/HinodePremiumTemplate';
 import { ContactForm } from './ContactForm';
 
+// Importar os novos componentes específicos
+import { RepresentanteHinodeSite } from './models/RepresentanteHinodeSite';
+import { InstitucionalSite } from './models/InstitucionalSite';
+import { LandingVendasSite } from './models/LandingVendasSite';
+import { PortfolioSite } from './models/PortfolioSite';
+
 interface SiteSection {
   type: string;
   conteudo: any;
@@ -38,9 +44,27 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
   console.log('SectionRenderer - Site data recebido:', siteData);
   
   if (templateId) {
-    // Ensure we're rendering the correct template based on the ID
+    // USAR COMPONENTES ESPECÍFICOS PARA CADA MODELO
     switch (templateId) {
-      // Landing Page Templates
+      // Modelos específicos com componentes únicos
+      case 'representante-hinode':
+        console.log('Renderizando Representante Hinode - Componente Específico');
+        return <RepresentanteHinodeSite siteData={siteData} isPreview={isPreview} />;
+      
+      case 'site-institucional':
+        console.log('Renderizando Site Institucional - Componente Específico');
+        return <InstitucionalSite siteData={siteData} isPreview={isPreview} />;
+      
+      case 'landing-vendas':
+      case 'landing-page-vendas':
+        console.log('Renderizando Landing de Vendas - Componente Específico');
+        return <LandingVendasSite siteData={siteData} isPreview={isPreview} />;
+      
+      case 'portfolio-profissional':
+        console.log('Renderizando Portfólio - Componente Específico');
+        return <PortfolioSite siteData={siteData} isPreview={isPreview} />;
+
+      // Templates existentes (variações antigas)
       case 'landing-premium':
         console.log('Renderizando Landing Premium');
         return <LandingPremiumTemplate siteData={siteData} isPreview={isPreview} />;
