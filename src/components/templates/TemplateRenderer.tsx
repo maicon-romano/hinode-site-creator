@@ -40,12 +40,24 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
 }) => {
   console.log('TemplateRenderer - Site data recebido:', siteData);
 
+  // Ensure we have a valid siteData object with default values
+  const safeSiteData = {
+    nomeDoSite: 'Site em Desenvolvimento',
+    cores: {
+      principal: '#0066cc',
+      fundo: '#ffffff',
+      destaque: '#ff6b35',
+      texto: '#333333'
+    },
+    ...siteData
+  };
+
   // Ensure we have valid templateId, with proper fallback
-  let templateId = siteData.templateId || siteData.modelId;
+  let templateId = safeSiteData.templateId || safeSiteData.modelId;
   
   // If we still don't have a templateId, construct one safely
-  if (!templateId) {
-    const template = siteData.template || 'landing-page-vendas'; // Default template
+  if (!templateId || typeof templateId !== 'string') {
+    const template = safeSiteData.template || 'landing-page-vendas'; // Default template
     templateId = `${template}-01`;
   }
   
@@ -54,24 +66,24 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
   // Para modelos novos, usar diretamente o DynamicSiteRenderer
   if (['representante-hinode', 'site-institucional', 'landing-page-vendas', 'portfolio-profissional'].includes(templateId)) {
     console.log('TemplateRenderer - Usando modelo novo:', templateId);
-    return <DynamicSiteRenderer siteData={{ ...siteData, templateId }} isPreview={isPreview} />;
+    return <DynamicSiteRenderer siteData={{ ...safeSiteData, templateId }} isPreview={isPreview} />;
   }
 
   // Para modelos antigos, converter formato se necessário
   const convertedData = {
-    ...siteData,
+    ...safeSiteData,
     templateId,
-    activeSections: siteData.activeSections || Object.keys(siteData.secoes || {}).filter(key => siteData.secoes?.[key]),
-    hero: siteData.hero || {
-      titulo: siteData.headline || 'Título do Site',
-      subtitulo: siteData.descricao || 'Descrição do site',
-      videoUrl: siteData.videoUrl,
+    activeSections: safeSiteData.activeSections || Object.keys(safeSiteData.secoes || {}).filter(key => safeSiteData.secoes?.[key]),
+    hero: safeSiteData.hero || {
+      titulo: safeSiteData.headline || 'Título do Site',
+      subtitulo: safeSiteData.descricao || 'Descrição do site',
+      videoUrl: safeSiteData.videoUrl,
       botaoTexto: 'Fale Conosco',
-      botaoLink: siteData.whatsapp ? `https://wa.me/${siteData.whatsapp}` : '#'
+      botaoLink: safeSiteData.whatsapp ? `https://wa.me/${safeSiteData.whatsapp}` : '#'
     },
-    contato: siteData.contato || {
+    contato: safeSiteData.contato || {
       titulo: 'Entre em Contato',
-      whatsapp: siteData.whatsapp
+      whatsapp: safeSiteData.whatsapp
     }
   };
 
