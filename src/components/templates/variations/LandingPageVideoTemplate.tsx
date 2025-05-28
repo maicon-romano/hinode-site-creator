@@ -82,7 +82,7 @@ export const LandingPageVideoTemplate: React.FC<LandingPageVideoTemplateProps> =
                       src={embedUrl}
                       className="w-full h-full"
                       frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
                       title="Vídeo Demonstrativo"
                     />

@@ -14,6 +14,7 @@ import { getSiteModel, SiteModel } from '@/data/siteModels';
 import { ColorSelector } from './ColorSelector';
 import { LogoUpload } from './LogoUpload';
 import { TemplatePreview } from './TemplatePreview';
+import { convertYouTubeToEmbed } from '@/lib/imageUtils';
 
 interface DynamicSiteEditorProps {
   templateId: string;
@@ -331,9 +332,24 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
                     type="url"
                     placeholder="https://exemplo.com"
                     {...field}
+                    onBlur={(e) => {
+                      // Auto-convert YouTube URLs to embed format
+                      const value = e.target.value;
+                      if (value && (value.includes('youtube.com') || value.includes('youtu.be'))) {
+                        const convertedUrl = convertYouTubeToEmbed(value);
+                        field.onChange(convertedUrl);
+                      } else {
+                        field.onBlur(e);
+                      }
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
+                {field.value && (field.value.includes('youtube.com') || field.value.includes('youtu.be')) && (
+                  <p className="text-sm text-blue-600 mt-1">
+                    ✓ URL do YouTube será convertida automaticamente para formato de embed
+                  </p>
+                )}
               </FormItem>
             )}
           />

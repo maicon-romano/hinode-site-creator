@@ -1,3 +1,4 @@
+
 export const saveBase64Image = (base64: string, clienteId: string, fileName: string): string => {
   // Since this is a frontend application, we'll create a blob URL for immediate use
   // In a real implementation, this would send the base64 to a backend API
@@ -117,7 +118,7 @@ export const convertYouTubeToEmbed = (url: string): string => {
     }
     
     if (videoId) {
-      const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+      const embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&showinfo=0`;
       console.log('YouTube URL converted:', url, '->', embedUrl);
       return embedUrl;
     }
