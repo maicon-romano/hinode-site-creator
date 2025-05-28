@@ -40,7 +40,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
   const [sectionsOrder, setSectionsOrder] = useState<string[]>(
     initialData?.sectionsOrder || siteModel?.secoesPadrao.map(s => s.type) || []
   );
-  const [showPreview, setShowPreview] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
   const [colors, setColors] = useState({
     principal: initialData?.cores?.principal || '#ff6b35',
     fundo: initialData?.cores?.fundo || '#ffffff',
@@ -52,9 +52,12 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
   // Use the form context from the parent SiteBuilder
   const form = useFormContext();
 
+  // Watch form values for real-time preview updates
+  const watchedValues = form.watch();
+
   // Initialize form values only once
   useEffect(() => {
-    if (!isInitialized) {
+    if (!isInitialized && siteModel) {
       console.log('Inicializando formulário com dados:', { clientId, clientName, templateId, initialData });
       
       form.setValue('clientId', clientId);
@@ -84,7 +87,28 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
       
       setIsInitialized(true);
     }
-  }, []);
+  }, [siteModel]);
+
+  // Update sections when template changes
+  useEffect(() => {
+    if (siteModel && isInitialized) {
+      const newSections = new Set(siteModel.secoesPadrao.map(s => s.type));
+      const newOrder = siteModel.secoesPadrao.map(s => s.type);
+      
+      setActiveSections(newSections);
+      setSectionsOrder(newOrder);
+      
+      form.setValue('activeSections', Array.from(newSections));
+      form.setValue('sectionsOrder', newOrder);
+      
+      // Clear existing section data when changing template
+      if (!isEditing) {
+        newOrder.forEach(sectionType => {
+          form.setValue(sectionType, {});
+        });
+      }
+    }
+  }, [templateId, siteModel, isInitialized]);
 
   // Update colors in form when they change
   useEffect(() => {
@@ -292,6 +316,8 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     );
   };
 
+  // ... keep existing code (renderSectionField and renderSectionFields functions and all other remaining methods)
+
   const renderSectionField = (fieldKey: string, sectionType: string, fieldLabel: string, fieldType: 'text' | 'textarea' | 'url' | 'image' = 'text') => {
     const fieldName = `${sectionType}.${fieldKey}`;
 
@@ -417,8 +443,6 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
         );
     }
   };
-
-  // ... keep existing code (renderSectionFields function and all other remaining methods)
 
   const renderSectionFields = (sectionType: string) => {
     switch (sectionType) {
@@ -652,7 +676,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
   };
 
   const getCurrentSiteData = () => {
-    const formData = form.getValues();
+    const formData = { ...watchedValues };
     const layout = sectionsOrder.map(sectionType => {
       const secao = siteModel.secoesPadrao.find(s => s.type === sectionType);
       return {
@@ -664,6 +688,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
 
     return {
       modelId: templateId,
+      templateId: templateId,
       nomeDoSite: formData.nomeDoSite || 'Exemplo Site',
       logoPath: formData.logoPath,
       cores: colors,

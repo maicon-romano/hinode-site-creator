@@ -60,9 +60,24 @@ export const SiteBuilder: React.FC<SiteBuilderProps> = ({
     }
   };
 
+  const handleClientChange = (clientId: string) => {
+    setSelectedClient(clientId);
+    form.setValue('clientId', clientId);
+  };
+
+  const handleClientDataChange = (name: string) => {
+    setClientName(name);
+    form.setValue('clientName', name);
+  };
+
+  const handleModelSelect = (modelId: string) => {
+    setSelectedModel(modelId);
+    form.setValue('modelId', modelId);
+  };
+
   return (
     <Form {...form}>
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Progress Steps */}
         <Card>
           <CardContent className="p-6">
@@ -102,15 +117,15 @@ export const SiteBuilder: React.FC<SiteBuilderProps> = ({
             {step === 1 && (
               <ClientSelector
                 value={selectedClient}
-                onValueChange={setSelectedClient}
-                onClientDataChange={setClientName}
+                onValueChange={handleClientChange}
+                onClientDataChange={handleClientDataChange}
               />
             )}
 
             {step === 2 && (
               <ModelSelector
                 selectedModel={selectedModel}
-                onModelSelect={setSelectedModel}
+                onModelSelect={handleModelSelect}
               />
             )}
 

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -11,41 +11,24 @@ interface LogoUploadProps {
   onLogoChange: (logoPath: string) => void;
 }
 
-export const LogoUpload: React.FC<LogoUploadProps> = ({ 
-  clientId, 
-  currentLogo, 
-  onLogoChange 
+export const LogoUpload: React.FC<LogoUploadProps> = ({
+  clientId,
+  currentLogo,
+  onLogoChange
 }) => {
-  const [preview, setPreview] = useState<string | null>(currentLogo || null);
-  const [uploading, setUploading] = useState(false);
-
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !clientId) return;
-
-    setUploading(true);
-    
-    try {
-      // Criar preview imediato
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setPreview(result);
-        // Usar o data URL diretamente como logo path
+      reader.onload = (event) => {
+        const result = event.target?.result as string;
         onLogoChange(result);
-        console.log('Logo carregado com sucesso');
       };
       reader.readAsDataURL(file);
-      
-    } catch (error) {
-      console.error('Erro ao fazer upload do logo:', error);
-    } finally {
-      setUploading(false);
     }
   };
 
   const removeLogo = () => {
-    setPreview(null);
     onLogoChange('');
   };
 
@@ -54,50 +37,62 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
       <FormLabel>Logo do Site</FormLabel>
       <FormControl>
         <div className="space-y-4">
-          {preview ? (
-            <div className="relative inline-block">
+          {currentLogo ? (
+            <div className="flex items-center gap-4">
               <img 
-                src={preview} 
-                alt="Preview do logo" 
-                className="w-32 h-32 object-contain border rounded-lg bg-white"
+                src={currentLogo} 
+                alt="Logo atual" 
+                className="w-20 h-20 object-contain border rounded-lg bg-white p-2"
               />
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                className="absolute -top-2 -right-2"
-                onClick={removeLogo}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              <div className="flex flex-col gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={removeLogo}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Remover Logo
+                </Button>
+                <label className="cursor-pointer">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    asChild
+                  >
+                    <span>
+                      <Upload className="h-4 w-4 mr-2" />
+                      Alterar Logo
+                    </span>
+                  </Button>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                </label>
+              </div>
             </div>
           ) : (
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-              <Upload className="mx-auto h-12 w-12 text-gray-400" />
-              <p className="mt-2 text-sm text-gray-600">
-                Clique para fazer upload do logo
-              </p>
-            </div>
-          )}
-          
-          <Input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            disabled={uploading || !clientId}
-            className="cursor-pointer"
-          />
-          
-          {uploading && (
-            <p className="text-sm text-blue-600">
-              Fazendo upload...
-            </p>
-          )}
-          
-          {!clientId && (
-            <p className="text-sm text-orange-600">
-              Selecione um cliente primeiro para fazer upload do logo
-            </p>
+            <label className="cursor-pointer">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
+                <Upload className="h-8 w-8 mx-auto mb-4 text-gray-400" />
+                <p className="text-sm text-gray-600 mb-2">
+                  Clique para fazer upload do logo
+                </p>
+                <p className="text-xs text-gray-500">
+                  PNG, JPG ou SVG até 5MB
+                </p>
+              </div>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+            </label>
           )}
         </div>
       </FormControl>

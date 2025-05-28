@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,7 @@ import { db } from '@/lib/firebase';
 import { Plus, Edit, Trash2, ArrowLeft, Eye, LogOut, Download, Copy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
-import { SiteForm } from '@/components/sites/SiteForm';
+import { SiteBuilder } from '@/components/sites/SiteBuilder';
 import { processImageData, createSitesDirectory, detectBase64Images } from '@/lib/imageUtils';
 
 interface SiteData {
@@ -315,7 +314,7 @@ const ManageSites = () => {
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-7xl max-h-[95vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingSite ? 'Editar Site' : 'Criar Novo Site'}
@@ -324,7 +323,7 @@ const ManageSites = () => {
                 {editingSite ? 'Edite as configurações do site usando o construtor visual.' : 'Use o construtor de sites para criar um site personalizado.'}
               </DialogDescription>
             </DialogHeader>
-            <SiteForm
+            <SiteBuilder
               initialData={editingSite || undefined}
               onSubmit={onSubmit}
               isEditing={!!editingSite}
