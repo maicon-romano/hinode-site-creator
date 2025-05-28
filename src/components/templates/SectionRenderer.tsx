@@ -38,24 +38,26 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
   isPreview = false
 }) => {
   // Ensure we have safe data with defaults
+  const defaultCores = {
+    principal: '#0066cc',
+    fundo: '#ffffff',
+    destaque: '#ff6b35',
+    texto: '#333333',
+    degradeHero: {
+      inicio: '#0067c7',
+      fim: '#00ffcc'
+    }
+  };
+
   const safeSiteData = {
     nomeDoSite: 'Site em Desenvolvimento',
-    cores: {
-      principal: '#0066cc',
-      fundo: '#ffffff',
-      destaque: '#ff6b35',
-      texto: '#333333',
-      degradeHero: {
-        inicio: '#0067c7',
-        fim: '#00ffcc'
-      }
-    },
+    cores: defaultCores,
     ...siteData
   };
 
-  // Merge cores properly, ensuring degradeHero is handled correctly - SEM DUPLICAÇÃO
+  // Properly merge cores with guaranteed degradeHero structure
   if (siteData.cores) {
-    const coresOriginais = safeSiteData.cores;
+    const coresOriginais = defaultCores;
     const coresNovas = siteData.cores;
     
     safeSiteData.cores = {
@@ -102,6 +104,7 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
       case 'landing-premium':
         console.log('Renderizando Landing Premium');
         return <LandingPremiumTemplate siteData={safeSiteData} isPreview={isPreview} />;
+      
       case 'landing-conversion':
         console.log('Renderizando Landing Conversion');
         return <LandingPremiumTemplate siteData={safeSiteData} isPreview={isPreview} />;
@@ -461,263 +464,6 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
                 ))}
               </div>
             )}
-          </div>
-        </section>
-      );
-
-    case 'bio':
-      return (
-        <section className="py-20 px-4 relative" style={{ backgroundColor: safeSiteData.cores.fundo }}>
-          <div className="container mx-auto max-w-6xl">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <div className="order-2 lg:order-1">
-                {safeConteudo.titulo && (
-                  <h2 className="text-4xl lg:text-5xl font-bold mb-6 animate-fade-in" style={{ color: safeSiteData.cores.principal }}>
-                    {safeConteudo.titulo}
-                  </h2>
-                )}
-
-                {safeConteudo.subtitulo && (
-                  <h3 className="text-2xl mb-8 animate-fade-in animation-delay-1000" style={{ color: safeSiteData.cores.destaque }}>
-                    {safeConteudo.subtitulo}
-                  </h3>
-                )}
-
-                {safeConteudo.texto && (
-                  <div className="text-lg leading-relaxed space-y-4 animate-fade-in animation-delay-2000" style={{ color: safeSiteData.cores.texto }}>
-                    {safeConteudo.texto.split('\n').map((paragraph: string, index: number) => (
-                      <p key={index} className="animate-fade-in" style={{ animationDelay: `${(index + 3) * 200}ms` }}>
-                        {paragraph}
-                      </p>
-                    ))}
-                  </div>
-                )}
-
-                {safeConteudo.experiencia && (
-                  <div className="mt-6 p-4 bg-white rounded-lg shadow-sm">
-                    <p className="text-sm text-gray-600">Experiência</p>
-                    <p className="font-semibold" style={{ color: safeSiteData.cores.principal }}>{safeConteudo.experiencia}</p>
-                  </div>
-                )}
-
-                {safeConteudo.botaoTexto && safeConteudo.botaoLink && (
-                  <a
-                    href={safeConteudo.botaoLink}
-                    className="inline-flex items-center gap-2 px-6 py-3 mt-6 font-semibold rounded-lg transition-all duration-300 hover:scale-105 text-white"
-                    style={{ backgroundColor: safeSiteData.cores.destaque }}
-                    target={safeConteudo.botaoLink.includes('wa.me') ? '_blank' : '_self'}
-                  >
-                    {safeConteudo.botaoTexto}
-                    <ArrowRight className="h-4 w-4" />
-                  </a>
-                )}
-              </div>
-              
-              <div className="order-1 lg:order-2">
-                {safeConteudo.imagem ? (
-                  <div className="relative animate-scale-in">
-                    <img src={safeConteudo.imagem} alt="Biografia" className="w-full rounded-2xl shadow-2xl" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent rounded-2xl"></div>
-                  </div>
-                ) : (
-                  <div className="w-full aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-2xl flex items-center justify-center animate-scale-in">
-                    <span className="text-gray-400 text-lg">Sua foto aqui</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-      );
-
-    case 'beneficios':
-    case 'servicos':
-    case 'habilidades':
-      return (
-        <section className="py-16 px-4" style={{ backgroundColor: `${safeSiteData.cores.principal}05` }}>
-          <div className="container mx-auto max-w-6xl">
-            {safeConteudo.titulo && (
-              <h2 className="text-3xl font-bold text-center mb-4" style={{ color: safeSiteData.cores.principal }}>
-                {safeConteudo.titulo}
-              </h2>
-            )}
-            
-            {safeConteudo.subtitulo && (
-              <p className="text-xl text-center mb-8" style={{ color: safeSiteData.cores.texto }}>
-                {safeConteudo.subtitulo}
-              </p>
-            )}
-
-            {safeConteudo.descricao && (
-              <p className="text-center mb-12 max-w-3xl mx-auto" style={{ color: safeSiteData.cores.texto }}>
-                {safeConteudo.descricao}
-              </p>
-            )}
-
-            {safeConteudo.lista && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {safeConteudo.lista.split('\n').filter((item: string) => item.trim()).map((item: string, index: number) => (
-                  <div key={index} className="bg-white p-6 rounded-lg shadow-sm border text-center">
-                    <div className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center text-white font-bold" style={{ backgroundColor: safeSiteData.cores.destaque }}>
-                      {index + 1}
-                    </div>
-                    <h3 className="font-semibold text-lg" style={{ color: safeSiteData.cores.texto }}>{item}</h3>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {safeConteudo.cards && renderCards(safeConteudo.cards)}
-          </div>
-        </section>
-      );
-
-    case 'como-funciona':
-    case 'etapas-comecar':
-      return (
-        <section className="py-16 px-4" style={{ backgroundColor: safeSiteData.cores.fundo }}>
-          <div className="container mx-auto max-w-6xl">
-            {safeConteudo.titulo && (
-              <h2 className="text-3xl font-bold text-center mb-12" style={{ color: safeSiteData.cores.principal }}>
-                {safeConteudo.titulo}
-              </h2>
-            )}
-            {renderCards(safeConteudo.cards, "grid grid-cols-1 md:grid-cols-3 gap-8")}
-          </div>
-        </section>
-      );
-
-    case 'sobre':
-    case 'sobre-distribuidor':
-    case 'produto':
-      return (
-        <section className="py-16 px-4" style={{ backgroundColor: safeSiteData.cores.fundo }}>
-          <div className="container mx-auto max-w-6xl">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div>
-                {safeConteudo.titulo && (
-                  <h2 className="text-3xl font-bold mb-4" style={{ color: safeSiteData.cores.principal }}>
-                    {safeConteudo.titulo}
-                  </h2>
-                )}
-
-                {safeConteudo.subtitulo && (
-                  <h3 className="text-xl mb-6" style={{ color: safeSiteData.cores.destaque }}>
-                    {safeConteudo.subtitulo}
-                  </h3>
-                )}
-
-                {safeConteudo.texto && (
-                  <div className="text-lg leading-relaxed" style={{ color: safeSiteData.cores.texto }}>
-                    {safeConteudo.texto.split('\n').map((paragraph: string, index: number) => (
-                      <p key={index} className="mb-4">{paragraph}</p>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <div>
-                {safeConteudo.imagem ? (
-                  <img src={safeConteudo.imagem} alt="Seção" className="w-full rounded-lg shadow-lg" />
-                ) : (
-                  <div className="w-full aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg shadow-lg flex items-center justify-center">
-                    <span className="text-gray-400">Imagem da seção</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-      );
-
-    case 'depoimentos':
-      return (
-        <section className="py-16 px-4" style={{ backgroundColor: `${safeSiteData.cores.destaque}10` }}>
-          <div className="container mx-auto max-w-6xl">
-            {safeConteudo.titulo && (
-              <h2 className="text-3xl font-bold text-center mb-12" style={{ color: safeSiteData.cores.principal }}>
-                {safeConteudo.titulo}
-              </h2>
-            )}
-            {renderCards(safeConteudo.cards, "grid grid-cols-1 md:grid-cols-2 gap-8")}
-          </div>
-        </section>
-      );
-
-    case 'equipe':
-    case 'projetos':
-      return (
-        <section className="py-16 px-4" style={{ backgroundColor: safeSiteData.cores.fundo }}>
-          <div className="container mx-auto max-w-6xl">
-            {safeConteudo.titulo && (
-              <h2 className="text-3xl font-bold text-center mb-12" style={{ color: safeSiteData.cores.principal }}>
-                {safeConteudo.titulo}
-              </h2>
-            )}
-            {renderCards(safeConteudo.cards, "grid grid-cols-1 md:grid-cols-3 gap-8")}
-          </div>
-        </section>
-      );
-
-    case 'faq':
-      return (
-        <section className="py-16 px-4" style={{ backgroundColor: `${safeSiteData.cores.principal}05` }}>
-          <div className="container mx-auto max-w-4xl">
-            {safeConteudo.titulo && (
-              <h2 className="text-3xl font-bold text-center mb-12" style={{ color: safeSiteData.cores.principal }}>
-                {safeConteudo.titulo}
-              </h2>
-            )}
-            <div className="space-y-4">
-              {safeConteudo.cards?.sort((a, b) => a.ordem - b.ordem).map((faq) => (
-                <div key={faq.id} className="bg-white p-6 rounded-lg shadow-sm border">
-                  <h3 className="font-semibold text-lg mb-2" style={{ color: safeSiteData.cores.texto }}>
-                    {faq.titulo}
-                  </h3>
-                  <p className="text-gray-600">{faq.texto}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      );
-
-    case 'banner-institucional':
-      return (
-        <section 
-          className="py-20 px-4 relative"
-          style={{ 
-            backgroundColor: safeSiteData.cores.principal,
-            backgroundImage: safeConteudo.imagem ? `url(${safeConteudo.imagem})` : 'none',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-        >
-          <div className="absolute inset-0 bg-black/40"></div>
-          <div className="container mx-auto max-w-6xl text-center text-white relative z-10">
-            <h1 className="text-4xl lg:text-6xl font-bold leading-tight mb-6">
-              {safeConteudo.titulo}
-            </h1>
-            {safeConteudo.subtitulo && (
-              <p className="text-xl lg:text-2xl opacity-90">
-                {safeConteudo.subtitulo}
-              </p>
-            )}
-          </div>
-        </section>
-      );
-
-    case 'mapa':
-      return (
-        <section className="py-16 px-4" style={{ backgroundColor: safeSiteData.cores.fundo }}>
-          <div className="container mx-auto max-w-6xl">
-            {safeConteudo.titulo && (
-              <h2 className="text-3xl font-bold text-center mb-12" style={{ color: safeSiteData.cores.principal }}>
-                {safeConteudo.titulo}
-              </h2>
-            )}
-            <div className="bg-gray-200 rounded-lg h-64 flex items-center justify-center">
-              <p className="text-gray-500">Mapa: {safeConteudo.endereco}</p>
-            </div>
           </div>
         </section>
       );
