@@ -43,7 +43,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
   const [sectionsOrder, setSectionsOrder] = useState<string[]>(
     initialData?.sectionsOrder || siteModel?.secoesPadrao.map(s => s.type) || []
   );
-  const [showPreview, setShowPreview] = useState(false); // Desativar preview automático
+  const [showPreview, setShowPreview] = useState(false);
   const [colors, setColors] = useState({
     principal: initialData?.cores?.principal || '#ff6b35',
     fundo: initialData?.cores?.fundo || '#ffffff',
@@ -59,7 +59,6 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
 
   const form = useFormContext();
 
-  // Função para atualizar cores imediatamente
   const handleColorChange = useCallback((colorType: string, color: string | { inicio: string; fim: string }) => {
     let newColors = { ...colors };
     
@@ -177,7 +176,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     );
   }
 
-  // Mapeamento COMPLETO de campos específicos por modelo - INCLUINDO BIO
+  // Mapeamento COMPLETO de campos específicos por modelo
   const getModelSpecificFields = (modelId: string) => {
     const fieldMappings = {
       'representante-hinode': {
@@ -221,6 +220,17 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
           { key: 'descricao', label: 'Descrição', type: 'textarea', placeholder: 'Os melhores produtos de beleza...' },
           { key: 'produtos', label: 'Lista de Produtos (um por linha)', type: 'textarea', placeholder: 'Perfumes\nCosméticos\nCuidados com a pele' }
         ],
+        'produtos-destaque': [
+          { key: 'titulo', label: 'Título da Seção', type: 'text', placeholder: 'Produtos em Destaque' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text', placeholder: 'Conheça nossos principais produtos' },
+          { key: 'descricao', label: 'Descrição', type: 'textarea', placeholder: 'Seleção especial dos melhores produtos...' },
+          { key: 'cards', label: 'Cards de Produtos', type: 'textarea', placeholder: 'Produto 1\nProduto 2\nProduto 3' }
+        ],
+        'depoimentos': [
+          { key: 'titulo', label: 'Título dos Depoimentos', type: 'text', placeholder: 'O que nossos clientes dizem' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text', placeholder: 'Experiências reais de quem confia' },
+          { key: 'lista', label: 'Lista de Depoimentos', type: 'textarea', placeholder: 'Depoimento 1\nDepoimento 2\nDepoimento 3' }
+        ],
         'contato-hinode': [
           { key: 'titulo', label: 'Título do Contato', type: 'text', placeholder: 'Entre em Contato' },
           { key: 'subtitulo', label: 'Subtítulo', type: 'text', placeholder: 'Estou aqui para te ajudar' },
@@ -228,8 +238,18 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
           { key: 'telefone', label: 'Telefone', type: 'text', placeholder: '(11) 99999-9999' },
           { key: 'email', label: 'E-mail', type: 'email', placeholder: 'seu@email.com' }
         ],
+        'contato': [
+          { key: 'titulo', label: 'Título da Seção', type: 'text', placeholder: 'Fale Conosco' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text', placeholder: 'Estamos prontos para atender' },
+          { key: 'whatsapp', label: 'WhatsApp', type: 'text', placeholder: '5511999999999' },
+          { key: 'telefone', label: 'Telefone', type: 'text', placeholder: '(11) 99999-9999' },
+          { key: 'email', label: 'E-mail', type: 'email', placeholder: 'contato@empresa.com' },
+          { key: 'endereco', label: 'Endereço', type: 'textarea', placeholder: 'Rua Example, 123\nSão Paulo - SP' },
+          { key: 'formulario', label: 'Texto de Instrução', type: 'textarea', placeholder: 'Preencha o formulário abaixo...' }
+        ],
         'rodape-hinode': [
-          { key: 'texto', label: 'Texto do Rodapé', type: 'textarea', placeholder: '© 2024 - Todos os direitos reservados' }
+          { key: 'texto', label: 'Texto do Rodapé', type: 'textarea', placeholder: '© 2024 - Todos os direitos reservados' },
+          { key: 'links', label: 'Links do Rodapé', type: 'textarea', placeholder: 'Sobre\nContato\nPrivacidade' }
         ]
       },
       'site-institucional': {
@@ -262,12 +282,35 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
           { key: 'endereco', label: 'Endereço', type: 'textarea', placeholder: 'Rua Example, 123\nSão Paulo - SP' }
         ]
       },
-      'landing-page-vendas': [
-        // ... keep existing code for landing-page-vendas
-      ],
-      'portfolio-profissional': [
-        // ... keep existing code for portfolio-profissional
-      ]
+      'landing-page-vendas': {
+        'hero': [
+          { key: 'titulo', label: 'Título Principal', type: 'text', placeholder: 'Transforme Sua Vida' },
+          { key: 'subtitulo', label: 'Subtítulo', type: 'text', placeholder: 'Descubra o segredo do sucesso' },
+          { key: 'video', label: 'URL do Vídeo', type: 'url', placeholder: 'https://youtube.com/...' },
+          { key: 'botaoTexto', label: 'Texto do Botão', type: 'text', placeholder: 'Quero Saber Mais' }
+        ],
+        'produto': [
+          { key: 'titulo', label: 'Nome do Produto', type: 'text', placeholder: 'Produto Revolucionário' },
+          { key: 'descricao', label: 'Descrição', type: 'textarea', placeholder: 'Descrição do produto...' },
+          { key: 'preco', label: 'Preço', type: 'text', placeholder: 'R$ 197' },
+          { key: 'imagem', label: 'Imagem do Produto', type: 'image' }
+        ]
+      },
+      'portfolio-profissional': {
+        'hero': [
+          { key: 'titulo', label: 'Seu Nome', type: 'text', placeholder: 'João Silva' },
+          { key: 'subtitulo', label: 'Sua Profissão', type: 'text', placeholder: 'Desenvolvedor Full Stack' },
+          { key: 'foto', label: 'Sua Foto', type: 'image' }
+        ],
+        'sobre': [
+          { key: 'titulo', label: 'Título Sobre', type: 'text', placeholder: 'Sobre Mim' },
+          { key: 'texto', label: 'Biografia', type: 'textarea', placeholder: 'Conte sua história...' }
+        ],
+        'projetos': [
+          { key: 'titulo', label: 'Título dos Projetos', type: 'text', placeholder: 'Meus Projetos' },
+          { key: 'lista', label: 'Lista de Projetos', type: 'textarea', placeholder: 'Projeto 1\nProjeto 2\nProjeto 3' }
+        ]
+      }
     };
 
     return fieldMappings[modelId] || {};
@@ -482,7 +525,6 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     setIsSubmitting(true);
     
     try {
-      // Validação básica
       if (!data.nomeDoSite || data.nomeDoSite.trim() === '') {
         toast({
           title: "Erro de Validação",
@@ -706,7 +748,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
             title="Visualizar site"
           >
             <Eye className="h-4 w-4 mr-2" />
-            🔍 Visualizar
+            🔍 Ver Preview
           </Button>
           
           <Button 
@@ -721,7 +763,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
         </div>
       </div>
 
-      {/* Preview - Apenas quando solicitado */}
+      {/* Preview - APENAS quando solicitado explicitamente */}
       {showPreview && (
         <div className="xl:sticky xl:top-6 xl:self-start">
           <div className="bg-white border rounded-lg overflow-hidden">

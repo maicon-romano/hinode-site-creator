@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -102,10 +101,10 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
 
   // Aplicar cores CSS variables
   const styleVars = {
-    '--color-primary': siteData.cores.principal,
-    '--color-background': siteData.cores.fundo,
-    '--color-accent': siteData.cores.destaque,
-    '--color-text': siteData.cores.texto,
+    '--cor-principal': siteData.cores.principal,
+    '--cor-fundo': siteData.cores.fundo,
+    '--cor-destaque': siteData.cores.destaque,
+    '--cor-texto': siteData.cores.texto,
   } as React.CSSProperties;
 
   return (
@@ -126,7 +125,7 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
                 <img src={siteData.logoPath} alt="Logo" className="h-10 w-auto" />
               )}
               <h1 className="text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent" 
-                  style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}>
+                  style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}>
                 {siteData.nomeDoSite}
               </h1>
             </div>
@@ -141,14 +140,14 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
                     activeSection === item ? 'text-transparent bg-gradient-to-r bg-clip-text' : 'hover:text-gray-900'
                   }`}
                   style={{
-                    color: activeSection === item ? 'transparent' : siteData.cores.texto,
-                    backgroundImage: activeSection === item ? `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` : 'none'
+                    color: activeSection === item ? 'transparent' : 'var(--cor-texto)',
+                    backgroundImage: activeSection === item ? `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` : 'none'
                   }}
                 >
                   {item.charAt(0).toUpperCase() + item.slice(1)}
                   {activeSection === item && (
                     <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r" 
-                         style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}></div>
+                         style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}></div>
                   )}
                 </button>
               ))}
@@ -158,7 +157,7 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="lg:hidden p-2 rounded-xl bg-gradient-to-r text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-              style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}
+              style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -173,8 +172,8 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
                   onClick={() => scrollToSection(item)}
                   className="block w-full text-left py-3 px-4 hover:text-white hover:bg-gradient-to-r rounded-xl transition-all duration-300 transform hover:scale-105"
                   style={{ 
-                    backgroundImage: activeSection === item ? `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` : 'none',
-                    color: activeSection === item ? 'white' : siteData.cores.texto
+                    backgroundImage: activeSection === item ? `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` : 'none',
+                    color: activeSection === item ? 'white' : 'var(--cor-texto)'
                   }}
                 >
                   {item.charAt(0).toUpperCase() + item.slice(1)}
@@ -191,14 +190,14 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
           <div className="text-center mb-12 animate-fade-in">
             <div className="inline-block mb-6">
               <span className="px-6 py-3 bg-gradient-to-r text-white text-sm font-semibold rounded-full shadow-lg animate-pulse"
-                    style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}>
+                    style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}>
                 ✨ {heroData.subtitulo || 'Transforme sua vida com Hinode'}
               </span>
             </div>
             
             <h1 className="text-5xl md:text-7xl font-black mb-8 leading-tight">
               <span className="bg-gradient-to-r bg-clip-text text-transparent"
-                    style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}>
+                    style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}>
                 {heroData.titulo || siteData.headline || 'Transforme Sua Beleza'}
               </span>
             </h1>
@@ -208,7 +207,7 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
               <div className="mb-12 animate-scale-in" style={{ animationDelay: '0.3s' }}>
                 <div className="relative max-w-4xl mx-auto group">
                   <div className="absolute inset-0 bg-gradient-to-r rounded-3xl blur-xl opacity-30 group-hover:opacity-50 transition-opacity duration-500"
-                       style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}></div>
+                       style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}></div>
                   <div className="relative aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border-4 border-white/20">
                     <iframe
                       src={(heroData.video || siteData.videoUrl)?.replace('watch?v=', 'embed/')}
@@ -222,7 +221,7 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
             )}
 
             <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed animate-fade-in" 
-               style={{ color: siteData.cores.texto, animationDelay: '0.6s' }}>
+               style={{ color: 'var(--cor-texto)', animationDelay: '0.6s' }}>
               {siteData.descricao || 'Descubra produtos de luxo que transformam sua rotina de beleza e bem-estar'}
             </p>
 
@@ -231,7 +230,7 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
                 size="lg" 
                 onClick={handleWhatsAppClick}
                 className="group relative overflow-hidden text-white text-lg px-10 py-6 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-500"
-                style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}
+                style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
                 <Phone className="h-6 w-6 mr-3 group-hover:rotate-12 transition-transform duration-300" />
@@ -245,12 +244,12 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
                   size="lg"
                   className="group text-lg px-10 py-6 rounded-2xl border-2 hover:bg-gradient-to-r hover:text-white hover:border-transparent transform hover:scale-105 transition-all duration-500"
                   style={{ 
-                    borderColor: siteData.cores.principal,
-                    color: siteData.cores.principal,
+                    borderColor: 'var(--cor-principal)',
+                    color: 'var(--cor-principal)',
                     backgroundImage: 'none'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundImage = `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})`;
+                    e.currentTarget.style.backgroundImage = `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))`;
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundImage = 'none';
@@ -271,10 +270,10 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-20">
               <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r bg-clip-text text-transparent"
-                  style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}>
+                  style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}>
                 {sobreData.titulo || 'Sobre a Hinode'}
               </h2>
-              <p className="text-xl max-w-3xl mx-auto" style={{ color: siteData.cores.texto }}>
+              <p className="text-xl max-w-3xl mx-auto" style={{ color: 'var(--cor-texto)' }}>
                 {sobreData.texto || 'Descubra a empresa que está transformando vidas através de produtos inovadores e oportunidades únicas'}
               </p>
             </div>
@@ -283,14 +282,14 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
               <div className="animate-fade-in">
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-r rounded-3xl blur-2xl opacity-20"
-                       style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}></div>
+                       style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}></div>
                   <img 
                     src={sobreData.imagem || "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&h=400&fit=crop"} 
                     alt="Hinode" 
                     className="relative w-full rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute -bottom-6 -right-6 bg-gradient-to-r text-white p-6 rounded-2xl shadow-xl"
-                       style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}>
+                       style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}>
                     <Award className="h-8 w-8" />
                   </div>
                 </div>
@@ -298,10 +297,10 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
 
               <div className="space-y-8">
                 <div>
-                  <h3 className="text-3xl font-bold mb-4" style={{ color: siteData.cores.principal }}>
+                  <h3 className="text-3xl font-bold mb-4" style={{ color: 'var(--cor-principal)' }}>
                     Mais de 10 anos transformando vidas
                   </h3>
-                  <p className="text-lg leading-relaxed" style={{ color: siteData.cores.texto }}>
+                  <p className="text-lg leading-relaxed" style={{ color: 'var(--cor-texto)' }}>
                     A Hinode é uma empresa brasileira líder em cosméticos e produtos de bem-estar, 
                     comprometida em proporcionar qualidade de vida e oportunidades de crescimento pessoal e profissional.
                   </p>
@@ -309,26 +308,26 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
 
                 <div className="grid grid-cols-3 gap-6">
                   <div className="text-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                    <Users className="h-10 w-10 mx-auto mb-3" style={{ color: siteData.cores.destaque }} />
-                    <div className="text-2xl font-bold" style={{ color: siteData.cores.principal }}>1M+</div>
-                    <div className="text-sm" style={{ color: siteData.cores.texto }}>Clientes</div>
+                    <Users className="h-10 w-10 mx-auto mb-3" style={{ color: 'var(--cor-destaque)' }} />
+                    <div className="text-2xl font-bold" style={{ color: 'var(--cor-principal)' }}>1M+</div>
+                    <div className="text-sm" style={{ color: 'var(--cor-texto)' }}>Clientes</div>
                   </div>
                   <div className="text-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                    <Star className="h-10 w-10 mx-auto mb-3" style={{ color: siteData.cores.destaque }} />
-                    <div className="text-2xl font-bold" style={{ color: siteData.cores.principal }}>10+</div>
-                    <div className="text-sm" style={{ color: siteData.cores.texto }}>Anos</div>
+                    <Star className="h-10 w-10 mx-auto mb-3" style={{ color: 'var(--cor-destaque)' }} />
+                    <div className="text-2xl font-bold" style={{ color: 'var(--cor-principal)' }}>10+</div>
+                    <div className="text-sm" style={{ color: 'var(--cor-texto)' }}>Anos</div>
                   </div>
                   <div className="text-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                    <Award className="h-10 w-10 mx-auto mb-3" style={{ color: siteData.cores.destaque }} />
-                    <div className="text-2xl font-bold" style={{ color: siteData.cores.principal }}>100%</div>
-                    <div className="text-sm" style={{ color: siteData.cores.texto }}>Nacional</div>
+                    <Award className="h-10 w-10 mx-auto mb-3" style={{ color: 'var(--cor-destaque)' }} />
+                    <div className="text-2xl font-bold" style={{ color: 'var(--cor-principal)' }}>100%</div>
+                    <div className="text-sm" style={{ color: 'var(--cor-texto)' }}>Nacional</div>
                   </div>
                 </div>
 
                 <Button 
                   onClick={handleWhatsAppClick}
                   className="group text-white text-lg px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-                  style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}
+                  style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}
                 >
                   {sobreData.botaoTexto || 'Conhecer Mais'}
                   <ChevronRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
@@ -344,10 +343,10 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
         <div className="container mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r bg-clip-text text-transparent"
-                style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}>
+                style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}>
               {produtosData.titulo || 'Produtos em Destaque'}
             </h2>
-            <p className="text-xl max-w-3xl mx-auto" style={{ color: siteData.cores.texto }}>
+            <p className="text-xl max-w-3xl mx-auto" style={{ color: 'var(--cor-texto)' }}>
               {produtosData.subtitulo || 'Conheça nossa linha premium de produtos que combinam inovação, qualidade e resultados excepcionais'}
             </p>
           </div>
@@ -370,24 +369,24 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
                       alt={productData.title}
                       className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
                   <CardContent className="p-8">
                     <h3 className="text-xl font-bold mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text transition-all duration-300"
                         style={{ 
-                          color: siteData.cores.principal,
-                          backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})`
+                          color: 'var(--cor-principal)',
+                          backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))`
                         }}>
                       {produto.trim() || productData.title}
                     </h3>
-                    <p className="mb-6" style={{ color: siteData.cores.texto }}>{productData.desc}</p>
+                    <p className="mb-6" style={{ color: 'var(--cor-texto)' }}>{productData.desc}</p>
                     <Button 
                       variant="outline" 
                       onClick={handleWhatsAppClick}
                       className="w-full group border-2 hover:bg-gradient-to-r hover:text-white hover:border-transparent transition-all duration-300"
-                      style={{ borderColor: siteData.cores.principal, color: siteData.cores.principal }}
+                      style={{ borderColor: 'var(--cor-principal)', color: 'var(--cor-principal)' }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundImage = `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})`;
+                        e.currentTarget.style.backgroundImage = `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))`;
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundImage = 'none';
@@ -409,10 +408,10 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
         <div className="container mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r bg-clip-text text-transparent"
-                style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}>
+                style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}>
               Depoimentos
             </h2>
-            <p className="text-xl max-w-3xl mx-auto" style={{ color: siteData.cores.texto }}>
+            <p className="text-xl max-w-3xl mx-auto" style={{ color: 'var(--cor-texto)' }}>
               Veja o que nossos parceiros e clientes falam sobre a experiência Hinode
             </p>
           </div>
@@ -421,24 +420,24 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
             {[1, 2, 3].map((i) => (
               <Card key={i} className="border-0 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-500 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r"
-                     style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}></div>
+                     style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}></div>
                 <CardContent className="p-8">
                   <div className="flex mb-4">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star key={star} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                     ))}
                   </div>
-                  <p className="mb-6 leading-relaxed" style={{ color: siteData.cores.texto }}>
+                  <p className="mb-6 leading-relaxed" style={{ color: 'var(--cor-texto)' }}>
                     "A Hinode transformou minha vida! Os produtos são excepcionais e a oportunidade de negócio é incrível. Recomendo de coração!"
                   </p>
                   <div className="flex items-center">
                     <div className="w-12 h-12 bg-gradient-to-r rounded-full flex items-center justify-center text-white font-bold mr-4"
-                         style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}>
+                         style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}>
                       {String.fromCharCode(64 + i)}
                     </div>
                     <div>
-                      <p className="font-semibold" style={{ color: siteData.cores.principal }}>Cliente {i}</p>
-                      <p className="text-sm" style={{ color: siteData.cores.texto }}>Parceiro Hinode</p>
+                      <p className="font-semibold" style={{ color: 'var(--cor-principal)' }}>Cliente {i}</p>
+                      <p className="text-sm" style={{ color: 'var(--cor-texto)' }}>Parceiro Hinode</p>
                     </div>
                   </div>
                 </CardContent>
@@ -452,10 +451,10 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
       <section id="contato" className="py-32 bg-gradient-to-br from-gray-50 to-white">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r bg-clip-text text-transparent"
-              style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}>
+              style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}>
             {contatoData.titulo || 'Pronto para Começar?'}
           </h2>
-          <p className="text-xl mb-12 max-w-3xl mx-auto" style={{ color: siteData.cores.texto }}>
+          <p className="text-xl mb-12 max-w-3xl mx-auto" style={{ color: 'var(--cor-texto)' }}>
             {contatoData.subtitulo || 'Entre em contato conosco e descubra como a Hinode pode transformar sua vida pessoal e profissional'}
           </p>
           
@@ -464,7 +463,7 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
               size="lg" 
               onClick={handleWhatsAppClick}
               className="group text-white text-xl px-12 py-6 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-500 relative overflow-hidden"
-              style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}
+              style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
               <Phone className="h-6 w-6 mr-3 group-hover:rotate-12 transition-transform duration-300" />
@@ -479,7 +478,7 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
 
       {/* Footer */}
       <footer className="py-16 bg-gradient-to-r text-white relative overflow-hidden"
-              style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}>
+              style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}>
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="container mx-auto px-6 relative">
           <div className="text-center">
@@ -511,17 +510,17 @@ export const HinodeLandingTemplate: React.FC<HinodeLandingTemplateProps> = ({
           <button
             onClick={scrollToTop}
             className="w-14 h-14 bg-white rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 flex items-center justify-center group border-2"
-            style={{ borderColor: siteData.cores.principal }}
+            style={{ borderColor: 'var(--cor-principal)' }}
             title="Voltar ao topo"
           >
             <ArrowUp className="h-6 w-6 group-hover:-translate-y-1 transition-transform duration-300" 
-                     style={{ color: siteData.cores.principal }} />
+                     style={{ color: 'var(--cor-principal)' }} />
           </button>
           
           <button
             onClick={handleWhatsAppClick}
             className="w-16 h-16 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 flex items-center justify-center text-white group relative overflow-hidden"
-            style={{ backgroundImage: `linear-gradient(135deg, ${siteData.cores.principal}, ${siteData.cores.destaque})` }}
+            style={{ backgroundImage: `linear-gradient(135deg, var(--cor-principal), var(--cor-destaque))` }}
             title="Fale conosco no WhatsApp"
           >
             <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:scale-100 transition-transform duration-300"></div>

@@ -63,7 +63,15 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
     }
   };
 
+  // CSS Variables aplicadas CORRETAMENTE em TODO o site
   const styles = {
+    '--cor-principal': coresFinais.principal,
+    '--cor-fundo': coresFinais.fundo,
+    '--cor-destaque': coresFinais.destaque,
+    '--cor-texto': coresFinais.texto,
+    '--cor-degrade-inicio': coresFinais.degradeHero.inicio,
+    '--cor-degrade-fim': coresFinais.degradeHero.fim,
+    // Aliases para compatibilidade
     '--color-primary': coresFinais.principal,
     '--color-background': coresFinais.fundo,
     '--color-accent': coresFinais.destaque,
@@ -85,6 +93,7 @@ export const DynamicSiteRenderer: React.FC<DynamicSiteRendererProps> = ({
   const templateId = siteData.templateId || siteData.modelId;
   
   console.log('DynamicSiteRenderer - Template ID final:', templateId);
+  console.log('DynamicSiteRenderer - Cores aplicadas:', coresFinais);
   
   if (templateId) {
     // Pass the entire siteData as a section to trigger template rendering
