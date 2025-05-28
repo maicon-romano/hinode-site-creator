@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import { ColorSelector } from './ColorSelector';
 import { LogoUpload } from './LogoUpload';
 import { TemplatePreview } from './TemplatePreview';
 import { convertYouTubeToEmbed } from '@/lib/imageUtils';
+import { debounce } from 'lodash';
 
 interface DynamicSiteEditorProps {
   templateId: string;
@@ -48,12 +49,30 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     texto: initialData?.cores?.texto || '#333333'
   });
   const [isInitialized, setIsInitialized] = useState(false);
+  const [previewData, setPreviewData] = useState(null);
 
   // Use the form context from the parent SiteBuilder
   const form = useFormContext();
 
-  // Watch form values for real-time preview updates
-  const watchedValues = form.watch();
+  // Debounced function to update preview data
+  const debouncedUpdatePreview = useCallback(
+    debounce((data) => {
+      setPreviewData(data);
+    }, 300),
+    []
+  );
+
+  // Watch only specific fields that affect preview
+  const nomeDoSite = form.watch('nomeDoSite');
+  const logoPath = form.watch('logoPath');
+
+  // Update preview data when key fields change
+  useEffect(() => {
+    if (isInitialized) {
+      const currentData = getCurrentSiteData();
+      debouncedUpdatePreview(currentData);
+    }
+  }, [nomeDoSite, logoPath, colors, activeSections, sectionsOrder, isInitialized]);
 
   // Initialize form values only once
   useEffect(() => {
@@ -87,7 +106,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
       
       setIsInitialized(true);
     }
-  }, [siteModel]);
+  }, [siteModel, form, clientId, clientName, templateId, initialData, colors, activeSections, sectionsOrder, isInitialized]);
 
   // Update sections when template changes
   useEffect(() => {
@@ -108,22 +127,54 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
         });
       }
     }
-  }, [templateId, siteModel, isInitialized]);
+  }, [templateId, siteModel, isInitialized, form, isEditing]);
 
-  // Update colors in form when they change
-  useEffect(() => {
-    form.setValue('cores', colors);
-  }, [colors, form]);
+  // Memoized color change handler
+  const handleColorChange = useCallback((colorType: string, color: string) => {
+    setColors(prev => ({ ...prev, [colorType]: color }));
+    form.setValue(`cores.${colorType}` as any, color);
+  }, [form]);
 
-  // Update activeSections in form when they change
-  useEffect(() => {
-    form.setValue('activeSections', Array.from(activeSections));
-  }, [activeSections, form]);
+  // Memoized section toggle handler
+  const toggleSection = useCallback((sectionType: string) => {
+    setActiveSections(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(sectionType)) {
+        newSet.delete(sectionType);
+      } else {
+        newSet.add(sectionType);
+      }
+      form.setValue('activeSections', Array.from(newSet));
+      return newSet;
+    });
+  }, [form]);
 
-  // Update sectionsOrder in form when they change
-  useEffect(() => {
-    form.setValue('sectionsOrder', sectionsOrder);
-  }, [sectionsOrder, form]);
+  // Memoized move section handlers
+  const moveSectionUp = useCallback((sectionType: string) => {
+    setSectionsOrder(prev => {
+      const currentIndex = prev.indexOf(sectionType);
+      if (currentIndex > 0) {
+        const newOrder = [...prev];
+        [newOrder[currentIndex], newOrder[currentIndex - 1]] = [newOrder[currentIndex - 1], newOrder[currentIndex]];
+        form.setValue('sectionsOrder', newOrder);
+        return newOrder;
+      }
+      return prev;
+    });
+  }, [form]);
+
+  const moveSectionDown = useCallback((sectionType: string) => {
+    setSectionsOrder(prev => {
+      const currentIndex = prev.indexOf(sectionType);
+      if (currentIndex < prev.length - 1) {
+        const newOrder = [...prev];
+        [newOrder[currentIndex], newOrder[currentIndex + 1]] = [newOrder[currentIndex + 1], newOrder[currentIndex]];
+        form.setValue('sectionsOrder', newOrder);
+        return newOrder;
+      }
+      return prev;
+    });
+  }, [form]);
 
   if (!siteModel) {
     return (
@@ -132,38 +183,6 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
       </div>
     );
   }
-
-  const handleColorChange = (colorType: string, color: string) => {
-    setColors(prev => ({ ...prev, [colorType]: color }));
-  };
-
-  const toggleSection = (sectionType: string) => {
-    const newActiveSections = new Set(activeSections);
-    if (newActiveSections.has(sectionType)) {
-      newActiveSections.delete(sectionType);
-    } else {
-      newActiveSections.add(sectionType);
-    }
-    setActiveSections(newActiveSections);
-  };
-
-  const moveSectionUp = (sectionType: string) => {
-    const currentIndex = sectionsOrder.indexOf(sectionType);
-    if (currentIndex > 0) {
-      const newOrder = [...sectionsOrder];
-      [newOrder[currentIndex], newOrder[currentIndex - 1]] = [newOrder[currentIndex - 1], newOrder[currentIndex]];
-      setSectionsOrder(newOrder);
-    }
-  };
-
-  const moveSectionDown = (sectionType: string) => {
-    const currentIndex = sectionsOrder.indexOf(sectionType);
-    if (currentIndex < sectionsOrder.length - 1) {
-      const newOrder = [...sectionsOrder];
-      [newOrder[currentIndex], newOrder[currentIndex + 1]] = [newOrder[currentIndex + 1], newOrder[currentIndex]];
-      setSectionsOrder(newOrder);
-    }
-  };
 
   // Helper function to get section display name
   const getSectionDisplayName = (sectionType: string) => {
@@ -359,7 +378,6 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
                     placeholder="https://exemplo.com"
                     {...field}
                     onBlur={(e) => {
-                      // Auto-convert YouTube URLs to embed format
                       const value = e.target.value;
                       if (value && (value.includes('youtube.com') || value.includes('youtu.be'))) {
                         const convertedUrl = convertYouTubeToEmbed(value);
@@ -547,7 +565,7 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     }
   };
 
-  const handleSubmit = (data: any) => {
+  const handleSubmit = useCallback((data: any) => {
     console.log('DynamicSiteEditor - Dados do formulário:', data);
     console.log('DynamicSiteEditor - Template ID:', templateId);
     
@@ -673,10 +691,10 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
 
     console.log('DynamicSiteEditor - Dados processados:', processedData);
     onSubmit(processedData);
-  };
+  }, [templateId, clientId, clientName, colors, activeSections, sectionsOrder, onSubmit]);
 
-  const getCurrentSiteData = () => {
-    const formData = { ...watchedValues };
+  const getCurrentSiteData = useCallback(() => {
+    const formData = form.getValues();
     const layout = sectionsOrder.map(sectionType => {
       const secao = siteModel.secoesPadrao.find(s => s.type === sectionType);
       return {
@@ -698,12 +716,12 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
       activeSections: Array.from(activeSections),
       ...formData
     };
-  };
+  }, [form, sectionsOrder, siteModel, activeSections, templateId, colors]);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
       {/* Formulário */}
-      <div className="space-y-6">
+      <div className="space-y-6 max-h-[80vh] overflow-y-auto">
         {/* Informações Básicas */}
         <Card>
           <CardHeader>
@@ -834,9 +852,9 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
       </div>
 
       {/* Preview */}
-      <div className="lg:sticky lg:top-6 lg:self-start">
+      <div className="xl:sticky xl:top-6 xl:self-start">
         <TemplatePreview
-          siteData={getCurrentSiteData()}
+          siteData={previewData || getCurrentSiteData()}
           showPreview={showPreview}
           onTogglePreview={() => setShowPreview(!showPreview)}
         />

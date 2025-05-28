@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Maximize2, Minimize2 } from 'lucide-react';
 import { TemplateRenderer } from '@/components/templates/TemplateRenderer';
 
 interface TemplatePreviewProps {
@@ -16,28 +16,44 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
   showPreview,
   onTogglePreview
 }) => {
+  const [isFullscreen, setIsFullscreen] = React.useState(false);
+
   return (
-    <Card className="sticky top-6">
+    <Card className={`${isFullscreen ? 'fixed inset-4 z-50' : 'sticky top-6'}`}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Preview do Site</CardTitle>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onTogglePreview}
-          >
-            {showPreview ? (
-              <>
-                <EyeOff className="h-4 w-4 mr-2" />
-                Ocultar
-              </>
-            ) : (
-              <>
-                <Eye className="h-4 w-4 mr-2" />
-                Mostrar
-              </>
-            )}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsFullscreen(!isFullscreen)}
+              title={isFullscreen ? 'Sair do modo tela cheia' : 'Modo tela cheia'}
+            >
+              {isFullscreen ? (
+                <Minimize2 className="h-4 w-4" />
+              ) : (
+                <Maximize2 className="h-4 w-4" />
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onTogglePreview}
+            >
+              {showPreview ? (
+                <>
+                  <EyeOff className="h-4 w-4 mr-2" />
+                  Ocultar
+                </>
+              ) : (
+                <>
+                  <Eye className="h-4 w-4 mr-2" />
+                  Mostrar
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </CardHeader>
       
@@ -55,9 +71,22 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
               </div>
             </div>
             
-            <div className="relative bg-white">
+            <div className="relative bg-white" style={{ 
+              height: isFullscreen ? 'calc(100vh - 200px)' : '600px' 
+            }}>
               {/* Container com escala reduzida para simular preview */}
-              <div className="transform scale-[0.4] origin-top-left w-[250%] h-[600px] overflow-hidden">
+              <div 
+                className={`transform origin-top-left overflow-hidden ${
+                  isFullscreen 
+                    ? 'scale-75 w-[133%] h-[133%]' 
+                    : 'scale-[0.4] w-[250%] h-[250%]'
+                }`}
+                style={{
+                  position: 'relative',
+                  width: isFullscreen ? '133%' : '250%',
+                  height: isFullscreen ? '133%' : '250%'
+                }}
+              >
                 <div style={{ 
                   position: 'relative',
                   width: '100vw',
@@ -72,7 +101,9 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
               </div>
               
               {/* Overlay para capturar cliques no preview */}
-              <div className="absolute inset-0 bg-transparent cursor-not-allowed" />
+              {!isFullscreen && (
+                <div className="absolute inset-0 bg-transparent cursor-not-allowed" />
+              )}
             </div>
           </div>
         </CardContent>
