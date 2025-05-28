@@ -40,8 +40,14 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
 }) => {
   console.log('TemplateRenderer - Site data recebido:', siteData);
 
-  // Priorizar templateId sobre modelId, depois template
-  const templateId = siteData.templateId || siteData.modelId || `${siteData.template}-01`;
+  // Ensure we have valid templateId, with proper fallback
+  let templateId = siteData.templateId || siteData.modelId;
+  
+  // If we still don't have a templateId, construct one safely
+  if (!templateId) {
+    const template = siteData.template || 'landing-page-vendas'; // Default template
+    templateId = `${template}-01`;
+  }
   
   console.log('TemplateRenderer - Template ID determinado:', templateId);
 
@@ -57,11 +63,11 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
     templateId,
     activeSections: siteData.activeSections || Object.keys(siteData.secoes || {}).filter(key => siteData.secoes?.[key]),
     hero: siteData.hero || {
-      titulo: siteData.headline,
-      subtitulo: siteData.descricao,
+      titulo: siteData.headline || 'Título do Site',
+      subtitulo: siteData.descricao || 'Descrição do site',
       videoUrl: siteData.videoUrl,
       botaoTexto: 'Fale Conosco',
-      botaoLink: `https://wa.me/${siteData.whatsapp}`
+      botaoLink: siteData.whatsapp ? `https://wa.me/${siteData.whatsapp}` : '#'
     },
     contato: siteData.contato || {
       titulo: 'Entre em Contato',
