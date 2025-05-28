@@ -17,9 +17,10 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
   onTogglePreview
 }) => {
   const createPreviewData = (templateId: string) => {
+    console.log('Criando preview data para template:', templateId);
+    
     const baseData = {
       templateId,
-      modelId: templateId,
       nomeDoSite: siteData.nomeDoSite || 'Preview Site',
       logoPath: siteData.logoPath || '',
       cores: {
@@ -29,9 +30,11 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
         texto: siteData.cores?.texto || '#333333',
       },
       whatsapp: '5511999999999',
+      clientId: 'preview',
       ...siteData
     };
 
+    // Dados específicos para cada template
     switch (templateId) {
       case 'landing-premium':
         return {
@@ -46,21 +49,32 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
           beneficios: {
             titulo: 'Benefícios Exclusivos',
             lista: 'Design Premium\nTecnologia Avançada\nSuporte VIP\nResultados Garantidos'
+          },
+          contato: {
+            titulo: 'Vamos Conversar?',
+            whatsapp: '5511999999999'
           }
         };
 
       case 'landing-conversion':
         return {
           ...baseData,
-          hero: {
-            titulo: 'Maximize Suas Conversões Agora',
-            subtitulo: 'Landing page otimizada para resultados excepcionais',
-            botaoTexto: 'Converter Agora',
-            imagemHero: '',
+          urgencia: {
+            texto: '🔥 Oferta termina em 24h!',
+            ativo: true
           },
-          beneficios: {
-            titulo: 'Por Que Converter Conosco?',
-            lista: 'Alta Conversão\nOtimização A/B\nAnalytics Avançado\nSupporte 24/7'
+          hero: {
+            titulo: 'Aumente Suas Vendas em 300%',
+            subtitulo: 'Sistema comprovado usado por +10.000 empresas',
+            garantia: '30 dias ou seu dinheiro de volta'
+          },
+          'social-proof': {
+            titulo: 'Mais de 50.000 Clientes Satisfeitos',
+            numero: '50.000+'
+          },
+          contato: {
+            titulo: 'Quero Aumentar Minhas Vendas Agora!',
+            whatsapp: '5511999999999'
           }
         };
 
@@ -69,49 +83,84 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
           ...baseData,
           hero: {
             titulo: 'Sua Empresa do Futuro',
-            subtitulo: 'Soluções corporativas de excelência',
-            botaoTexto: 'Conhecer Mais',
+            slogan: 'Inovação que transforma o futuro dos negócios',
+            anos: '15',
+            imagemCorporativa: ''
           },
           sobre: {
-            titulo: 'Sobre Nossa Empresa',
-            texto: 'Líder em soluções empresariais inovadoras',
+            historia: 'Fundada em 2009, somos líderes em soluções empresariais inovadoras.',
+            missao: 'Nossa missão é transformar negócios através da tecnologia.',
+            visao: 'Nossa visão é ser referência mundial em inovação corporativa.'
           },
           servicos: {
             titulo: 'Nossos Serviços',
-            lista: 'Consultoria Empresarial\nSoluções Digitais\nSupporte Técnico\nTreinamentos'
+            lista: 'Consultoria Estratégica\nDesenvolvimento de Software\nMarketing Digital\nTreinamento Corporativo'
+          },
+          numeros: {
+            clientes: '500+',
+            projetos: '1000+',
+            satisfacao: '98%'
+          },
+          contato: {
+            endereco: 'Av. Paulista, 1000 - São Paulo',
+            telefone: '(11) 3000-0000',
+            email: 'contato@empresa.com.br',
+            whatsapp: '5511999999999'
           }
         };
 
       case 'portfolio-creative':
         return {
           ...baseData,
-          'apresentacao-pessoal': {
-            titulo: 'Criatividade em Ação',
-            subtitulo: 'Designer & Desenvolvedor Criativo',
-            texto: 'Transformo ideias em experiências digitais únicas',
-            botaoTexto: 'Ver Portfolio',
+          hero: {
+            nome: 'João Silva',
+            profissao: 'Designer Gráfico & Fotógrafo',
+            descricao: 'Transformo ideias em experiências visuais memoráveis',
+            foto: ''
           },
-          projetos: {
-            titulo: 'Projetos Criativos',
-            cards: [
-              { id: 1, titulo: 'App Mobile', texto: 'Design inovador', ordem: 1 },
-              { id: 2, titulo: 'Website', texto: 'UX/UI moderno', ordem: 2 }
-            ]
+          sobre: {
+            biografia: 'Sou um profissional apaixonado por design e fotografia há mais de 8 anos.',
+            experiencia: '8',
+            especializacao: 'Branding & Design Digital'
+          },
+          habilidades: {
+            lista: 'Photoshop - 95%\nIllustrator - 90%\nFigma - 85%\nFotografia - 80%'
+          },
+          portfolio: {
+            titulo: 'Meus Trabalhos',
+            descricao: 'Alguns dos meus projetos mais recentes'
+          },
+          contato: {
+            titulo: 'Vamos Trabalhar Juntos?',
+            email: 'joao@designer.com',
+            whatsapp: '5511999999999',
+            instagram: 'https://instagram.com/joaodesigner'
           }
         };
 
       case 'portfolio-developer':
         return {
           ...baseData,
-          'apresentacao-pessoal': {
-            titulo: 'Desenvolvedor Full Stack',
-            subtitulo: 'Código Limpo & Soluções Eficientes',
-            texto: 'Especialista em criar aplicações web modernas e escaláveis',
-            botaoTexto: 'Ver Projetos',
+          hero: {
+            nome: 'Maria Santos',
+            titulo: 'Full Stack Developer',
+            especializacao: 'React • Node.js • TypeScript',
+            github: 'https://github.com/mariasantos'
           },
-          habilidades: {
-            titulo: 'Tecnologias',
-            lista: 'React & TypeScript\nNode.js & Express\nPython & Django\nAWS & Docker'
+          tecnologias: {
+            frontend: 'React, Vue, Angular',
+            backend: 'Node.js, Python, PHP',
+            database: 'MongoDB, PostgreSQL, MySQL',
+            cloud: 'AWS, Docker, Kubernetes'
+          },
+          projetos: {
+            titulo: 'Projetos em Destaque',
+            quantidade: '50+'
+          },
+          contato: {
+            email: 'maria@dev.com',
+            linkedin: 'https://linkedin.com/in/mariasantos',
+            whatsapp: '5511999999999'
           }
         };
 
@@ -167,6 +216,9 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
           'produtos-destaque': {
             titulo: 'Produtos em Destaque',
             lista: 'Perfumes Importados\nCosméticos Premium\nCuidados Pessoais\nProdutos Naturais'
+          },
+          contato: {
+            whatsapp: '5511999999999'
           }
         };
 

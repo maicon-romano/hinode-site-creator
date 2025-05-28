@@ -28,6 +28,43 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
     return names[type] || type;
   };
 
+  const getTemplatePreview = (template: TemplateSchema) => {
+    const colors = {
+      'landing': 'from-blue-500 to-blue-600',
+      'institucional': 'from-gray-500 to-gray-600', 
+      'portfolio': 'from-purple-500 to-purple-600',
+      'hinode': 'from-pink-500 to-rose-500'
+    };
+
+    const icons = {
+      'landing-premium': '⚡',
+      'landing-conversion': '🎯',
+      'institucional-corporate': '🏢',
+      'portfolio-creative': '🎨',
+      'portfolio-developer': '💻',
+      'hinode-premium': '💄',
+      'hinode-landing': '🌹'
+    };
+
+    return (
+      <div className={`aspect-video bg-gradient-to-br ${colors[template.type]} rounded-lg mb-3 flex items-center justify-center relative overflow-hidden`}>
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
+        <div className="relative z-10 text-center text-white">
+          <div className="text-4xl mb-2">{icons[template.id] || '📄'}</div>
+          <div className="text-xs font-medium mb-2">{template.name}</div>
+          <div className="space-y-1">
+            <div className="w-16 h-1 bg-white/50 rounded mx-auto"></div>
+            <div className="w-12 h-1 bg-white/30 rounded mx-auto"></div>
+            <div className="w-20 h-1 bg-white/30 rounded mx-auto"></div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  console.log('TemplateSelector - Tipo selecionado:', selectedType);
+  console.log('TemplateSelector - Templates disponíveis:', templates);
+
   return (
     <div className="space-y-4">
       <div>
@@ -51,7 +88,7 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base">{template.name}</CardTitle>
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="secondary" className="text-xs capitalize">
                   {template.type}
                 </Badge>
               </div>
@@ -60,15 +97,7 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-purple-400/20"></div>
-                <div className="relative z-10 text-center">
-                  <div className="text-xs font-medium text-gray-600 mb-1">{template.name}</div>
-                  <div className="w-16 h-2 bg-white/50 rounded mb-1"></div>
-                  <div className="w-12 h-1 bg-white/30 rounded mb-1"></div>
-                  <div className="w-20 h-1 bg-white/30 rounded"></div>
-                </div>
-              </div>
+              {getTemplatePreview(template)}
               <Button 
                 variant={selectedTemplate === template.id ? "default" : "outline"}
                 size="sm" 
