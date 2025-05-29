@@ -1,11 +1,9 @@
 
 export const saveBase64Image = (base64: string, clienteId: string, fileName: string): string => {
-  // Since this is a frontend application, we'll create a blob URL for immediate use
-  // In a real implementation, this would send the base64 to a backend API
-  console.log(`Processing base64 image for client ${clienteId} as ${fileName}`);
+  console.log(`imageUtils - Processando imagem base64 para cliente ${clienteId} como ${fileName}`);
   
   try {
-    // Determine extension based on base64 prefix
+    // Determinar extensão baseada no prefixo base64
     let extension = '.jpg';
     if (base64.startsWith('data:image/png')) {
       extension = '.png';
@@ -15,10 +13,10 @@ export const saveBase64Image = (base64: string, clienteId: string, fileName: str
       extension = '.webp';
     }
     
-    // Ensure fileName has extension
+    // Garantir que fileName tenha extensão
     const fileNameWithExt = fileName.includes('.') ? fileName : `${fileName}${extension}`;
     
-    // Create blob from base64
+    // Criar blob do base64
     const byteCharacters = atob(base64.split(',')[1]);
     const byteNumbers = new Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
@@ -26,57 +24,72 @@ export const saveBase64Image = (base64: string, clienteId: string, fileName: str
     }
     const byteArray = new Uint8Array(byteNumbers);
     
-    // Determine MIME type
+    // Determinar MIME type
     const mimeType = base64.split(',')[0].split(':')[1].split(';')[0];
     const blob = new Blob([byteArray], { type: mimeType });
     
-    // Create object URL for immediate use
+    // Criar object URL para uso imediato
     const blobUrl = URL.createObjectURL(blob);
     
-    // Store the blob URL in a global map for later retrieval
+    // Armazenar a blob URL em um mapa global para recuperação posterior
     if (!window.imageCache) {
       window.imageCache = new Map();
     }
+    
     const publicPath = `/sites/${clienteId}/${fileNameWithExt}`;
     window.imageCache.set(publicPath, blobUrl);
     
-    console.log(`Base64 image converted to blob URL: ${publicPath} -> ${blobUrl}`);
+    console.log(`imageUtils - Imagem base64 convertida para blob URL: ${publicPath} -> ${blobUrl}`);
     
-    // Return the expected public path
+    // Retornar o caminho público esperado
     return publicPath;
   } catch (error) {
-    console.error('Error processing base64 image:', error);
-    // Return a fallback or null to avoid 404s
+    console.error('imageUtils - Erro ao processar imagem base64:', error);
+    // Retornar string vazia para evitar 404s
     return '';
   }
 };
 
 export const createSitesDirectory = (clienteId: string) => {
-  console.log(`Creating sites directory for client: ${clienteId}`);
-  // This would be handled by backend in a real implementation
-  // For now, we just ensure our imageCache is initialized
+  console.log(`imageUtils - Criando diretório de sites para cliente: ${clienteId}`);
+  // Isso seria tratado pelo backend em uma implementação real
+  // Por enquanto, apenas garantimos que nosso imageCache esteja inicializado
   if (!window.imageCache) {
     window.imageCache = new Map();
   }
+  if (!window.logoCache) {
+    window.logoCache = new Map();
+  }
 };
 
-// Helper function to get the actual URL for an image path
+// Função auxiliar para obter a URL real de uma imagem
 export const getImageUrl = (imagePath: string): string => {
   if (!imagePath) return '';
   
-  // If it's already a blob URL or full URL, return as is
-  if (imagePath.startsWith('blob:') || imagePath.startsWith('http')) {
+  console.log('imageUtils - Obtendo URL para:', imagePath);
+  
+  // Se já é uma blob URL ou URL completa, retornar como está
+  if (imagePath.startsWith('blob:') || imagePath.startsWith('http') || imagePath.startsWith('data:')) {
     return imagePath;
   }
   
-  // Check our image cache for blob URLs
+  // Verificar nosso cache de imagens para blob URLs
   if (window.imageCache && window.imageCache.has(imagePath)) {
-    return window.imageCache.get(imagePath);
+    const cachedUrl = window.imageCache.get(imagePath);
+    console.log('imageUtils - URL encontrada no cache:', imagePath, '->', cachedUrl);
+    return cachedUrl;
   }
   
-  // If it starts with /sites/, it's our expected format
+  // Verificar cache de logos
+  if (window.logoCache && window.logoCache.has(imagePath)) {
+    const cachedUrl = window.logoCache.get(imagePath);
+    console.log('imageUtils - Logo encontrada no cache:', imagePath, '->', cachedUrl);
+    return cachedUrl;
+  }
+  
+  // Se começa com /sites/, é nosso formato esperado
   if (imagePath.startsWith('/sites/')) {
-    // For now, return the path as-is and let the browser handle 404s gracefully
+    console.log('imageUtils - Caminho de sites, retornando como está:', imagePath);
     return imagePath;
   }
   
@@ -95,7 +108,7 @@ const isYouTubeUrl = (value: any): boolean => {
 export const convertYouTubeToEmbed = (url: string): string => {
   if (!isYouTubeUrl(url)) return url;
   
-  console.log('Converting YouTube URL to embed format:', url);
+  console.log('imageUtils - Convertendo URL do YouTube para embed:', url);
   
   // Se já é uma URL de embed, retorna como está
   if (url.includes('youtube.com/embed/')) {
@@ -119,46 +132,49 @@ export const convertYouTubeToEmbed = (url: string): string => {
     
     if (videoId) {
       const embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&showinfo=0`;
-      console.log('YouTube URL converted:', url, '->', embedUrl);
+      console.log('imageUtils - URL do YouTube convertida:', url, '->', embedUrl);
       return embedUrl;
     }
   } catch (error) {
-    console.error('Error converting YouTube URL:', error);
+    console.error('imageUtils - Erro ao converter URL do YouTube:', error);
   }
   
   return url; // Retorna a URL original se não conseguir converter
 };
 
 export const processImageData = (data: any, clienteId: string): any => {
+  console.log('imageUtils - Processando dados de imagem para cliente:', clienteId);
+  console.log('imageUtils - Dados recebidos:', data);
+  
   const processedData = { ...data };
   
-  // Create client directory
+  // Criar diretório do cliente
   createSitesDirectory(clienteId);
   
-  // Function to recursively process nested objects
+  // Função para processar objetos recursivamente
   const processObject = (obj: any, prefix = ''): any => {
     const processed: any = {};
     
     for (const [key, value] of Object.entries(obj)) {
       if (isBase64Image(value)) {
-        // This is a base64 image - convert to file path
+        // Esta é uma imagem base64 - converter para caminho de arquivo
         const fileName = prefix ? `${prefix}_${key}` : key;
-        console.log(`Converting base64 image for field: ${fileName}`);
+        console.log(`imageUtils - Convertendo imagem base64 para campo: ${fileName}`);
         
-        // Save the image and get the file path
+        // Salvar a imagem e obter o caminho do arquivo
         const imagePath = saveBase64Image(value as string, clienteId, fileName);
         
-        // If saving failed, use empty string instead of base64 to avoid Firestore issues
+        // Se o salvamento falhou, usar string vazia em vez de base64 para evitar problemas no Firestore
         processed[key] = imagePath || '';
         
-        console.log(`Base64 image converted to: ${imagePath || 'fallback'}`);
+        console.log(`imageUtils - Imagem base64 convertida para: ${imagePath || 'fallback'}`);
       } else if (isYouTubeUrl(value)) {
-        // This is a YouTube URL - convert to embed format
-        console.log(`Converting YouTube URL for field: ${key}`);
+        // Esta é uma URL do YouTube - converter para formato embed
+        console.log(`imageUtils - Convertendo URL do YouTube para campo: ${key}`);
         const embedUrl = convertYouTubeToEmbed(value as string);
         processed[key] = embedUrl;
       } else if (Array.isArray(value)) {
-        // Process arrays (like product cards)
+        // Processar arrays (como cards de produtos)
         processed[key] = value.map((item, index) => {
           if (typeof item === 'object' && item !== null) {
             return processObject(item, `${prefix || key}${index + 1}`);
@@ -166,10 +182,10 @@ export const processImageData = (data: any, clienteId: string): any => {
           return item;
         });
       } else if (typeof value === 'object' && value !== null) {
-        // Process nested objects
+        // Processar objetos aninhados
         processed[key] = processObject(value, prefix ? `${prefix}_${key}` : key);
       } else {
-        // Primitive value, keep as is
+        // Valor primitivo, manter como está
         processed[key] = value;
       }
     }
@@ -177,10 +193,12 @@ export const processImageData = (data: any, clienteId: string): any => {
     return processed;
   };
   
-  return processObject(processedData);
+  const result = processObject(processedData);
+  console.log('imageUtils - Dados processados:', result);
+  return result;
 };
 
-// Helper function to detect all base64 images in an object
+// Função auxiliar para detectar todas as imagens base64 em um objeto
 export const detectBase64Images = (obj: any, path = ''): string[] => {
   const images: string[] = [];
   
@@ -203,9 +221,10 @@ export const detectBase64Images = (obj: any, path = ''): string[] => {
   return images;
 };
 
-// Extend window interface for TypeScript
+// Estender interface window para TypeScript
 declare global {
   interface Window {
     imageCache: Map<string, string>;
+    logoCache: Map<string, string>;
   }
 }

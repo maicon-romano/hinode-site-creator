@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Phone, ArrowRight, Award, Users, Star, Mail, MapPin, Heart } from 'lucide-react';
+import { getImageUrl } from '@/lib/imageUtils';
 
 interface SiteData {
   nomeDoSite: string;
@@ -88,7 +89,7 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
     }
   };
 
-  // Extract section data
+  // Extrair dados das seções com fallbacks seguros
   const heroHinode = siteData['hero-hinode'] || {};
   const bio = siteData.bio || {};
   const sobreHinode = siteData['sobre-hinode'] || {};
@@ -106,6 +107,12 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
     contato,
     rodapeHinode
   });
+
+  // Função auxiliar para obter URL de imagem
+  const getSafeImageUrl = (imagePath?: string): string => {
+    if (!imagePath) return '';
+    return getImageUrl(imagePath);
+  };
 
   return (
     <div className="min-h-screen w-full">
@@ -130,9 +137,13 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
               <div className="text-center lg:text-left">
                 {siteData.logoPath && (
                   <img 
-                    src={siteData.logoPath} 
+                    src={getSafeImageUrl(siteData.logoPath)} 
                     alt="Logo" 
                     className="h-16 w-auto mb-8 mx-auto lg:mx-0 animate-fade-in"
+                    onError={(e) => {
+                      console.log('Erro ao carregar logo:', siteData.logoPath);
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
                   />
                 )}
                 
@@ -172,6 +183,7 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
                         src={heroHinode.video.replace('watch?v=', 'embed/')}
                         className="w-full h-full"
                         allowFullScreen
+                        title="Vídeo de apresentação"
                       />
                     </div>
                   </div>
@@ -205,9 +217,11 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
                 {bio.texto && (
                   <div className="text-lg leading-relaxed space-y-4 animate-fade-in animation-delay-2000" style={{ color: siteData.cores.texto }}>
                     {bio.texto.split('\n').map((paragraph: string, index: number) => (
-                      <p key={index} className="animate-fade-in" style={{ animationDelay: `${(index + 3) * 200}ms` }}>
-                        {paragraph}
-                      </p>
+                      paragraph.trim() && (
+                        <p key={index} className="animate-fade-in" style={{ animationDelay: `${(index + 3) * 200}ms` }}>
+                          {paragraph}
+                        </p>
+                      )
                     ))}
                   </div>
                 )}
@@ -234,7 +248,15 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
               <div className="order-1 lg:order-2">
                 {bio.imagem ? (
                   <div className="relative animate-scale-in">
-                    <img src={bio.imagem} alt="Biografia" className="w-full rounded-2xl shadow-2xl" />
+                    <img 
+                      src={getSafeImageUrl(bio.imagem)} 
+                      alt="Biografia" 
+                      className="w-full rounded-2xl shadow-2xl"
+                      onError={(e) => {
+                        console.log('Erro ao carregar imagem da bio:', bio.imagem);
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent rounded-2xl"></div>
                   </div>
                 ) : (
@@ -272,7 +294,15 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
               <div className="animate-fade-in animation-delay-2000">
                 {sobreHinode.imagem ? (
                   <div className="relative">
-                    <img src={sobreHinode.imagem} alt="Hinode" className="w-full rounded-2xl shadow-xl" />
+                    <img 
+                      src={getSafeImageUrl(sobreHinode.imagem)} 
+                      alt="Hinode" 
+                      className="w-full rounded-2xl shadow-xl"
+                      onError={(e) => {
+                        console.log('Erro ao carregar imagem Hinode:', sobreHinode.imagem);
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
                     <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-xl">
                       <Award className="h-8 w-8 text-white" />
                     </div>
@@ -291,9 +321,11 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
                 {sobreHinode.texto && (
                   <div className="text-lg leading-relaxed space-y-4 animate-fade-in animation-delay-1000" style={{ color: siteData.cores.texto }}>
                     {sobreHinode.texto.split('\n').map((paragraph: string, index: number) => (
-                      <p key={index} className="animate-fade-in" style={{ animationDelay: `${(index + 3) * 300}ms` }}>
-                        {paragraph}
-                      </p>
+                      paragraph.trim() && (
+                        <p key={index} className="animate-fade-in" style={{ animationDelay: `${(index + 3) * 300}ms` }}>
+                          {paragraph}
+                        </p>
+                      )
                     ))}
                   </div>
                 )}
@@ -359,9 +391,13 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
                     {card.imagem && (
                       <div className="overflow-hidden rounded-lg mb-4">
                         <img 
-                          src={card.imagem} 
+                          src={getSafeImageUrl(card.imagem)} 
                           alt={card.titulo} 
-                          className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300" 
+                          className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            console.log('Erro ao carregar imagem do produto:', card.imagem);
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
                         />
                       </div>
                     )}
