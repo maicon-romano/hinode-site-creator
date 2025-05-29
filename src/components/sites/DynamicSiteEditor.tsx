@@ -143,6 +143,11 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
     console.log('Logo updated:', logoPath);
   };
 
+  const handleColorChange = (colors: any) => {
+    setValue('cores', colors);
+    console.log('Colors updated:', colors);
+  };
+
   const handlePreviewClick = () => {
     const currentValues = getValues();
     const activeSections = currentValues.activeSections || [];
@@ -214,7 +219,10 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
                 <Separator />
 
                 {/* Color Selector */}
-                <ColorSelector />
+                <ColorSelector 
+                  colors={getValues('cores')}
+                  onColorChange={handleColorChange}
+                />
 
                 <Separator />
 
@@ -225,7 +233,10 @@ export const DynamicSiteEditor: React.FC<DynamicSiteEditorProps> = ({
                       <h3 className="text-lg font-semibold">{section.name}</h3>
                       <Badge variant="secondary">{section.id}</Badge>
                     </div>
-                    <DynamicFields fields={section.fields} prefix={section.id} />
+                    <DynamicFields 
+                      fields={section.fields} 
+                      prefix={section.id} 
+                    />
                     <Separator />
                   </div>
                 ))}

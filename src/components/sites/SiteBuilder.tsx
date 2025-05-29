@@ -1,8 +1,9 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { DynamicSiteEditor } from './DynamicSiteEditor';
 import hinodeModel from '@/models/hinode.json';
@@ -32,7 +33,7 @@ export const SiteBuilder: React.FC = () => {
         }
 
         // Fetch existing data from Firestore
-        const siteDoc = await doc(db, 'sites', docId).get();
+        const siteDoc = await getDoc(doc(db, 'sites', docId));
         if (siteDoc.exists()) {
           console.log('Existing site data:', siteDoc.data());
           setInitialData(siteDoc.data());
@@ -67,7 +68,7 @@ export const SiteBuilder: React.FC = () => {
         // Admin creating for a client
         docId = data.clientId;
       } else {
-        // Client creating their own site
+        // Client creating/editing their own site
         docId = currentUser.uid;
       }
 
