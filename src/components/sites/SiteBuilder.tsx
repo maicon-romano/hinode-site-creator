@@ -1,117 +1,168 @@
 
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Form } from '@/components/ui/form';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ClientSelector } from './ClientSelector';
+import { ModelSelector } from './ModelSelector';
 import { DynamicSiteEditor } from './DynamicSiteEditor';
-import hinodeModel from '@/models/hinode.json';
 
-export const SiteBuilder: React.FC = () => {
-  const { currentUser, userData } = useAuth();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
-  const [initialData, setInitialData] = useState<any>(null);
+interface SiteBuilderProps {
+  initialData?: any;
+  onSubmit: (data: any) => void;
+  isEditing?: boolean;
+}
 
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      if (!currentUser) {
-        console.error('User not authenticated');
-        return;
-      }
+export const SiteBuilder: React.FC<SiteBuilderProps> = ({
+  initialData,
+  onSubmit,
+  isEditing = false
+}) => {
+  const [step, setStep] = useState(1);
+  const [selectedClient, setSelectedClient] = useState(initialData?.clientId || '');
+  const [clientName, setClientName] = useState(initialData?.clientName || '');
+  const [selectedModel, setSelectedModel] = useState(initialData?.modelId || '');
 
-      try {
-        // Determine the document ID based on user type
-        let docId;
-        if (userData?.tipo === 'admin' && userData?.selectedClient) {
-          // Admin creating/editing for a client
-          docId = userData.selectedClient;
-        } else {
-          // Client creating/editing their own site
-          docId = currentUser.uid;
-        }
-
-        // Fetch existing data from Firestore
-        const siteDoc = await getDoc(doc(db, 'sites', docId));
-        if (siteDoc.exists()) {
-          console.log('Existing site data:', siteDoc.data());
-          setInitialData(siteDoc.data());
-        } else {
-          console.log('No existing site data found, starting with a blank slate.');
-          setInitialData(null);
-        }
-      } catch (error) {
-        console.error('Error fetching initial data:', error);
-        toast.error('Erro ao carregar os dados do site. Tente novamente.');
-      }
-    };
-
-    fetchInitialData();
-  }, [currentUser, userData]);
-
-  const handleSiteSubmit = async (data: any) => {
-    if (!currentUser) {
-      console.error('User not authenticated');
-      return;
+  const form = useForm({
+    defaultValues: {
+      clientId: selectedClient,
+      clientName: clientName,
+      modelId: selectedModel,
+      ...initialData
     }
+  });
 
-    try {
-      setIsSubmitting(true);
-      console.log('Submitting site data:', data);
+  const steps = [
+    { number: 1, title: 'Cliente', description: 'Selecione o cliente' },
+    { number: 2, title: 'Modelo', description: 'Escolha o modelo do site' },
+    { number: 3, title: 'Conteúdo', description: 'Configure o site' }
+  ];
 
-      // Determine the collection and document ID based on user type
-      let docId;
-      let collectionName = 'sites';
-      
-      if (userData?.tipo === 'admin' && data.clientId) {
-        // Admin creating for a client
-        docId = data.clientId;
-      } else {
-        // Client creating/editing their own site
-        docId = currentUser.uid;
-      }
-
-      console.log('Saving to document ID:', docId);
-
-      // Save to Firestore
-      await setDoc(doc(db, collectionName, docId), {
-        ...data,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        userId: currentUser.uid,
-        createdBy: userData?.tipo === 'admin' ? 'admin' : 'client'
-      }, { merge: true });
-
-      console.log('Site saved successfully!');
-      
-      // Show success message
-      toast.success('Site salvo com sucesso!');
-      
-      // Redirect to sites management or preview
-      if (userData?.tipo === 'admin') {
-        navigate('/manage-sites');
-      } else {
-        navigate(`/cliente/${docId}`);
-      }
-    } catch (error) {
-      console.error('Error saving site:', error);
-      toast.error('Erro ao salvar o site. Tente novamente.');
-    } finally {
-      setIsSubmitting(false);
+  const canProceedToStep = (stepNumber: number): boolean => {
+    switch (stepNumber) {
+      case 2: return !!selectedClient;
+      case 3: return !!selectedClient && !!selectedModel;
+      default: return true;
     }
   };
 
+  const handleNext = () => {
+    if (step < 3 && canProceedToStep(step + 1)) {
+      setStep(step + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (step > 1) {
+      setStep(step - 1);
+    }
+  };
+
+  const handleClientChange = (clientId: string) => {
+    setSelectedClient(clientId);
+    form.setValue('clientId', clientId);
+  };
+
+  const handleClientDataChange = (name: string) => {
+    setClientName(name);
+    form.setValue('clientName', name);
+  };
+
+  const handleModelSelect = (modelId: string) => {
+    setSelectedModel(modelId);
+    form.setValue('modelId', modelId);
+  };
+
   return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-semibold mb-6">
-        {userData?.tipo === 'admin' ? 'Criar Site para Cliente' : 'Personalize Seu Site'}
-      </h1>
-      <DynamicSiteEditor
-        modelConfig={hinodeModel}
-        onSubmit={handleSiteSubmit}
-        initialData={initialData}
-      />
-    </div>
+    <Form {...form}>
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Progress Steps */}
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              {steps.map((stepItem, index) => (
+                <div key={stepItem.number} className="flex items-center">
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
+                    step >= stepItem.number
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-gray-200 text-gray-600'
+                  }`}>
+                    {stepItem.number}
+                  </div>
+                  <div className="ml-3 hidden sm:block">
+                    <p className="text-sm font-medium">{stepItem.title}</p>
+                    <p className="text-xs text-gray-500">{stepItem.description}</p>
+                  </div>
+                  {index < steps.length - 1 && (
+                    <div className={`w-12 h-0.5 mx-4 ${
+                      step > stepItem.number ? 'bg-primary' : 'bg-gray-200'
+                    }`} />
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Step Content */}
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {steps[step - 1].title}: {steps[step - 1].description}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {step === 1 && (
+              <ClientSelector
+                value={selectedClient}
+                onValueChange={handleClientChange}
+                onClientDataChange={handleClientDataChange}
+              />
+            )}
+
+            {step === 2 && (
+              <ModelSelector
+                selectedModel={selectedModel}
+                onModelSelect={handleModelSelect}
+              />
+            )}
+
+            {step === 3 && selectedModel && (
+              <DynamicSiteEditor
+                templateId={selectedModel}
+                clientId={selectedClient}
+                clientName={clientName}
+                initialData={initialData}
+                onSubmit={onSubmit}
+                isEditing={isEditing}
+              />
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Navigation */}
+        {step < 3 && (
+          <div className="flex justify-between">
+            <Button
+              variant="outline"
+              onClick={handlePrevious}
+              disabled={step === 1}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Anterior
+            </Button>
+            <Button
+              onClick={handleNext}
+              disabled={!canProceedToStep(step + 1)}
+            >
+              Próximo
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        )}
+      </div>
+    </Form>
   );
 };

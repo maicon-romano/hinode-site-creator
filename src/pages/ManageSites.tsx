@@ -323,7 +323,11 @@ const ManageSites = () => {
                 {editingSite ? 'Edite as configurações do site usando o construtor visual.' : 'Use o construtor de sites para criar um site personalizado.'}
               </DialogDescription>
             </DialogHeader>
-            <SiteBuilder />
+            <SiteBuilder
+              initialData={editingSite || undefined}
+              onSubmit={onSubmit}
+              isEditing={!!editingSite}
+            />
           </DialogContent>
         </Dialog>
 
