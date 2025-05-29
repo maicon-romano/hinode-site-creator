@@ -88,7 +88,7 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
     }
   };
 
-  // Extract section data
+  // Extract section data with safe defaults
   const heroHinode = siteData['hero-hinode'] || {};
   const bio = siteData.bio || {};
   const sobreHinode = siteData['sobre-hinode'] || {};
@@ -104,19 +104,28 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
     sobreHinode,
     produtosDestaque,
     contato,
-    rodapeHinode
+    rodapeHinode,
+    whatsappNumber
   });
 
+  // CSS Variables para cores
+  const cssVars = {
+    '--cor-principal': siteData.cores?.principal || '#0066cc',
+    '--cor-fundo': siteData.cores?.fundo || '#ffffff',
+    '--cor-destaque': siteData.cores?.destaque || '#ff6b35',
+    '--cor-texto': siteData.cores?.texto || '#333333',
+    '--cor-degrade-inicio': siteData.cores?.degradeHero?.inicio || '#0067c7',
+    '--cor-degrade-fim': siteData.cores?.degradeHero?.fim || '#00ffcc',
+  } as React.CSSProperties;
+
   return (
-    <div className="min-h-screen w-full">
+    <div className="min-h-screen w-full" style={cssVars}>
       {/* Hero Section */}
       {siteData.activeSections?.includes('hero-hinode') && (
         <section 
           className="relative py-16 lg:py-20 px-4 min-h-screen flex items-center overflow-hidden w-full text-white"
           style={{ 
-            background: siteData.cores.degradeHero ? 
-              `linear-gradient(135deg, ${siteData.cores.degradeHero.inicio}, ${siteData.cores.degradeHero.fim})` :
-              `linear-gradient(135deg, #0067c7, #00ffcc)`
+            background: `linear-gradient(135deg, var(--cor-degrade-inicio), var(--cor-degrade-fim))`
           }}
         >
           {/* Background decoration */}
@@ -156,7 +165,7 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
                   <Button
                     onClick={() => handleWhatsAppClick(whatsappNumber)}
                     className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-xl text-white animate-fade-in animation-delay-2000 group"
-                    style={{ backgroundColor: siteData.cores.destaque }}
+                    style={{ backgroundColor: 'var(--cor-destaque)' }}
                   >
                     {heroHinode.botaoTexto || 'Fale Comigo'}
                     <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -187,23 +196,25 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
       )}
 
       {/* Bio Section */}
-      {siteData.activeSections?.includes('bio') && (
-        <section className="py-20 px-4 relative" style={{ backgroundColor: siteData.cores.fundo }}>
+      {siteData.activeSections?.includes('bio') && bio && (
+        <section className="py-20 px-4 relative" style={{ backgroundColor: 'var(--cor-fundo)' }}>
           <div className="container mx-auto max-w-6xl">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div className="order-2 lg:order-1">
-                <h2 className="text-4xl lg:text-5xl font-bold mb-6 animate-fade-in" style={{ color: siteData.cores.principal }}>
-                  {bio.titulo || 'Sobre Mim'}
-                </h2>
+                {bio.titulo && (
+                  <h2 className="text-4xl lg:text-5xl font-bold mb-6 animate-fade-in" style={{ color: 'var(--cor-principal)' }}>
+                    {bio.titulo}
+                  </h2>
+                )}
 
                 {bio.subtitulo && (
-                  <h3 className="text-2xl mb-8 animate-fade-in animation-delay-1000" style={{ color: siteData.cores.destaque }}>
+                  <h3 className="text-2xl mb-8 animate-fade-in animation-delay-1000" style={{ color: 'var(--cor-destaque)' }}>
                     {bio.subtitulo}
                   </h3>
                 )}
 
                 {bio.texto && (
-                  <div className="text-lg leading-relaxed space-y-4 animate-fade-in animation-delay-2000" style={{ color: siteData.cores.texto }}>
+                  <div className="text-lg leading-relaxed space-y-4 animate-fade-in animation-delay-2000" style={{ color: 'var(--cor-texto)' }}>
                     {bio.texto.split('\n').map((paragraph: string, index: number) => (
                       <p key={index} className="animate-fade-in" style={{ animationDelay: `${(index + 3) * 200}ms` }}>
                         {paragraph}
@@ -215,7 +226,7 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
                 {bio.experiencia && (
                   <div className="mt-6 p-4 bg-white rounded-lg shadow-sm">
                     <p className="text-sm text-gray-600">Experiência</p>
-                    <p className="font-semibold" style={{ color: siteData.cores.principal }}>{bio.experiencia}</p>
+                    <p className="font-semibold" style={{ color: 'var(--cor-principal)' }}>{bio.experiencia}</p>
                   </div>
                 )}
 
@@ -223,7 +234,7 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
                   <Button
                     onClick={() => handleWhatsAppClick(whatsappNumber)}
                     className="inline-flex items-center gap-2 px-6 py-3 mt-6 font-semibold rounded-lg transition-all duration-300 hover:scale-105 text-white"
-                    style={{ backgroundColor: siteData.cores.destaque }}
+                    style={{ backgroundColor: 'var(--cor-destaque)' }}
                   >
                     {bio.botaoTexto || 'Entre em Contato'}
                     <ArrowRight className="h-4 w-4" />
@@ -404,13 +415,13 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
 
       {/* Contato */}
       {siteData.activeSections?.includes('contato') && (
-        <section className="py-16 px-4" style={{ backgroundColor: `${siteData.cores.principal}10` }}>
+        <section className="py-16 px-4" style={{ backgroundColor: `var(--cor-principal)10` }}>
           <div className="container mx-auto max-w-4xl">
-            <h2 className="text-3xl font-bold text-center mb-6" style={{ color: siteData.cores.principal }}>
+            <h2 className="text-3xl font-bold text-center mb-6" style={{ color: 'var(--cor-principal)' }}>
               {contato.titulo || 'Entre em Contato'}
             </h2>
             {contato.subtitulo && (
-              <p className="text-center text-lg mb-12" style={{ color: siteData.cores.texto }}>
+              <p className="text-center text-lg mb-12" style={{ color: 'var(--cor-texto)' }}>
                 {contato.subtitulo}
               </p>
             )}
@@ -418,8 +429,8 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {(contato.whatsapp || whatsappNumber) && (
                 <div className="text-center p-6 bg-white rounded-lg shadow-sm">
-                  <Phone className="h-8 w-8 mx-auto mb-4" style={{ color: siteData.cores.destaque }} />
-                  <h4 className="font-semibold mb-2" style={{ color: siteData.cores.texto }}>WhatsApp</h4>
+                  <Phone className="h-8 w-8 mx-auto mb-4" style={{ color: 'var(--cor-destaque)' }} />
+                  <h4 className="font-semibold mb-2" style={{ color: 'var(--cor-texto)' }}>WhatsApp</h4>
                   <Button
                     onClick={() => handleWhatsAppClick(contato.whatsapp || whatsappNumber)}
                     className="text-green-600 hover:underline font-medium bg-transparent border-0 p-0 h-auto"
@@ -430,25 +441,25 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
               )}
               {contato.telefone && (
                 <div className="text-center p-6 bg-white rounded-lg shadow-sm">
-                  <Phone className="h-8 w-8 mx-auto mb-4" style={{ color: siteData.cores.destaque }} />
-                  <h4 className="font-semibold mb-2" style={{ color: siteData.cores.texto }}>Telefone</h4>
-                  <p style={{ color: siteData.cores.texto }}>{contato.telefone}</p>
+                  <Phone className="h-8 w-8 mx-auto mb-4" style={{ color: 'var(--cor-destaque)' }} />
+                  <h4 className="font-semibold mb-2" style={{ color: 'var(--cor-texto)' }}>Telefone</h4>
+                  <p style={{ color: 'var(--cor-texto)' }}>{contato.telefone}</p>
                 </div>
               )}
               {contato.email && (
                 <div className="text-center p-6 bg-white rounded-lg shadow-sm">
-                  <Mail className="h-8 w-8 mx-auto mb-4" style={{ color: siteData.cores.destaque }} />
-                  <h4 className="font-semibold mb-2" style={{ color: siteData.cores.texto }}>E-mail</h4>
-                  <a href={`mailto:${contato.email}`} className="hover:underline" style={{ color: siteData.cores.destaque }}>
+                  <Mail className="h-8 w-8 mx-auto mb-4" style={{ color: 'var(--cor-destaque)' }} />
+                  <h4 className="font-semibold mb-2" style={{ color: 'var(--cor-texto)' }}>E-mail</h4>
+                  <a href={`mailto:${contato.email}`} className="hover:underline" style={{ color: 'var(--cor-destaque)' }}>
                     {contato.email}
                   </a>
                 </div>
               )}
               {contato.endereco && (
                 <div className="text-center p-6 bg-white rounded-lg shadow-sm">
-                  <MapPin className="h-8 w-8 mx-auto mb-4" style={{ color: siteData.cores.destaque }} />
-                  <h4 className="font-semibold mb-2" style={{ color: siteData.cores.texto }}>Endereço</h4>
-                  <p style={{ color: siteData.cores.texto }}>{contato.endereco}</p>
+                  <MapPin className="h-8 w-8 mx-auto mb-4" style={{ color: 'var(--cor-destaque)' }} />
+                  <h4 className="font-semibold mb-2" style={{ color: 'var(--cor-texto)' }}>Endereço</h4>
+                  <p style={{ color: 'var(--cor-texto)' }}>{contato.endereco}</p>
                 </div>
               )}
             </div>
@@ -458,7 +469,7 @@ export const RepresentanteHinodeSite: React.FC<RepresentanteHinodeSiteProps> = (
 
       {/* Rodapé */}
       {siteData.activeSections?.includes('rodape-hinode') && (
-        <footer className="py-8 px-4" style={{ backgroundColor: siteData.cores.principal }}>
+        <footer className="py-8 px-4" style={{ backgroundColor: 'var(--cor-principal)' }}>
           <div className="container mx-auto max-w-6xl text-center text-white">
             <p className="opacity-90">
               {rodapeHinode.texto || `© 2024 ${siteData.nomeDoSite}. Todos os direitos reservados.`}
