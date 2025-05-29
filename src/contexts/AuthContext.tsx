@@ -11,6 +11,7 @@ export interface UserData {
   tipo: 'admin' | 'cliente';
   name?: string;
   createdAt: Date;
+  selectedClient?: string;
 }
 
 interface AuthContextType {
